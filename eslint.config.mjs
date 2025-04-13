@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
@@ -10,7 +11,27 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
-];
+   ...compat.extends('next/core-web-vitals', 'next/typescript'),
+   {
+      rules: {
+         'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
+         'comma-dangle': [
+            'error',
+            {
+               arrays: 'always',
+               objects: 'always',
+               imports: 'always',
+               exports: 'always',
+               functions: 'always',
+            },
+         ], // trailingComma: "all"
+         indent: ['error', 3], // tabWidth: 3
+         semi: ['error', 'never'], // semi: false
+         quotes: ['error', 'single'], // singleQuote: true
+         'max-len': ['error', { code: 120 }], // printWidth: 120
+         'arrow-parens': ['error', 'as-needed'], // arrowParens: "avoid"
+      },
+   },
+]
 
 export default eslintConfig;
