@@ -1,0 +1,46 @@
+import * as React from 'react'
+import { Slot } from '@radix-ui/react-slot'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { cn } from '@/lib/utils'
+
+const buttonVariants = cva(
+   'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*="size-"])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+   {
+      variants: {
+         variant: {
+            fill: 'bg-[var(--color-primary-500)] text-[var(--color-base-white)] hover:bg-[var(--color-primary-600)] cursor-pointer',
+            stroke:
+               'color-base-white border border-primary-500 text-primary-500 disabled:border-primary-300 disabled:text-primary-300 cursor-pointer',
+            text: 'text-[var(--color-primary-500)] hover:bg-[var(--color-primary-100)] cursor-pointer',
+         },
+         size: {
+            XXL: 'w-[174px] h-[60px] px-5 py-4 rounded-md text-xl',
+            XL: 'w-[167px] h-[54px] px-5 py-3.5 rounded-md text-lg',
+            L: 'w-[167px] h-[50px] px-5 py-3 rounded-md text-base',
+            M: 'w-[153px] h-11 px-5 py-2.5 rounded-md text-sm',
+            S: 'w-[153px] h-10 px-5 py-2 rounded-md text-xs',
+            XS: 'w-[139px] h-10 px-5 py-1.5 rounded-md text-xs',
+         },
+      },
+      defaultVariants: {
+         variant: 'fill',
+         size: 'M',
+      },
+   },
+)
+
+function Button({
+   className,
+   variant,
+   size,
+   asChild = false,
+   ...props
+}: React.ComponentProps<'button'> &
+   VariantProps<typeof buttonVariants> & {
+      asChild?: boolean
+   }) {
+   const Comp = asChild ? Slot : 'button'
+   return <Comp data-slot='button' className={cn(buttonVariants({ variant, size, className }))} {...props} />
+}
+
+export { Button, buttonVariants }
