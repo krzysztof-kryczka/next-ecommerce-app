@@ -42,8 +42,8 @@ const RegistrationSuccess = () => {
                   console.log('Flaga wygasła, przekierowanie na stronę główną.')
                   sessionStorage.removeItem('registered')
                   setIsAuthorized(false)
-                  router.push('/')
                   clearInterval(intervalId)
+                  router.push('/')
                   return null
                }
             })

@@ -1,31 +1,36 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { registerSchema, RegisterFormData } from '@/schema/registerSchema'
 import { countries } from 'countries-list'
-import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import { toast } from 'react-toastify'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
 const RegisterPage: React.FC = () => {
-   const {
-      register,
-      handleSubmit,
-      formState: { errors },
-   } = useForm<RegisterFormData>({
+   const form = useForm<RegisterFormData>({
       resolver: zodResolver(registerSchema),
+      defaultValues: {
+         email: '',
+         phone: '',
+         password: '',
+         repeatPassword: '',
+         country: 'Poland',
+      },
    })
 
+   const {
+      register,
+      formState: { errors },
+   } = form
+
    const router = useRouter()
-
-   const [showPassword, setShowPassword] = useState(false)
-   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-
-   const togglePasswordVisibility = () => setShowPassword(prev => !prev)
-   const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(prev => !prev)
 
    const countryNames = Object.values(countries).map(country => country.name)
 
@@ -61,143 +66,179 @@ const RegisterPage: React.FC = () => {
             <span className='text-[var(--color-primary-400)]'>Nexus</span>
             <span className='text-[var(--color-base-white)]'>Hub</span>
          </p>
-
-         <form
-            className='flex w-full max-w-md flex-col gap-y-6 rounded-md bg-[var(--color-gray-900)] p-6 text-white shadow-lg'
-            onSubmit={handleSubmit(onSubmit)}
-         >
-            <h2 className='text-left text-2xl font-medium'>Create Account</h2>
-            <hr className='border-t border-[var(--color-gray-800)]' />
-            <div>
-               <label className='block pb-4 text-lg font-medium' htmlFor='email'>
-                  Email
-               </label>
-               <input
-                  type='email'
-                  id='email'
-                  placeholder='Your Email'
-                  {...register('email')}
-                  className={`w-full rounded-md border bg-[var(--color-gray-900)] px-5 py-3.5 text-base text-[var(--color-base-white)] placeholder-[var(--color-neutral-300)] focus:border-[var(--color-warning-500)] ${errors.email ? 'border-[var(--color-danger-500)]' : 'border-[var(--color-neutral-500)]'}`}
-               />
-               {errors.email && <p className='pt-2 text-sm text-[var(--color-danger-500)]'>{errors.email.message}</p>}
-            </div>
-            <div>
-               <label className='block pb-4 text-lg font-medium' htmlFor='phone'>
-                  Mobile Number
-               </label>
-               <input
-                  type='tel'
-                  id='phone'
-                  placeholder='Mobile Number'
-                  {...register('phone')}
-                  className={`w-full rounded-md border bg-[var(--color-gray-900)] px-5 py-3.5 text-base text-[var(--color-base-white)] placeholder-[var(--color-neutral-300)] focus:border-[var(--color-warning-500)] ${errors.phone ? 'border-[var(--color-danger-500)]' : 'border-[var(--color-neutral-500)]'}`}
-               />
-               {errors.phone && <p className='pt-2 text-sm text-[var(--color-danger-500)]'>{errors.phone.message}</p>}
-            </div>
-            <div className='mb-4'>
-               <label className='block pb-4 text-lg font-medium' htmlFor='password'>
-                  Password
-               </label>
-               <div className='relative'>
-                  <input
-                     type={showPassword ? 'text' : 'password'}
-                     id='password'
-                     placeholder='Password'
-                     {...register('password')}
-                     className={`w-full rounded-md border bg-[var(--color-gray-900)] px-5 py-3.5 text-base text-[var(--color-base-white)] placeholder-[var(--color-neutral-300)] focus:border-[var(--color-warning-500)] ${
-                        errors.password ? 'border-[var(--color-danger-500)]' : 'border-[var(--color-neutral-500)]'
-                     } relative`}
-                  />
-                  <span
-                     onClick={togglePasswordVisibility}
-                     className='absolute top-[50%] right-4 translate-y-[-50%] cursor-pointer text-2xl text-gray-500'
-                  >
-                     {showPassword ? <FaEye /> : <FaEyeSlash />}
-                  </span>
-               </div>
-               <p className='mt-2 text-base text-gray-400'>
-                  Password at least 8 characters and includes at least 1 upper case letter, 1 lower case letter, and 1
-                  number.
-               </p>
-               {errors.password && (
-                  <p className='pt-2 text-sm text-[var(--color-danger-500)]'>{errors.password.message}</p>
-               )}
-            </div>
-            <div className='mb-4'>
-               <label className='block pb-4 text-lg font-medium' htmlFor='repeatPassword'>
-                  Confirm Password
-               </label>
-               <div className='relative'>
-                  <input
-                     type={showConfirmPassword ? 'text' : 'password'}
-                     id='repeatPassword'
-                     placeholder='Confirm Password'
-                     {...register('repeatPassword')}
-                     className={`w-full rounded-md border bg-[var(--color-gray-900)] px-5 py-3.5 text-base text-[var(--color-base-white)] placeholder-[var(--color-neutral-300)] focus:border-[var(--color-warning-500)] ${
-                        errors.repeatPassword ? 'border-[var(--color-danger-500)]' : 'border-[var(--color-neutral-500)]'
-                     } relative`}
-                  />
-                  <span
-                     onClick={toggleConfirmPasswordVisibility}
-                     className='absolute top-[50%] right-4 translate-y-[-50%] cursor-pointer text-2xl text-gray-500'
-                  >
-                     {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
-                  </span>
-               </div>
-               {errors.repeatPassword && (
-                  <p className='pt-2 text-sm text-[var(--color-danger-500)]'>{errors.repeatPassword.message}</p>
-               )}
-            </div>
-            <div>
-               <label className='block pb-4 text-lg font-medium' htmlFor='country'>
-                  Country or region
-               </label>
-               <select
-                  id='country'
-                  {...register('country')}
-                  className={`w-full rounded-md border bg-[var(--color-gray-900)] px-5 py-3.5 text-base text-[var(--color-base-white)] placeholder-[var(--color-neutral-300)] focus:border-[var(--color-warning-500)] ${errors.country ? 'border-[var(--color-danger-500)]' : 'border-[var(--color-neutral-500)]'}`}
-               >
-                  {countryNames.map(country => (
-                     <option key={country} value={country}>
-                        {country}
-                     </option>
-                  ))}
-               </select>
-               {errors.country && (
-                  <p className='pt-2 text-sm text-[var(--color-danger-500)]'>{errors.country.message}</p>
-               )}
-            </div>
-            <div className='pt-2'>
-               <label className='relative inline-flex items-start'>
-                  {/* Checkbox */}
-                  <div className='modal-order-service-checkbox relative'>
-                     <input
-                        type='checkbox'
-                        {...register('terms')}
-                        id='custom-checkbox'
-                        className='absolute h-6 w-6 opacity-0'
+         <Card className='w-full max-w-md rounded-md border-0 bg-[var(--color-gray-900)] p-6 text-[var(--color-base-white)] shadow-lg'>
+            <CardHeader className='px-0'>
+               <CardTitle className='text-2xl font-medium'>Create Account</CardTitle>
+               <CardDescription className='text-muted-foreground'>
+                  <Separator className='my-4 bg-[var(--color-gray-800)]' />
+               </CardDescription>
+            </CardHeader>
+            <CardContent className='px-0'>
+               <Form {...form}>
+                  <form className='flex flex-col gap-y-6' onSubmit={form.handleSubmit(onSubmit)}>
+                     <FormField
+                        control={form.control}
+                        name='email'
+                        render={({ field }) => (
+                           <FormItem>
+                              <FormLabel>Email</FormLabel>
+                              <FormControl>
+                                 <Input
+                                    type='email'
+                                    variant='custom'
+                                    state={errors.email ? 'error' : 'neutral'}
+                                    placeholder='Your Email'
+                                    // {...register('email')}
+                                    {...field}
+                                    error={errors.email?.message}
+                                 />
+                              </FormControl>
+                              {/* <FormMessage /> */}
+                           </FormItem>
+                        )}
                      />
-                     <label htmlFor='custom-checkbox' className='checkmark cursor-pointer'></label>
-                  </div>
-                  <span className='ml-10 text-sm'>
-                     By creating an account, you agree to the{' '}
-                     <a href='#' className='text-[var(--color-primary-400)] hover:underline'>
-                        Conditions of Use
-                     </a>{' '}
-                     and{' '}
-                     <a href='#' className='text-[var(--color-primary-400)] hover:underline'>
-                        Privacy Notice
-                     </a>
-                     .
-                  </span>
-               </label>
-               {errors.terms && <p className='pt-2 text-sm text-[var(--color-danger-500)]'>{errors.terms.message}</p>}
-            </div>
 
-            <Button variant='fill' size={'XXL'} type='submit' className='w-full text-[var(--color-base-white)]'>
-               Create Account
-            </Button>
-         </form>
+                     <FormField
+                        control={form.control}
+                        name='phone'
+                        render={({ field }) => (
+                           <FormItem>
+                              <FormLabel>Mobile Number</FormLabel>
+                              <FormControl>
+                                 <Input
+                                    type='tel'
+                                    variant='custom'
+                                    state={errors.phone ? 'error' : 'neutral'}
+                                    placeholder='Mobile Number'
+                                    // {...register('phone')}
+                                    {...field}
+                                    error={errors.phone?.message}
+                                 />
+                              </FormControl>
+                              {/* <FormMessage /> */}
+                           </FormItem>
+                        )}
+                     />
+
+                     <FormField
+                        control={form.control}
+                        name='password'
+                        render={({ field }) => (
+                           <FormItem>
+                              <FormLabel>Password</FormLabel>
+                              <FormControl>
+                                 <Input
+                                    type='password'
+                                    variant='custom'
+                                    state={errors.password ? 'error' : 'neutral'}
+                                    placeholder='Password'
+                                    isPassword
+                                    // {...register('password')}
+                                    {...field}
+                                    error={errors.password?.message}
+                                 />
+                              </FormControl>
+                              <FormDescription className='pt-2'>
+                                 Password at least 8 characters and includes at least 1 upper case letter. 1 lower case
+                                 letter and 1 number.
+                              </FormDescription>
+                              {/* <FormMessage /> */}
+                           </FormItem>
+                        )}
+                     />
+
+                     <FormField
+                        control={form.control}
+                        name='repeatPassword'
+                        render={({ field }) => (
+                           <FormItem>
+                              <FormLabel className='block pb-4 text-lg font-medium'>Confirm Password</FormLabel>
+                              <FormControl>
+                                 <Input
+                                    type='password'
+                                    variant='custom'
+                                    state={errors.repeatPassword ? 'error' : 'neutral'}
+                                    placeholder='Confirm Password'
+                                    isPassword
+                                    // {...register('password')}
+                                    {...field}
+                                    error={errors.repeatPassword?.message}
+                                 />
+                              </FormControl>
+                              {/* <FormMessage /> */}
+                           </FormItem>
+                        )}
+                     />
+
+                     <FormField
+                        control={form.control}
+                        name='country'
+                        render={({ field }) => (
+                           <FormItem>
+                              <FormLabel>Country or Region</FormLabel>
+                              <FormControl>
+                                 <select
+                                    id='country'
+                                    {...register('country')}
+                                    className={`w-full rounded-md border bg-[var(--color-gray-900)] px-5 py-3.5 text-base text-[var(--color-base-white)] placeholder-[var(--color-neutral-300)] focus:border-[var(--color-warning-500)] ${errors.country ? 'border-[var(--color-danger-500)]' : 'border-[var(--color-neutral-500)]'}`}
+                                 >
+                                    {countryNames.map(country => (
+                                       <option key={country} value={country}>
+                                          {country}
+                                       </option>
+                                    ))}
+                                 </select>
+                              </FormControl>
+                              {/* <FormMessage /> */}
+                              {errors.country && (
+                                 <p className='pt-2 text-sm text-[var(--color-danger-500)]'>{errors.country.message}</p>
+                              )}
+                           </FormItem>
+                        )}
+                     />
+                     <div className='pt-2'>
+                        <label className='relative inline-flex items-start'>
+                           {/* Checkbox */}
+                           <div className='modal-order-service-checkbox relative'>
+                              <input
+                                 type='checkbox'
+                                 {...register('terms')}
+                                 id='custom-checkbox'
+                                 className='absolute h-6 w-6 opacity-0'
+                              />
+                              <label htmlFor='custom-checkbox' className='checkmark cursor-pointer'></label>
+                           </div>
+                           <span className='ml-10 text-sm'>
+                              By creating an account, you agree to the{' '}
+                              <a href='#' className='text-[var(--color-primary-400)] hover:underline'>
+                                 Conditions of Use
+                              </a>{' '}
+                              and{' '}
+                              <a href='#' className='text-[var(--color-primary-400)] hover:underline'>
+                                 Privacy Notice
+                              </a>
+                              .
+                           </span>
+                        </label>
+                        {errors.terms && (
+                           <p className='pt-2 text-sm text-[var(--color-danger-500)]'>{errors.terms.message}</p>
+                        )}
+                     </div>
+                  </form>
+               </Form>
+            </CardContent>
+            <CardFooter className='px-0 pt-4'>
+               <Button
+                  variant='fill'
+                  size={'XXL'}
+                  type='submit'
+                  onClick={() => form.handleSubmit(onSubmit)()}
+                  className='w-full text-[var(--color-base-white)]'
+               >
+                  Create Account
+               </Button>
+            </CardFooter>
+         </Card>
       </div>
    )
 }
