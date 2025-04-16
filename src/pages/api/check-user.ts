@@ -9,14 +9,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return sendResponse(res, 405, false, 'Method not allowed')
    }
 
-   const { emailOrPhone } = req.body
+   const { emailOrPhone, } = req.body
 
    try {
       const user = await prisma.user.findFirst({
          where: {
             OR: [
-               { email: emailOrPhone },
-               { phone: emailOrPhone },
+               { email: emailOrPhone, },
+               { phone: emailOrPhone, },
             ],
          },
       })

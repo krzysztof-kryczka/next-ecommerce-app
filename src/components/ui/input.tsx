@@ -22,7 +22,7 @@ const inputVariants = cva(
          variant: 'default',
          state: 'neutral',
       },
-   },
+   }
 )
 
 interface InputProps extends React.ComponentProps<'input'>, VariantProps<typeof inputVariants> {
@@ -31,13 +31,13 @@ interface InputProps extends React.ComponentProps<'input'>, VariantProps<typeof 
 }
 
 const Input: React.FC<InputProps> = ({ className, type, variant, state, isPassword, error, ...props }) => {
-   const [isVisible, setIsVisible] = React.useState(false)
+   const [isVisible, setIsVisible,] = React.useState(false)
    return (
       <div>
          <div className='relative space-y-1'>
             <input
                type={isPassword ? (isVisible ? 'text' : 'password') : type}
-               className={cn(inputVariants({ variant, state }), 'pr-12', className)}
+               className={cn(inputVariants({ variant, state, }), 'pr-12', className)}
                aria-invalid={!!error}
                {...props}
             />

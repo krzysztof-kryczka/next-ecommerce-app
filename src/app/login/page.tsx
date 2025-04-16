@@ -14,18 +14,18 @@ import { Input } from '@/components/ui/input'
 
 const LoginPage: React.FC = () => {
    // Sterowanie krokami logowania (email/telefon -> hasło)
-   const [step, setStep] = useState<'email' | 'password'>('email')
-   const [emailOrPhone, setEmailOrPhone] = useState('')
-   const [isSavePasswordChecked, setIsSavePasswordChecked] = useState(false)
-   const { data: session } = useSession()
+   const [step, setStep,] = useState<'email' | 'password'>('email')
+   const [emailOrPhone, setEmailOrPhone,] = useState('')
+   const [isSavePasswordChecked, setIsSavePasswordChecked,] = useState(false)
+   const { data: session, } = useSession()
 
    React.useEffect(() => {
       console.log('Active session data:', session)
-   }, [session])
+   }, [session,])
 
    useEffect(() => {
       console.log('Step changed to:', step) // Sprawdzenie zmiany kroku
-   }, [step])
+   }, [step,])
 
    const formStepOne = useForm({
       resolver: zodResolver(loginStepOneSchema),
@@ -50,7 +50,7 @@ const LoginPage: React.FC = () => {
             headers: {
                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ emailOrPhone: data.emailOrPhone }),
+            body: JSON.stringify({ emailOrPhone: data.emailOrPhone, }),
          })
 
          const responseData = await response.json()
@@ -60,7 +60,7 @@ const LoginPage: React.FC = () => {
             setEmailOrPhone(data.emailOrPhone)
             setStep('password')
          } else {
-            formStepOne.setError('emailOrPhone', { type: 'manual', message: responseData.message || 'User not found' })
+            formStepOne.setError('emailOrPhone', { type: 'manual', message: responseData.message || 'User not found', })
          }
       } catch (err) {
          console.error('Error in handleNextStep:', err)
@@ -69,7 +69,7 @@ const LoginPage: React.FC = () => {
    }
 
    const handleLogin = async (data: { password: string }) => {
-      console.log('Attempting login with:', { emailOrPhone, password: data.password })
+      console.log('Attempting login with:', { emailOrPhone, password: data.password, })
 
       const response = await signIn('credentials', {
          redirect: false,
@@ -120,7 +120,7 @@ const LoginPage: React.FC = () => {
                         <FormField
                            control={formStepOne.control}
                            name='emailOrPhone'
-                           render={({ field }) => (
+                           render={({ field, }) => (
                               <FormItem>
                                  <FormLabel>Email or mobile phone number</FormLabel>
                                  <FormControl>
@@ -201,8 +201,6 @@ const LoginPage: React.FC = () => {
                )}
             </CardFooter>
          </Card>
-
-         <div>{session ? <p>Logged in as: {session.user?.email}</p> : <p>No active session.</p>}</div>
       </div>
    )
 }

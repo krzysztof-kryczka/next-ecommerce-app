@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       return sendResponse(res, 405, false, 'Method not allowed')
    }
 
-   const { emailOrPhone, password } = req.body
+   const { emailOrPhone, password, } = req.body
 
    if (!emailOrPhone || !password) {
       return sendResponse(res, 400, false, 'Email or phone and password are required')
@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
    try {
       const user = await prisma.user.findFirst({
          where: {
-            OR: [{ email: emailOrPhone }, { phone: emailOrPhone }],
+            OR: [{ email: emailOrPhone, }, { phone: emailOrPhone, },],
          },
       })
       console.log('User fetched from database:', user)
@@ -39,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       }
 
       if (passwordMatches) {
-         sendResponse(res, 200, true, 'Login successful', { id: user.id, email: user.email })
+         sendResponse(res, 200, true, 'Login successful', { id: user.id, email: user.email, })
       }
    } catch (error) {
       console.error(error)

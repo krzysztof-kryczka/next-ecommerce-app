@@ -6,14 +6,14 @@ import Image from 'next/image'
 
 const RegistrationSuccess = () => {
    const router = useRouter()
-   const [isAuthorized, setIsAuthorized] = useState(false)
-   const [isLoading, setIsLoading] = useState(true)
-   const [remainingTime, setRemainingTime] = useState<number | null>(null)
+   const [isAuthorized, setIsAuthorized,] = useState(false)
+   const [isLoading, setIsLoading,] = useState(true)
+   const [remainingTime, setRemainingTime,] = useState<number | null>(null)
 
    useEffect(() => {
       const registeredData = sessionStorage.getItem('registered')
       if (registeredData) {
-         const { expiresAt } = JSON.parse(registeredData)
+         const { expiresAt, } = JSON.parse(registeredData)
          const currentTime = new Date().getTime()
 
          if (currentTime < expiresAt) {
@@ -29,7 +29,7 @@ const RegistrationSuccess = () => {
          router.push('/')
       }
       setIsLoading(false)
-   }, [router])
+   }, [router,])
 
    useEffect(() => {
       if (remainingTime !== null) {
@@ -51,7 +51,7 @@ const RegistrationSuccess = () => {
 
          return () => clearInterval(intervalId) // Czyszczenie interwału przy odmontowaniu
       }
-   }, [remainingTime, router])
+   }, [remainingTime, router,])
 
    if (isLoading) {
       // Zablokuj renderowanie, dopóki flaga nie zostanie sprawdzona

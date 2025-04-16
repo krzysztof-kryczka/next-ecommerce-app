@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       return sendResponse(res, 405, false, 'Method not allowed')
    }
 
-   const { email, password, phone, country } = req.body
+   const { email, password, phone, country, } = req.body
 
    if (!email || !password || !phone || !country) {
       return sendResponse(res, 400, false, 'All fields are required')
@@ -23,14 +23,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
    try {
       const existingUser = await prisma.user.findUnique({
-         where: { email },
+         where: { email, },
       })
       if (existingUser) {
          return sendResponse(res, 400, false, 'Email already exists')
       }
 
       const existingPhone = await prisma.user.findUnique({
-         where: { phone },
+         where: { phone, },
       })
       if (existingPhone) {
          return sendResponse(res, 400, false, 'Phone number already exists')

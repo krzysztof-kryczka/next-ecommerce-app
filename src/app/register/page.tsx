@@ -10,7 +10,7 @@ import { toast } from 'react-toastify'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
 const RegisterPage: React.FC = () => {
@@ -27,7 +27,7 @@ const RegisterPage: React.FC = () => {
 
    const {
       register,
-      formState: { errors },
+      formState: { errors, },
    } = form
 
    const router = useRouter()
@@ -38,21 +38,21 @@ const RegisterPage: React.FC = () => {
       try {
          const response = await fetch('/api/register', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', },
             body: JSON.stringify(data),
          })
 
          if (response.ok) {
-            toast.success('Account created successfully!', { className: 'toast-success' })
+            toast.success('Account created successfully!', { className: 'toast-success', })
 
             // Ustaw flagę z czasem życia (60 sekund)
             const expirationTime = new Date().getTime() + 60 * 1000
-            sessionStorage.setItem('registered', JSON.stringify({ expiresAt: expirationTime }))
+            sessionStorage.setItem('registered', JSON.stringify({ expiresAt: expirationTime, }))
 
             router.push('/registration-success')
          } else {
             const error = await response.json()
-            toast.error(error.message || 'Failed to create account', { className: 'toast-error' })
+            toast.error(error.message || 'Failed to create account', { className: 'toast-error', })
          }
       } catch (error) {
          console.error('Error during form submission:', error)
@@ -79,7 +79,7 @@ const RegisterPage: React.FC = () => {
                      <FormField
                         control={form.control}
                         name='email'
-                        render={({ field }) => (
+                        render={({ field, }) => (
                            <FormItem>
                               <FormLabel>Email</FormLabel>
                               <FormControl>
@@ -88,12 +88,10 @@ const RegisterPage: React.FC = () => {
                                     variant='custom'
                                     state={errors.email ? 'error' : 'neutral'}
                                     placeholder='Your Email'
-                                    // {...register('email')}
                                     {...field}
                                     error={errors.email?.message}
                                  />
                               </FormControl>
-                              {/* <FormMessage /> */}
                            </FormItem>
                         )}
                      />
@@ -101,7 +99,7 @@ const RegisterPage: React.FC = () => {
                      <FormField
                         control={form.control}
                         name='phone'
-                        render={({ field }) => (
+                        render={({ field, }) => (
                            <FormItem>
                               <FormLabel>Mobile Number</FormLabel>
                               <FormControl>
@@ -110,12 +108,10 @@ const RegisterPage: React.FC = () => {
                                     variant='custom'
                                     state={errors.phone ? 'error' : 'neutral'}
                                     placeholder='Mobile Number'
-                                    // {...register('phone')}
                                     {...field}
                                     error={errors.phone?.message}
                                  />
                               </FormControl>
-                              {/* <FormMessage /> */}
                            </FormItem>
                         )}
                      />
@@ -123,7 +119,7 @@ const RegisterPage: React.FC = () => {
                      <FormField
                         control={form.control}
                         name='password'
-                        render={({ field }) => (
+                        render={({ field, }) => (
                            <FormItem>
                               <FormLabel>Password</FormLabel>
                               <FormControl>
@@ -133,7 +129,6 @@ const RegisterPage: React.FC = () => {
                                     state={errors.password ? 'error' : 'neutral'}
                                     placeholder='Password'
                                     isPassword
-                                    // {...register('password')}
                                     {...field}
                                     error={errors.password?.message}
                                  />
@@ -142,7 +137,6 @@ const RegisterPage: React.FC = () => {
                                  Password at least 8 characters and includes at least 1 upper case letter. 1 lower case
                                  letter and 1 number.
                               </FormDescription>
-                              {/* <FormMessage /> */}
                            </FormItem>
                         )}
                      />
@@ -150,7 +144,7 @@ const RegisterPage: React.FC = () => {
                      <FormField
                         control={form.control}
                         name='repeatPassword'
-                        render={({ field }) => (
+                        render={({ field, }) => (
                            <FormItem>
                               <FormLabel className='block pb-4 text-lg font-medium'>Confirm Password</FormLabel>
                               <FormControl>
@@ -160,12 +154,10 @@ const RegisterPage: React.FC = () => {
                                     state={errors.repeatPassword ? 'error' : 'neutral'}
                                     placeholder='Confirm Password'
                                     isPassword
-                                    // {...register('password')}
                                     {...field}
                                     error={errors.repeatPassword?.message}
                                  />
                               </FormControl>
-                              {/* <FormMessage /> */}
                            </FormItem>
                         )}
                      />
@@ -173,7 +165,7 @@ const RegisterPage: React.FC = () => {
                      <FormField
                         control={form.control}
                         name='country'
-                        render={({ field }) => (
+                        render={() => (
                            <FormItem>
                               <FormLabel>Country or Region</FormLabel>
                               <FormControl>
