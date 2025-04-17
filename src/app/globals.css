@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
    --font-geist-sans: 'Inter', sans-serif;
@@ -6,33 +6,33 @@
    --color-background: var(--background);
    --color-foreground: var(--foreground);
 
-   --color-gray-50: #222327;
+   --color-gray-50: #222327; /* */
    --color-gray-100: #edeef1;
    --color-gray-200: #d8dbdf;
    --color-gray-300: #b6bac3;
-   --color-gray-400: #8e95a2;
+   --color-gray-400: #616674; /* */
    --color-gray-500: #6b7280;
    --color-gray-600: #4a4e5a;
    --color-gray-700: #40444c;
-   --color-gray-800: #383b42;
+   --color-gray-800: #383b42; /* */
    --color-gray-900: #25272c;
 
    --color-neutral-50: #f6f6f6;
    --color-neutral-100: #e7e7e7;
    --color-neutral-200: #d1d1d1;
-   --color-neutral-300: #b0b0b0;
+   --color-neutral-300: #b0b0b0; /* */
    --color-neutral-400: #888888;
    --color-neutral-500: #737373;
    --color-neutral-600: #5d5d5d;
    --color-neutral-700: #4f4f4f;
    --color-neutral-800: #454545;
-   --color-neutral-900: #262626;
+   --color-neutral-900: #fcfcfc; /* */
 
    --color-primary-50: #fef7ee;
-   --color-primary-100: #fdedd7;
+   --color-primary-100: #fdedd7; /* */
    --color-primary-200: #fad6ae;
    --color-primary-300: #f7b87a;
-   --color-primary-400: #f29145;
+   --color-primary-400: #f29145; /* */
    --color-primary-500: #ee701d;
    --color-primary-600: #e05816;
    --color-primary-700: #b94315;
@@ -78,6 +78,7 @@
    --color-base-shark: #232227;
    --color-base-woodsmoke: #141316;
    --color-base-black: #000000;
+   --color-base-gray: #262626;
 
    --color-violet-50: #f2ebfe;
    --color-violet-100: #d8c0fb;
@@ -140,14 +141,13 @@
    --color-blazeOrange-300: #fd9c5c;
    --color-blazeOrange-400: #fd893c;
    --color-blazeOrange-500: #fc6b0b;
-   --color-blazeOrange-600: #e5610a;
+   --color-blazeOrange-600: #e5610a; /* */
    --color-blazeOrange-700: #b34c08;
    --color-blazeOrange-800: #8b3b06;
    --color-blazeOrange-900: #6a2d05;
 }
 
 @layer utilities {
-
 }
 
 .toast-success {
@@ -201,8 +201,8 @@ body {
     position: absolute;
     width: 26px;
     height: 26px;
-    background-color: var(--color-neutral-300); /* Kolor tła nieznaczony */
-    border: 2px solid var(--color-neutral-500); /* Obramowanie nieznaczone */
+    background-color: var(--color-gray-50); /* Kolor tła nieznaczony */
+    border: 2px solid var(--color-gray-400); /* Obramowanie nieznaczone */
     border-radius: 6px; /* Zaokrąglenie */
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s; /* Płynna animacja */

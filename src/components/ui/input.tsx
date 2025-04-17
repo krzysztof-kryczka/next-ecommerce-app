@@ -11,7 +11,7 @@ const inputVariants = cva(
             default:
                'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-gray-300 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
             custom:
-               'h-12 w-full rounded-md border bg-[var(--color-gray-900)] px-5 py-3.5 text-base text-[var(--color-base-white)] placeholder-[var(--color-neutral-300)] focus:border-[var(--color-warning-500)] border-[var(--color-neutral-500)]',
+               'h-12 w-full rounded-md border bg-[var(--color-base-gray)] px-5 py-3.5 text-base text-[var(--color-base-white)] placeholder-[var(--color-neutral-300)] focus:border-[var(--color-warning-500)] border-[var(--color-neutral-500)]',
          },
          state: {
             error: 'border-[var(--color-danger-500)] text-destructive placeholder-destructive/70',
@@ -22,7 +22,7 @@ const inputVariants = cva(
          variant: 'default',
          state: 'neutral',
       },
-   }
+   },
 )
 
 interface InputProps extends React.ComponentProps<'input'>, VariantProps<typeof inputVariants> {
@@ -31,13 +31,13 @@ interface InputProps extends React.ComponentProps<'input'>, VariantProps<typeof 
 }
 
 const Input: React.FC<InputProps> = ({ className, type, variant, state, isPassword, error, ...props }) => {
-   const [isVisible, setIsVisible,] = React.useState(false)
+   const [isVisible, setIsVisible] = React.useState(false)
    return (
       <div>
          <div className='relative space-y-1'>
             <input
                type={isPassword ? (isVisible ? 'text' : 'password') : type}
-               className={cn(inputVariants({ variant, state, }), 'pr-12', className)}
+               className={cn(inputVariants({ variant, state }), 'pr-12', className)}
                aria-invalid={!!error}
                {...props}
             />
