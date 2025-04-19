@@ -19,6 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             name: true,
             price: true,
             categoryId: true,
+            stock: true,
             imageUrl: true,
             description: true,
             createdAt: true,

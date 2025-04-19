@@ -11,7 +11,7 @@ const buttonVariants = cva(
             fill: 'bg-[var(--color-primary-500)] text-[var(--color-base-white)] hover:bg-[var(--color-primary-600)] cursor-pointer',
             stroke:
                'color-base-white border border-primary-500 text-primary-500 disabled:border-primary-300 disabled:text-primary-300 cursor-pointer',
-            text: 'text-[var(--color-primary-500)] hover:bg-[var(--color-primary-100)] cursor-pointer',
+            text: 'text-[var(--color-primary-500)] cursor-pointer',
          },
          size: {
             XXL: 'w-[174px] h-[60px] px-5 py-4 rounded-md text-xl',
@@ -26,7 +26,7 @@ const buttonVariants = cva(
          variant: 'fill',
          size: 'M',
       },
-   }
+   },
 )
 
 function Button({
