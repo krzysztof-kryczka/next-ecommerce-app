@@ -21,7 +21,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
          include: {
             items: {
                include: {
-                  product: true,
+                  product: {
+                     include: {
+                        category: true,
+                     },
+                  },
                },
             },
          },
@@ -34,6 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             price: item.product.price,
             quantity: item.quantity,
             imageUrl: item.product.imageUrl?.[0],
+            categoryName: item.product.category?.name || 'Unknown', // Dodanie nazwy kategorii
          }))
       }
 

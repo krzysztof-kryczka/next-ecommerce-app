@@ -10,6 +10,7 @@ import QuantityPicker from '@/components/QuantityPicker'
 import Subtotal from '@/components/Subtotal'
 import ShieldCrossIcon from '@/components/icons/ShieldCrossIcon'
 import { Separator } from '@/components/ui/separator'
+import { toast } from 'react-toastify'
 
 const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
    const [product, setProduct] = useState<any>(null)
@@ -79,6 +80,35 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
    if (!product) {
       return <div className='flex h-screen items-center justify-center'>Ładowanie...</div>
+   }
+
+   const handleAddToCart = async () => {
+      try {
+         const cartItem = {
+            productId: product.id,
+            quantity,
+         }
+
+         const response = await fetch('/api/cart', {
+            method: 'POST',
+            headers: {
+               'Content-Type': 'application/json',
+               // userid: session?.user?.id || '',
+               // testy
+               userid: '123',
+            },
+            body: JSON.stringify(cartItem),
+         })
+
+         if (response.ok) {
+            toast.success('Product added to cart!')
+         } else {
+            toast.error('Failed to add product to cart.')
+         }
+      } catch (error) {
+         console.error('Error adding product to cart:', error)
+         toast.error('Something went wrong.')
+      }
    }
 
    return (
@@ -187,7 +217,12 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                   />
                   <QuantityPicker quantity={quantity} setQuantity={setQuantity} stock={stock} />
                   <Subtotal quantity={quantity} price={product.price} />
-                  <Button variant='stroke' size='XXL' className='flex w-full items-center gap-2 text-xs sm:text-sm'>
+                  <Button
+                     variant='stroke'
+                     size='XXL'
+                     className='flex w-full items-center gap-2 text-xs sm:text-sm'
+                     onClick={handleAddToCart}
+                  >
                      Add to Cart
                      <CartIcon className='text-[var(--color-blazeOrange-600)]' />
                   </Button>
@@ -196,7 +231,6 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
          </div>
       </div>
    )
-
 }
 
 export default ProductPage
