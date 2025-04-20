@@ -1,9 +1,9 @@
-import NextAuth, { RequestInternal } from 'next-auth'
+import NextAuth, { RequestInternal, SessionStrategy } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 
 console.log('NextAuth API initialized!')
 
-export default NextAuth({
+export const authOptions = {
    debug: true,
    providers: [
       CredentialsProvider({
@@ -52,7 +52,7 @@ export default NextAuth({
       }),
    ],
    session: {
-      strategy: 'jwt',
+      strategy: 'jwt' as SessionStrategy, // Poprawne przypisanie z typem
       maxAge: 3600, // 1 godzina
    },
    callbacks: {
@@ -88,4 +88,5 @@ export default NextAuth({
          return session
       },
    },
-})
+}
+export default NextAuth(authOptions)
