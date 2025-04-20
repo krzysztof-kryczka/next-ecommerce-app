@@ -21,6 +21,7 @@ model User {
   phone      String   @unique
   country    String
   createdAt  DateTime @default(now())
+  carts      Cart[]
 }
 
 model Product {
@@ -33,6 +34,7 @@ model Product {
   categoryId  Int
   category    Category  @relation(fields: [categoryId], references: [id])
   createdAt   DateTime  @default(now())
+  cartItems   CartItem[]
 }
 
 model Category {
@@ -42,4 +44,22 @@ model Category {
   image       String
   exploreInfo String?
   products    Product[]
+}
+
+model Cart {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  items     CartItem[]
+  createdAt DateTime  @default(now())
+}
+
+model CartItem {
+  id        Int       @id @default(autoincrement())
+  cartId    Int
+  cart      Cart      @relation(fields: [cartId], references: [id])
+  productId Int
+  product   Product   @relation(fields: [productId], references: [id])
+  quantity  Int
+  createdAt DateTime  @default(now())
 }
