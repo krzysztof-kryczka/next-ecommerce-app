@@ -5,4 +5,7 @@ export type Product = {
    categoryId: number
    imageUrl: string[]
    createdAt: string
+   quantity: number
+   stock: number
+   categoryName?: string
 }

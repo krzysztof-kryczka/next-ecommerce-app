@@ -57,7 +57,10 @@ const QuantityPicker = ({
                <span className={`${sizes[size].text} font-medium text-[var(--color-neutral-900)]`}>{quantity}</span>
                <div
                   onClick={increaseQuantity}
-                  className={`flex cursor-pointer items-center justify-center ${sizes[size].button}`}
+                  className={`flex cursor-pointer items-center justify-center ${sizes[size].button} ${
+                     quantity >= stock ? 'cursor-not-allowed opacity-50' : ''
+                  }`}
+                  disabled={quantity >= stock}
                >
                   <PlusIcon />
                </div>
@@ -66,6 +69,9 @@ const QuantityPicker = ({
                <span className={`${sizes[size].text} font-medium text-[var(--color-neutral-900)]`}>Stock: {stock}</span>
             )}
          </div>
+         {quantity >= stock && (
+            <p className='pt-2 text-sm text-[var(--color-blazeOrange-600)]'>Maximum available stock reached.</p>
+         )}
       </div>
    )
 }

@@ -37,6 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             name: item.product.name,
             price: item.product.price,
             quantity: item.quantity,
+            stock: item.product.stock,
             imageUrl: item.product.imageUrl?.[0],
             categoryName: item.product.category?.name || 'Unknown', // Dodanie nazwy kategorii
          }))
@@ -96,5 +97,90 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
    }
 
-   return res.setHeader('Allow', ['GET', 'POST']).status(405).end(`Method ${req.method} Not Allowed`)
+   if (req.method === 'PATCH') {
+      try {
+         const { productId, quantity } = req.body
+
+         const cart = await prisma.cart.findFirst({
+            where: { userId },
+         })
+
+         if (!cart) {
+            return res.status(404).json({ error: 'Cart not found' })
+         }
+
+         const existingItem = await prisma.cartItem.findFirst({
+            where: { cartId: cart.id, productId },
+         })
+
+         if (!existingItem) {
+            return sendResponse(res, 404, false, 'Item not found in cart')
+         }
+
+         await prisma.cartItem.update({
+            where: { id: existingItem.id },
+            data: { quantity: Math.max(1, quantity) },
+         })
+
+         const updatedCart = await prisma.cart.findFirst({
+            where: { userId },
+            include: {
+               items: {
+                  include: {
+                     product: true,
+                  },
+               },
+            },
+         })
+
+         return res.status(200).json(updatedCart)
+      } catch (error) {
+         console.error('Error updating cart item:', error)
+         return sendResponse(res, 500, false, 'Failed to update cart item')
+      }
+   }
+
+   if (req.method === 'DELETE') {
+      try {
+         const { productId } = req.body
+
+         const cart = await prisma.cart.findFirst({
+            where: { userId },
+         })
+
+         if (!cart) {
+            return sendResponse(res, 404, false, 'Cart not found')
+         }
+
+         const existingItem = await prisma.cartItem.findFirst({
+            where: { cartId: cart.id, productId },
+         })
+
+         if (!existingItem) {
+            return sendResponse(res, 404, false, 'Item not found in cart')
+         }
+
+         await prisma.cartItem.delete({
+            where: { id: existingItem.id },
+         })
+
+         const updatedCart = await prisma.cart.findFirst({
+            where: { userId },
+            include: {
+               items: {
+                  include: {
+                     product: true,
+                  },
+               },
+            },
+         })
+
+         return res.status(200).json(updatedCart)
+      } catch (error) {
+         console.error('Error deleting cart item:', error)
+         return sendResponse(res, 500, false, 'Failed to delete cart item')
+      }
+   }
+
+   return res.setHeader('Allow', ['GET', 'POST', 'PATCH', 'DELETE']).status(405).end(`Method ${req.method} Not Allowed`)
 }

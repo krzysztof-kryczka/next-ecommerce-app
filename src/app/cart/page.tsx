@@ -7,14 +7,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import Trash2Icon from '@/components/icons/Trash2Icon'
 import QuantityPicker from '@/components/QuantityPicker'
-
-type Product = {
-   id: number
-   name: string
-   price: number
-   imageUrl: string
-   quantity: number
-}
+import { toast } from 'react-toastify'
+import { Product } from '@/types/Product'
 
 const CartPage = () => {
    const [cartItems, setCartItems] = useState<Product[]>([])
@@ -23,40 +17,35 @@ const CartPage = () => {
    const [isLoading, setIsLoading] = useState<boolean>(false)
    const [isNoteVisible, setIsNoteVisible] = useState<number | null>(null)
 
-
    // useEffect(() => {
-      const fetchCart = async () => {
-         setIsLoading(true)
-         try {
-            const response = await fetch('/api/cart', { method: 'GET' })
+   const fetchCart = async () => {
+      setIsLoading(true)
+      try {
+         const response = await fetch('/api/cart', { method: 'GET' })
+         const data = await response.json()
 
-            if (!response.ok) {
-               throw new Error(`HTTP error! Status: ${response.status}`)
-            }
-
-            const data = await response.json()
-
-            if (Array.isArray(data.items)) {
-               const validatedItems = data.items.map(item => ({
-                  ...item,
-                  price: typeof item.price === 'number' ? item.price : 0,
-                  quantity: typeof item.quantity === 'number' ? item.quantity : 1,
-                  imageUrl: item.imageUrl || '',
-                  categoryName: item.categoryName,
-               }))
-               setCartItems(validatedItems)
-            } else {
-               console.error('Invalid cart data format:', data)
-               setCartItems([]) // Ustawienie pustej tablicy w przypadku błędnych danych
-            }
-         } catch (error) {
-            console.error('Error fetching cart:', error)
-            setCartItems([])
-         } finally {
-            setIsLoading(false)
+         if (Array.isArray(data.items)) {
+            const validatedItems = data.items.map((item: Product) => ({
+               ...item,
+               price: typeof item.price === 'number' ? item.price : 0,
+               quantity: typeof item.quantity === 'number' ? item.quantity : 1,
+               stock: typeof item.stock === 'number' ? item.stock : 0,
+               imageUrl: Array.isArray(item.imageUrl) ? item.imageUrl[0] : item.imageUrl || '',
+               categoryName: item.categoryName,
+            }))
+            setCartItems(validatedItems)
+         } else {
+            console.error('Invalid cart data format:', data)
+            setCartItems([]) // Ustawienie pustej tablicy w przypadku błędnych danych
          }
-         // fetchCart()
+      } catch (error) {
+         console.error('Error fetching cart:', error)
+         setCartItems([])
+      } finally {
+         setIsLoading(false)
       }
+      // fetchCart()
+   }
    // }, [])
 
    useEffect(() => {
@@ -69,14 +58,57 @@ const CartPage = () => {
 
    const selectAll = () => {
       setSelectedItems(cartItems.map(item => item.id))
+      toast.info('All items selected.')
    }
 
-   const updateQuantity = async (id: number, quantity: number) => {}
+   const deselectAll = () => {
+      setSelectedItems([])
+      toast.info('All items deselected.')
+   }
 
-   const removeFromCart = async (id: number) => {}
+   const updateQuantity = async (id: number, quantity: number) => {
+      try {
+         const response = await fetch('/api/cart', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: id, quantity }),
+         })
+         const data = await response.json()
+
+         if (response.ok) {
+            fetchCart()
+            toast.success(data.message)
+         } else {
+            toast.error(data.message)
+         }
+      } catch (error) {
+         console.error('Error updating quantity:', error)
+         toast.error('An error occurred while updating quantity.')
+      }
+   }
+
+   const removeFromCart = async (id: number) => {
+      try {
+         const response = await fetch('/api/cart', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: id }),
+         })
+         const data = await response.json()
+
+         if (response.ok) {
+            fetchCart()
+            toast.success(data.message)
+         } else {
+            toast.error(data.message)
+         }
+      } catch (error) {
+         console.error('Error removing item:', error)
+         toast.error('An error occurred while removing the item.')
+      }
+   }
 
    if (isLoading) return <div className='text-center'>Loading cart...</div>
-
    return (
       <div className='mx-auto flex max-w-[1440px] flex-col gap-y-8 px-4 pb-10 sm:px-6 md:px-10'>
          <Breadcrumb
@@ -91,13 +123,17 @@ const CartPage = () => {
                className='form-checkbox h-6 w-6 accent-[var(--color-blazeOrange-600)]'
                checked={isSelectAllChecked}
                onChange={() => {
-                  selectAll()
+                  if (isSelectAllChecked) {
+                     deselectAll()
+                  } else {
+                     selectAll()
+                  }
                   setIsSelectAllChecked(!isSelectAllChecked)
                }}
                id='selectAllCheckbox'
             />
             <label htmlFor='selectAllCheckbox' className='text-base font-medium text-[var(--color-neutral-900)]'>
-               Select all
+               {isSelectAllChecked ? 'Deselect all' : 'Select all'}
             </label>
          </div>
 
@@ -119,7 +155,11 @@ const CartPage = () => {
                            <div className='flex items-start gap-x-8'>
                               {/* Image Card */}
                               <Card className='h-[138px] w-[172px] rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-3'>
-                                 <img src={item.imageUrl} alt={item.name} className='h-[114px] w-[148px] rounded-md' />
+                                 <img
+                                    src={Array.isArray(item.imageUrl) ? item.imageUrl[0] : item.imageUrl}
+                                    alt={item.name}
+                                    className='h-[114px] w-[148px] rounded-md'
+                                 />
                               </Card>
                               {/* Product Details */}
                               <div className='flex flex-1 flex-col gap-y-4'>
