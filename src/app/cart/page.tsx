@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button'
 import Breadcrumb from '@/components/Breadcrumb'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import Trash2Icon from '@/components/icons/Trash2Icon'
-import QuantityPicker from '@/components/QuantityPicker'
 import { toast } from 'react-toastify'
 import { Product } from '@/types/Product'
+import Link from 'next/link'
+import ProductList from '@/components/ProductList'
 
 const CartPage = () => {
    const [cartItems, setCartItems] = useState<Product[]>([])
@@ -108,6 +108,12 @@ const CartPage = () => {
       }
    }
 
+   const handleCheckout = () => {
+      const selectedProducts =
+         selectedItems.length > 0 ? cartItems.filter(item => selectedItems.includes(item.id)) : cartItems
+      localStorage.setItem('checkoutItems', JSON.stringify(selectedProducts))
+   }
+
    if (isLoading) return <div className='text-center'>Loading cart...</div>
    return (
       <div className='mx-auto flex max-w-[1440px] flex-col gap-y-8 px-4 pb-10 sm:px-6 md:px-10'>
@@ -139,100 +145,26 @@ const CartPage = () => {
 
          <div className='grid grid-cols-1 gap-x-12 lg:grid-cols-[3fr_1fr]'>
             {/* Product List */}
-            <div className='flex w-[889px] flex-col gap-y-8'>
-               {cartItems.map(item => (
-                  <div key={item.id} className='flex items-center gap-x-8'>
-                     {/* Checkbox */}
-                     <input
-                        type='checkbox'
-                        checked={selectedItems.includes(item.id)}
-                        onChange={() => toggleSelectItem(item.id)}
-                        className='form-checkbox h-6 w-6 accent-[var(--color-blazeOrange-600)]'
-                     />
-                     {/* Karta Produktu */}
-                     <Card className='w-full rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-3'>
-                        <CardContent className='flex flex-col gap-y-6 px-0'>
-                           <div className='flex items-start gap-x-8'>
-                              {/* Image Card */}
-                              <Card className='h-[138px] w-[172px] rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-3'>
-                                 <img
-                                    src={Array.isArray(item.imageUrl) ? item.imageUrl[0] : item.imageUrl}
-                                    alt={item.name}
-                                    className='h-[114px] w-[148px] rounded-md'
-                                 />
-                              </Card>
-                              {/* Product Details */}
-                              <div className='flex flex-1 flex-col gap-y-4'>
-                                 <div className='flex flex-col gap-y-3'>
-                                    <div className='flex items-center justify-between'>
-                                       <p className='text-xl font-medium text-[var(--color-neutral-900)]'>
-                                          {item.name}
-                                       </p>
-                                       {/* Trash Icon */}
-                                       <Trash2Icon
-                                          onClick={() => removeFromCart(item.id)}
-                                          className='h-6 w-6 cursor-pointer text-[var(--color-blazeOrange-600)] hover:text-[var(--color-blazeOrange-800)]'
-                                       />
-                                    </div>
-
-                                    <Button variant='fill' size='XS' disabled className=''>
-                                       {item.categoryName || 'Unknown Category'}
-                                    </Button>
-                                 </div>
-
-                                 <div className='flex items-center justify-between'>
-                                    <p className='text-2xl text-[var(--color-neutral-900)]'>
-                                       {typeof item.price === 'number'
-                                          ? `$${item.price.toFixed(2)}`
-                                          : 'Price unavailable'}
-                                    </p>
-
-                                    {/* Quantity and Write Note */}
-                                    <div className='flex items-center justify-end gap-x-6'>
-                                       {/* Write Note Toggle Button */}
-                                       <button
-                                          className='text-[16px] font-medium text-[var(--color-blazeOrange-600)] hover:text-[var(--color-blazeOrange-800)]'
-                                          onClick={() => setIsNoteVisible(isNoteVisible === item.id ? null : item.id)}
-                                       >
-                                          Write Note
-                                       </button>
-                                       {/* Separator */}
-                                       <div className=''>
-                                          <div className='h-6'>
-                                             <Separator
-                                                orientation='vertical'
-                                                className='w-[2px] bg-[var(--color-gray-800)]'
-                                             />
-                                          </div>
-                                       </div>
-                                       {/* Quantity Picker */}
-                                       <div className='flex items-center gap-x-4'>
-                                          <QuantityPicker
-                                             quantity={item.quantity}
-                                             setQuantity={newQuantity => updateQuantity(item.id, newQuantity)}
-                                             stock={item.stock}
-                                             showTitle={false}
-                                             size='md'
-                                             hideStock={true}
-                                          />
-                                       </div>
-                                    </div>
-                                 </div>
-
-                                 {/* Rendering Write Note Pole Tekstowe */}
-                                 {isNoteVisible === item.id && (
-                                    <textarea
-                                       placeholder='Write your note here...'
-                                       className='mt-4 w-full rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-2 text-[16px] text-[var(--color-neutral-600)] placeholder:text-[var(--color-neutral-500)] focus:ring-2 focus:ring-[var(--color-blazeOrange-600)] focus:outline-none'
-                                    />
-                                 )}
-                              </div>
-                           </div>
-                        </CardContent>
-                     </Card>
-                  </div>
-               ))}
-            </div>
+            <ProductList
+               items={cartItems.map(item => ({
+                  id: item.id,
+                  name: item.name,
+                  quantity: item.quantity,
+                  price: item.price,
+                  stock: item.stock,
+                  imageUrl: Array.isArray(item.imageUrl) ? item.imageUrl[0] : item.imageUrl,
+                  categoryName: item.categoryName,
+               }))}
+               showCheckbox={true}
+               selectedItems={selectedItems}
+               toggleSelectItem={toggleSelectItem}
+               showTrashIcon={true}
+               onRemove={removeFromCart}
+               onQuantityChange={updateQuantity}
+               showNotes={true}
+               isNoteVisible={isNoteVisible}
+               toggleNote={setIsNoteVisible}
+            />
 
             {/* Total */}
             <div className='w-[423px]'>
@@ -280,13 +212,15 @@ const CartPage = () => {
                               : cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}
                         </p>
                      </div>
-                     <Button
-                        variant='fill'
-                        size='XXL'
-                        className='w-full bg-[var(--color-primary-400)] py-3.5 text-base font-medium text-[var(--color-base-gray)]'
-                     >
-                        Checkout
-                     </Button>
+                     <Link href='/checkout' onClick={handleCheckout}>
+                        <Button
+                           variant='fill'
+                           size='XXL'
+                           className='w-full bg-[var(--color-primary-400)] py-3.5 text-base font-medium text-[var(--color-base-gray)]'
+                        >
+                           Checkout
+                        </Button>
+                     </Link>
                   </CardContent>
                </Card>
             </div>
