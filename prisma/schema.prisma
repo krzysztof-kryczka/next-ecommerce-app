@@ -22,6 +22,20 @@ model User {
   country    String
   createdAt  DateTime @default(now())
   carts      Cart[]
+  addresses  Address[]
+}
+
+model Address {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  country     String
+  province    String
+  city        String
+  postalCode  String
+  addressLine String
+  isMain      Boolean   @default(false)
+  createdAt   DateTime  @default(now())
 }
 
 model Product {
