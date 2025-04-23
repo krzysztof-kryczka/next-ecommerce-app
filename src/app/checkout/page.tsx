@@ -3,13 +3,21 @@ import React, { useState, useEffect } from 'react'
 import Breadcrumb from '@/components/Breadcrumb'
 import ProductList from '@/components/ProductList'
 import { OrderSummary } from '@/types/OrderSummary'
+import { Card, CardContent } from '@/components/ui/card'
+import ShieldCrossIcon from '@/components/icons/ShieldCrossIcon'
+import StripeIcon from '@/components/icons/StripeIcon'
+import ShippingAddress from '@/components/ShippingAddress'
+import { Address } from '@/types/Address'
+import TotalList from '@/components/TotalList'
 
 const CheckoutPage = () => {
    const [orderSummary, setOrderSummary] = useState<OrderSummary | null>(null)
-
+   const [mainAddress, setMainAddress] = useState<Address | null>(null)
    const [isNoteVisible, setIsNoteVisible] = useState<number | null>(null)
    const [protectedItems, setProtectedItems] = useState<number[]>([])
    const [error, setError] = useState<string | null>(null)
+
+   const protectionCostPerItem = 1
 
    const toggleProtection = (id: number) => {
       setProtectedItems(prevState =>
@@ -35,11 +43,6 @@ const CheckoutPage = () => {
                return
             }
 
-            const totalAmount = data.validatedItems.reduce(
-               (sum: number, item: any) => sum + item.quantity * item.price,
-               0,
-            )
-
             setOrderSummary({
                items: data.validatedItems.map((item: any) => ({
                   id: item.id,
@@ -60,6 +63,23 @@ const CheckoutPage = () => {
       validateCheckoutItems()
    }, [])
 
+   // const calculateProtectionCost = () => {
+   //    if (!orderSummary || !protectedItems.length) return 0
+
+   //    return orderSummary.items
+   //       .filter(item => protectedItems.includes(item.id))
+   //       .reduce((total, item) => total + item.quantity * protectionCostPerItem, 0) // Obliczanie kosztu ochrony na podstawie protectedItems dla każdego produktu (ilość)  z osobna
+   // }
+
+
+   const calculateProtectionCost = () => {
+      if (!orderSummary || !protectedItems.length) return 0
+
+      return orderSummary.items
+         .filter(item => protectedItems.includes(item.id))
+         .reduce((total, item) => total + protectionCostPerItem, 0) // Stały koszt $1 za każdy produkt
+   }
+
    return (
       <div className='mx-auto flex max-w-[1440px] flex-col gap-y-8 px-4 pb-10 sm:px-6 md:px-10'>
          {error && <div className='error-banner'>{error}</div>}
@@ -79,6 +99,7 @@ const CheckoutPage = () => {
                      showCheckbox={false}
                      showTrashIcon={false}
                      onQuantityChange={(id, quantity) => {
+                        // Aktualizacja ilości produktu w stanie
                         setOrderSummary(prev => {
                            if (!prev) return prev
                            const updatedItems = prev.items.map(item => (item.id === id ? { ...item, quantity } : item))
@@ -93,10 +114,59 @@ const CheckoutPage = () => {
                      showProtectionOption={true}
                      protectedItems={protectedItems}
                      toggleProtection={toggleProtection}
-                     protectionCost={1}
+                     protectionCost={protectionCostPerItem}
                   />
                ) : (
                   <p>Loading your order summary...</p>
+               )}
+
+               <div className='flex flex-col gap-y-6'>
+                  {/* Sekcja adresu wysyłki */}
+                  <ShippingAddress onMainAddressSelect={setMainAddress} />
+                  {mainAddress && (
+                     <div className='mt-4'>
+                        <p>Selected Shipping Address:</p>
+                        <p>{mainAddress.addressLine}</p>
+                     </div>
+                  )}
+                  {/* Sekcja metody wysyłki */}
+                  Shipping
+                  <Card className='w-full rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-3'>
+                     <CardContent>
+                        <div className='flex items-start gap-2'>
+                           <ShieldCrossIcon />
+                           <div className='flex flex-col gap-y-1'>
+                              <p className='text-sm font-medium text-[var(--color-neutral-900)] sm:text-base'>
+                                 NexusHub Courier
+                              </p>
+                           </div>
+                        </div>
+                     </CardContent>
+                  </Card>
+                  {/* Sekcja metody płatności */}
+                  Payment Method
+                  <Card className='w-full rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-3'>
+                     <CardContent>
+                        <div className='flex items-start gap-2'>
+                           <StripeIcon />
+                        </div>
+                     </CardContent>
+                  </Card>
+               </div>
+            </div>
+            <div className='w-[423px]'>
+               {orderSummary ? (
+                  <TotalList
+                     items={orderSummary.items}
+                     showCheckoutButton={true}
+                     isCheckoutPage={true}
+                     productProtectionPrice={calculateProtectionCost()}
+                     shippingPrice={5}
+                     shippingInsurancePrice={6}
+                     serviceFees={0.5}
+                  />
+               ) : (
+                  <p>Loading total...</p>
                )}
             </div>
          </div>

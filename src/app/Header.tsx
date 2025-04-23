@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { useSession, signOut } from 'next-auth/react'
+import CartIcon from '@/components/icons/CartIcon'
 
 export default function Header() {
    const { data: session } = useSession()
@@ -37,15 +38,13 @@ export default function Header() {
             {session ? (
                <div className='flex items-center space-x-4'>
                   <Link href='/cart'>
-                     <button aria-label='Shopping Cart'>
-                        <Image src='/cart.svg' alt='Cart Icon' width={24} height={24} />
-                     </button>
+                     <CartIcon />
                   </Link>
 
                   <Link href='/user-panel'>
                      <Image
                         src={session.user?.image || '/avatar.png'}
-                         alt={session.user?.email || 'Default User Avatar'}
+                        alt={session.user?.email || 'Default User Avatar'}
                         width={40}
                         height={40}
                         className='rounded-full'

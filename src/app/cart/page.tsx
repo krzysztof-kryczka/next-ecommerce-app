@@ -9,6 +9,7 @@ import { toast } from 'react-toastify'
 import { Product } from '@/types/Product'
 import Link from 'next/link'
 import ProductList from '@/components/ProductList'
+import TotalList from '@/components/TotalList'
 
 const CartPage = () => {
    const [cartItems, setCartItems] = useState<Product[]>([])
@@ -169,60 +170,13 @@ const CartPage = () => {
             {/* Total */}
             <div className='w-[423px]'>
                {/* Total Product */}
-               <Card className='rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-6'>
-                  <CardContent className='px-0'>
-                     <div className='flex flex-col gap-y-4'>
-                        <h2 className='text-lg font-medium text-[var(--color-neutral-900)]'>Total Product</h2>
-
-                        {/* Zaznaczone Produkty Cena */}
-                        <div className='flex flex-col gap-y-2 text-base font-medium text-[var(--color-neutral-900)]'>
-                           {selectedItems.length > 0
-                              ? cartItems
-                                   .filter(item => selectedItems.includes(item.id))
-                                   .map(item => (
-                                      <div key={item.id} className='flex justify-between'>
-                                         <span>
-                                            {item.name} ({item.quantity} × ${item.price.toFixed(2)})
-                                         </span>
-                                         <span>${(item.quantity * item.price).toFixed(2)}</span>
-                                      </div>
-                                   ))
-                              : cartItems.map(item => (
-                                   <div key={item.id} className='flex justify-between'>
-                                      <span>
-                                         {item.name} ({item.quantity} × ${item.price.toFixed(2)})
-                                      </span>
-                                      <span>${(item.quantity * item.price).toFixed(2)}</span>
-                                   </div>
-                                ))}
-                        </div>
-                     </div>
-                     <div className='col-span-full my-6'>
-                        <Separator className='bg-[var(--color-gray-800)]' />
-                     </div>
-                     <div className='align-center flex justify-between pb-6'>
-                        <p className='text-lg font-medium text-[var(--color-neutral-900)]'>Subtotal:</p>
-                        <p className='text-[28px] font-medium text-[var(--color-neutral-900)]'>
-                           $
-                           {selectedItems.length > 0
-                              ? cartItems
-                                   .filter(item => selectedItems.includes(item.id))
-                                   .reduce((total, item) => total + item.price * item.quantity, 0)
-                                   .toFixed(2)
-                              : cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}
-                        </p>
-                     </div>
-                     <Link href='/checkout' onClick={handleCheckout}>
-                        <Button
-                           variant='fill'
-                           size='XXL'
-                           className='w-full bg-[var(--color-primary-400)] py-3.5 text-base font-medium text-[var(--color-base-gray)]'
-                        >
-                           Checkout
-                        </Button>
-                     </Link>
-                  </CardContent>
-               </Card>
+               <TotalList
+                  items={cartItems}
+                  selectedItems={selectedItems}
+                  showCheckoutButton={true}
+                  onCheckout={handleCheckout}
+                  isCheckoutPage={false}
+               />
             </div>
          </div>
       </div>
