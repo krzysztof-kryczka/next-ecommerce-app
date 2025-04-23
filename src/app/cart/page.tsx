@@ -1,15 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Button } from '@/components/ui/button'
 import Breadcrumb from '@/components/Breadcrumb'
-import { Card, CardContent } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
+import { Card, CardHeader } from '@/components/ui/card'
 import { toast } from 'react-toastify'
 import { Product } from '@/types/Product'
-import Link from 'next/link'
 import ProductList from '@/components/ProductList'
 import TotalList from '@/components/TotalList'
+import { useRouter } from 'next/navigation'
 
 const CartPage = () => {
    const [cartItems, setCartItems] = useState<Product[]>([])
@@ -17,7 +15,7 @@ const CartPage = () => {
    const [isSelectAllChecked, setIsSelectAllChecked] = useState(false)
    const [isLoading, setIsLoading] = useState<boolean>(false)
    const [isNoteVisible, setIsNoteVisible] = useState<number | null>(null)
-
+   const router = useRouter()
    // useEffect(() => {
    const fetchCart = async () => {
       setIsLoading(true)
@@ -113,6 +111,7 @@ const CartPage = () => {
       const selectedProducts =
          selectedItems.length > 0 ? cartItems.filter(item => selectedItems.includes(item.id)) : cartItems
       localStorage.setItem('checkoutItems', JSON.stringify(selectedProducts))
+      router.push('/checkout')
    }
 
    if (isLoading) return <div className='text-center'>Loading cart...</div>
@@ -170,13 +169,18 @@ const CartPage = () => {
             {/* Total */}
             <div className='w-[423px]'>
                {/* Total Product */}
-               <TotalList
-                  items={cartItems}
-                  selectedItems={selectedItems}
-                  showCheckoutButton={true}
-                  onCheckout={handleCheckout}
-                  isCheckoutPage={false}
-               />
+               <Card className='rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-6'>
+                  <CardHeader className='gap-0 px-0'>
+                     <h2 className='text-lg font-medium text-[var(--color-neutral-900)]'>Total Product</h2>
+                  </CardHeader>
+                  <TotalList
+                     items={cartItems}
+                     selectedItems={selectedItems}
+                     showCheckoutButton={true}
+                     onCheckout={handleCheckout}
+                     isCheckoutPage={false}
+                  />
+               </Card>
             </div>
          </div>
       </div>

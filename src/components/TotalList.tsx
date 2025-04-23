@@ -1,6 +1,5 @@
-import Link from 'next/link'
 import { Separator } from '@/components/ui/separator'
-import { Card, CardContent } from '@/components/ui/card'
+import { CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
 interface TotalListProps {
@@ -38,68 +37,63 @@ const TotalList = ({
       subtotal + (isCheckoutPage ? productProtectionPrice + shippingPrice + shippingInsurancePrice + serviceFees : 0)
 
    return (
-      <Card className='rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-6'>
-         <CardContent className='px-0'>
+      <CardContent className='px-0'>
+         <div className='flex flex-col gap-y-4'>
+            <div className='flex flex-col gap-y-2 text-base font-medium text-[var(--color-neutral-900)]'>
+               {filteredItems.map(item => (
+                  <div key={item.id} className='flex justify-between'>
+                     <span>
+                        {item.name} ({item.quantity} × ${item.price.toFixed(2)})
+                     </span>
+                     <span>${(item.quantity * item.price).toFixed(2)}</span>
+                  </div>
+               ))}
+            </div>
+         </div>
+
+         {isCheckoutPage && (
             <div className='flex flex-col gap-y-4'>
-               <h2 className='text-lg font-medium text-[var(--color-neutral-900)]'>Total Product</h2>
-
-               <div className='flex flex-col gap-y-2 text-base font-medium text-[var(--color-neutral-900)]'>
-                  {filteredItems.map(item => (
-                     <div key={item.id} className='flex justify-between'>
-                        <span>
-                           {item.name} ({item.quantity} × ${item.price.toFixed(2)})
-                        </span>
-                        <span>${(item.quantity * item.price).toFixed(2)}</span>
-                     </div>
-                  ))}
+               <div className='flex justify-between'>
+                  <span className='text-base text-[var(--color-neutral-900)]'>Product Protection:</span>
+                  <span>${productProtectionPrice.toFixed(2)}</span>
+               </div>
+               <div className='flex justify-between'>
+                  <span className='text-base text-[var(--color-neutral-900)]'>Shipping Price:</span>
+                  <span>${shippingPrice.toFixed(2)}</span>
+               </div>
+               <div className='flex justify-between'>
+                  <span className='text-base text-[var(--color-neutral-900)]'>Shipping Insurance:</span>
+                  <span>${shippingInsurancePrice.toFixed(2)}</span>
+               </div>
+               <div className='col-span-full my-6'>
+                  <Separator className='bg-[var(--color-gray-800)]' />
+               </div>
+               <div className='flex flex-col justify-between'>
+                  <p>Transaction Fees</p>
+                  <p className='text-base text-[var(--color-neutral-900)]'>Service Fees:</p>
+                  <span>${serviceFees.toFixed(2)}</span>
                </div>
             </div>
+         )}
 
-            {isCheckoutPage && (
-               <div className='flex flex-col gap-y-4'>
-                  <div className='flex justify-between'>
-                     <span className='text-base text-[var(--color-neutral-900)]'>Product Protection:</span>
-                     <span>${productProtectionPrice.toFixed(2)}</span>
-                  </div>
-                  <div className='flex justify-between'>
-                     <span className='text-base text-[var(--color-neutral-900)]'>Shipping Price:</span>
-                     <span>${shippingPrice.toFixed(2)}</span>
-                  </div>
-                  <div className='flex justify-between'>
-                     <span className='text-base text-[var(--color-neutral-900)]'>Shipping Insurance:</span>
-                     <span>${shippingInsurancePrice.toFixed(2)}</span>
-                  </div>
-                  <div className='col-span-full my-6'>
-                     <Separator className='bg-[var(--color-gray-800)]' />
-                  </div>
-                  <div className='flex flex-col justify-between'>
-                     <p>Transaction Fees</p>
-                     <p className='text-base text-[var(--color-neutral-900)]'>Service Fees:</p>
-                     <span>${serviceFees.toFixed(2)}</span>
-                  </div>
-               </div>
-            )}
-
-            <div className='col-span-full my-6'>
-               <Separator className='bg-[var(--color-gray-800)]' />
-            </div>
-            <div className='align-center flex justify-between pb-6'>
-               <p className='text-lg font-medium text-[var(--color-neutral-900)]'>Grand Total:</p>
-               <p className='text-[28px] font-medium text-[var(--color-neutral-900)]'>${grandTotal.toFixed(2)}</p>
-            </div>
-            {showCheckoutButton && (
-               <Link href={isCheckoutPage ? '/payment' : '/checkout'} onClick={onCheckout}>
-                  <Button
-                     variant='fill'
-                     size='XXL'
-                     className='w-full bg-[var(--color-primary-400)] py-3.5 text-base font-medium text-[var(--color-base-gray)]'
-                  >
-                     {isCheckoutPage ? 'Pay Now' : 'Checkout'}
-                  </Button>
-               </Link>
-            )}
-         </CardContent>
-      </Card>
+         <div className='col-span-full my-6'>
+            <Separator className='bg-[var(--color-gray-800)]' />
+         </div>
+         <div className='align-center flex justify-between pb-6'>
+            <p className='text-lg font-medium text-[var(--color-neutral-900)]'>Grand Total:</p>
+            <p className='text-[28px] font-medium text-[var(--color-neutral-900)]'>${grandTotal.toFixed(2)}</p>
+         </div>
+         {showCheckoutButton && (
+            <Button
+               variant='fill'
+               size='XXL'
+               className='w-full bg-[var(--color-primary-400)] py-3.5 text-base font-medium text-[var(--color-base-gray)]'
+               onClick={onCheckout}
+            >
+               {isCheckoutPage ? 'Pay Now' : 'Checkout'}
+            </Button>
+         )}
+      </CardContent>
    )
 }
 

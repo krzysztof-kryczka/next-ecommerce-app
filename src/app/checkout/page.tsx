@@ -3,12 +3,16 @@ import React, { useState, useEffect } from 'react'
 import Breadcrumb from '@/components/Breadcrumb'
 import ProductList from '@/components/ProductList'
 import { OrderSummary } from '@/types/OrderSummary'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import ShieldCrossIcon from '@/components/icons/ShieldCrossIcon'
 import StripeIcon from '@/components/icons/StripeIcon'
 import ShippingAddress from '@/components/ShippingAddress'
 import { Address } from '@/types/Address'
 import TotalList from '@/components/TotalList'
+import { loadStripe } from '@stripe/stripe-js'
+import { useRouter } from 'next/navigation'
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
 const CheckoutPage = () => {
    const [orderSummary, setOrderSummary] = useState<OrderSummary | null>(null)
@@ -16,7 +20,7 @@ const CheckoutPage = () => {
    const [isNoteVisible, setIsNoteVisible] = useState<number | null>(null)
    const [protectedItems, setProtectedItems] = useState<number[]>([])
    const [error, setError] = useState<string | null>(null)
-
+   const router = useRouter()
    const protectionCostPerItem = 1
 
    const toggleProtection = (id: number) => {
@@ -71,13 +75,50 @@ const CheckoutPage = () => {
    //       .reduce((total, item) => total + item.quantity * protectionCostPerItem, 0) // Obliczanie kosztu ochrony na podstawie protectedItems dla każdego produktu (ilość)  z osobna
    // }
 
-
    const calculateProtectionCost = () => {
       if (!orderSummary || !protectedItems.length) return 0
 
       return orderSummary.items
          .filter(item => protectedItems.includes(item.id))
          .reduce((total, item) => total + protectionCostPerItem, 0) // Stały koszt $1 za każdy produkt
+   }
+
+   const handleCheckout = async () => {
+      const stripe = await stripePromise
+
+      const orderDetails = {
+         items: orderSummary.items,
+         productProtectionPrice: calculateProtectionCost(),
+         shippingPrice: 5,
+         shippingInsurancePrice: 6,
+         serviceFees: 0.5,
+         grandTotal: orderSummary.totalAmount + calculateProtectionCost() + 5 + 6 + 0.5,
+         paymentMethod: 'Stripe (Credit Card)',
+         shippingMethod: 'NexusHub Courier',
+      }
+
+      localStorage.setItem('orderSummary', JSON.stringify(orderDetails))
+
+      const response = await fetch('/api/create-checkout-session', {
+         method: 'POST',
+         headers: {
+            'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({
+            items: orderSummary.items.map(item => ({
+               name: item.name,
+               price: item.price,
+               quantity: item.quantity,
+            })),
+         }),
+      })
+
+      const { id } = await response.json()
+
+      const { error } = await stripe?.redirectToCheckout({ sessionId: id })
+      if (error) {
+         console.error('Stripe checkout error:', error)
+      }
    }
 
    return (
@@ -155,19 +196,25 @@ const CheckoutPage = () => {
                </div>
             </div>
             <div className='w-[423px]'>
-               {orderSummary ? (
-                  <TotalList
-                     items={orderSummary.items}
-                     showCheckoutButton={true}
-                     isCheckoutPage={true}
-                     productProtectionPrice={calculateProtectionCost()}
-                     shippingPrice={5}
-                     shippingInsurancePrice={6}
-                     serviceFees={0.5}
-                  />
-               ) : (
-                  <p>Loading total...</p>
-               )}
+               <Card className='rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-6'>
+                  <CardHeader className='gap-0 px-0'>
+                     <h2 className='text-lg font-medium text-[var(--color-neutral-900)]'>Total Product</h2>
+                  </CardHeader>
+                  {orderSummary ? (
+                     <TotalList
+                        items={orderSummary.items}
+                        showCheckoutButton={true}
+                        isCheckoutPage={true}
+                        productProtectionPrice={calculateProtectionCost()}
+                        shippingPrice={5}
+                        shippingInsurancePrice={6}
+                        serviceFees={0.5}
+                        onCheckout={handleCheckout}
+                     />
+                  ) : (
+                     <p>Loading total...</p>
+                  )}
+               </Card>
             </div>
          </div>
       </div>
