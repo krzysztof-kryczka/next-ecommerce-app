@@ -8,36 +8,13 @@ import TotalList from '@/components/TotalList'
 import { Button } from '@/components/ui/button'
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon'
 import { useRouter, useSearchParams } from 'next/navigation'
-
-interface OrderSummary {
-   items: {
-      id: number
-      name: string
-      quantity: number
-      price: number
-   }[]
-   productProtectionPrice: number
-   shippingPrice: number
-   shippingInsurancePrice: number
-   serviceFees: number
-   grandTotal: number
-   paymentMethod: string
-   shippingMethod: string
-   transactionDate: string
-}
+import { SessionDetails } from '@/types/SessionDetails'
 
 const PaymentSuccessPage = () => {
-   const [orderSummary, setOrderSummary] = useState<OrderSummary | null>(null)
    const router = useRouter()
    const searchParams = useSearchParams()
-   const sessionId = searchParams.get('sessionId')
-   const [sessionDetails, setSessionDetails] = useState<null | {
-      transactionDate: string
-      amount: number
-      paymentIntentId: string
-      paymentMethod: string
-      shippingMethod: string
-   }>(null)
+   const sessionId = searchParams?.get('sessionId') || ''
+   const [sessionDetails, setSessionDetails] = useState<SessionDetails | null>(null)
 
    useEffect(() => {
       const fetchSessionDetails = async () => {
@@ -60,18 +37,16 @@ const PaymentSuccessPage = () => {
             amount: data.amount_total / 100,
             paymentMethod: data.paymentMethod,
             shippingMethod: data.shippingMethod,
+            productProtectionPrice: data.productProtectionPrice,
+            shippingPrice: data.shippingPrice,
+            shippingInsurancePrice: data.shippingInsurancePrice,
+            serviceFees: data.serviceFees,
+            items: data.products,
          })
       }
 
       fetchSessionDetails()
    }, [sessionId])
-
-   useEffect(() => {
-      const savedOrder = localStorage.getItem('orderSummary')
-      if (savedOrder) {
-         setOrderSummary(JSON.parse(savedOrder))
-      }
-   }, [])
 
    if (!sessionDetails) {
       return <p>Loading payment details...</p>
@@ -118,18 +93,18 @@ const PaymentSuccessPage = () => {
                <div className='flex flex-col gap-y-4'>
                   <p className='text-lg font-medium text-[var(--color-neutral-900)]'>Your Order</p>
                   <ProductList
-                     items={orderSummary.items}
+                     items={sessionDetails.items}
                      showCheckbox={false}
                      showTrashIcon={false}
                      onQuantityChange={undefined}
                      showNotes={false}
                   />
                   <TotalList
-                     items={orderSummary.items}
-                     productProtectionPrice={orderSummary.productProtectionPrice}
-                     shippingPrice={orderSummary.shippingPrice}
-                     shippingInsurancePrice={orderSummary.shippingInsurancePrice}
-                     serviceFees={orderSummary.serviceFees}
+                     items={sessionDetails.items}
+                     productProtectionPrice={sessionDetails.productProtectionPrice}
+                     shippingPrice={sessionDetails.shippingPrice}
+                     shippingInsurancePrice={sessionDetails.shippingInsurancePrice}
+                     serviceFees={sessionDetails.serviceFees}
                      showCheckoutButton={false}
                      isCheckoutPage={true}
                   />

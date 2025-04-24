@@ -106,10 +106,15 @@ const CheckoutPage = () => {
          },
          body: JSON.stringify({
             items: orderSummary.items.map(item => ({
+               id: item.id,
                name: item.name,
                price: item.price,
                quantity: item.quantity,
             })),
+            productProtectionPrice: orderDetails.productProtectionPrice,
+            shippingPrice: orderDetails.shippingPrice,
+            shippingInsurancePrice: orderDetails.shippingInsurancePrice,
+            serviceFees: orderDetails.serviceFees,
          }),
       })
 
