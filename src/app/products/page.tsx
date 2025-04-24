@@ -16,6 +16,7 @@ import DropdownSection from '@/components/DropdownSection'
 import CategoryList from '@/components/CategoryList'
 import PriceRange from '@/components/PriceRange'
 import { PriceRangeType } from '@/types/PriceRangeType'
+import { useSearchParams } from 'next/navigation'
 
 export default function ProductsPage() {
    const [categories, setCategories] = useState<Category[]>([])
@@ -32,6 +33,8 @@ export default function ProductsPage() {
    const [isPriceOpen, setIsPriceOpen] = useState<boolean>(true)
    const [visibleCategories, setVisibleCategories] = useState<number>(4)
    const [selectedCategories, setSelectedCategories] = useState<number[]>([])
+   const searchParams = useSearchParams()
+   const selectedParam = searchParams?.getAll('selected[]') || []
 
    useEffect(() => {
       async function fetchCategories() {
@@ -64,16 +67,29 @@ export default function ProductsPage() {
    }, [])
 
    useEffect(() => {
-      async function fetchProducts() {
-         setLoading(true)
-         const response = await fetch('/api/products')
-         const data = await response.json()
-         setProducts(data)
-         setFilteredProducts(data) // Początkowe filtrowanie: wszystkie produkty
-         setLoading(false)
+      // Zamieniamy URL na tablicę liczb
+      const selectedIds = selectedParam.map(id => parseInt(id, 10)).filter(id => !isNaN(id))
+      // gdy stan się różni, zaktualizuj selectedCategories
+      if (JSON.stringify(selectedCategories) !== JSON.stringify(selectedIds)) {
+         setSelectedCategories(selectedIds)
+         setCurrentPage(1)
       }
-      fetchProducts()
-   }, [])
+   }, [selectedParam, selectedCategories])
+
+   const handleCategoryChange = (newCategories: number[]) => {
+      setSelectedCategories(newCategories)
+
+      if (newCategories.length === 0) {
+         // Usuń wszystkie dodane parametry z adresu URL, jeśli -> All
+         window.history.replaceState(null, '', '/products')
+      } else {
+         // Dodaj parametry do URL jęsli zaznaczono wiele kategorii
+         // Zamieniamy tablicę na parametry URL
+         const params = newCategories.map(id => `selected[]=${id}`).join('&')
+         const url = `/products?${params}`
+         window.history.replaceState(null, '', url)
+      }
+   }
 
    useEffect(() => {
       let filtered = products
@@ -153,7 +169,8 @@ export default function ProductsPage() {
                {isProductOpen && (
                   <CategoryList
                      selectedCategories={selectedCategories}
-                     setSelectedCategories={setSelectedCategories}
+                     // setSelectedCategories={setSelectedCategories}
+                     setSelectedCategories={handleCategoryChange}
                      categories={categories}
                      setCurrentPage={setCurrentPage}
                      visibleCategories={visibleCategories}
