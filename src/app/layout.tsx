@@ -4,11 +4,14 @@ import Header from './Header'
 import Footer from './Footer'
 import 'react-toastify/dist/ReactToastify.css'
 import './globals.css'
+import { Inter } from 'next/font/google'
 
-export default function RootLayout({ children, }: Readonly<{ children: React.ReactNode }>) {
+const inter = Inter({ subsets: ['latin'] })
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
    return (
       <html lang='en'>
-         <body className='antialiased'>
+         <body className={`${inter.className} mx-auto flex max-w-[1440px] flex-col antialiased`}>
             <SessionProvider>
                <Header />
                <main>{children}</main>

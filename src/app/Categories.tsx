@@ -37,7 +37,7 @@ const Categories = () => {
 
    return (
       <div className='flex flex-col gap-y-8'>
-         <h2 className='text-[var(--color-neutral-900) text-[28px] font-medium'>Category</h2>
+         <h2 className='text-[var(--color-neutral-900)] text-[28px] font-medium'>Category</h2>
          <div className='grid grid-cols-1 gap-x-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5'>
             {categories.map(category => (
                <Link
