@@ -3,5 +3,5 @@ export type Category = {
    name: string
    description?: string
    image?: string
-   exploreInfo?: string
+   exploreInfo?: string | null | undefined
 }

@@ -61,7 +61,7 @@
    --color-warning-800: #85680e;
    --color-warning-900: #423306;
 
-   --color-danger-50: #fef2f2;
+   --color-danger-50: #842626 /* #fef2f2; */
    --color-danger-100: #fee2e2;
    --color-danger-200: #fecaca;
    --color-danger-300: #fca5a5;

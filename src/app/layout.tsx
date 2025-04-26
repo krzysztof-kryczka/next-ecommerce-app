@@ -5,6 +5,7 @@ import Footer from './Footer'
 import 'react-toastify/dist/ReactToastify.css'
 import './globals.css'
 import { Inter } from 'next/font/google'
+import { CategoriesProvider } from '@/context/CategoriesContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -14,7 +15,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
          <body className={`${inter.className} mx-auto flex max-w-[1440px] flex-col antialiased`}>
             <SessionProvider>
                <Header />
-               <main>{children}</main>
+               <CategoriesProvider>
+                  <main>{children}</main>
+               </CategoriesProvider>
                <Footer />
                <ToastContainer
                   position='top-right'

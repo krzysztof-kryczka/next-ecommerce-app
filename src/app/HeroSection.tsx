@@ -10,46 +10,44 @@ import {
    CarouselPrevious,
    type CarouselApi,
 } from '@/components/ui/carousel'
-import { Category } from '@/types/Category'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import ArrowRightIcon from '@/components/icons/ArrowRightIcon'
 import Text from '@/components/ui/text'
+import useFetch from '@/hooks/useFetch'
+import { Category } from '@/types/Category'
+import ArrowRightIcon from '@/components/icons/ArrowRightIcon'
 
 export default function CategoriesCarousel() {
-   const [categories, setCategories] = useState<Category[]>([])
    const [carouselApi, setCarouselApi] = useState<CarouselApi>()
    const [currentIndex, setCurrentIndex] = useState(0)
+   const { data: categories, loading, error } = useFetch<Category>('/api/categories')
    const router = useRouter()
 
-      useEffect(() => {
-         async function fetchCategories() {
-            try {
-               const response = await fetch('/api/categories')
-               if (!response.ok) throw new Error('Failed to fetch categories')
-               const data: Category[] = await response.json()
-               setCategories(data)
-            } catch (error) {
-               console.error('Failed to fetch categories:', error)
-            }
-         }
-         fetchCategories()
-      }, [])
-
    useEffect(() => {
-      if (!carouselApi) return
-      setCurrentIndex(carouselApi.selectedScrollSnap())
-      carouselApi.on('select', () => {
-         setCurrentIndex(carouselApi.selectedScrollSnap())
-      })
+      if (carouselApi) {
+         const updateCurrentIndex = () => {
+            setCurrentIndex(carouselApi.selectedScrollSnap())
+         }
+
+         updateCurrentIndex()
+         carouselApi.on('select', updateCurrentIndex)
+
+         return () => {
+            carouselApi.off('select', updateCurrentIndex)
+         }
+      }
    }, [carouselApi])
 
    const handleExploreCategory = (categoryId: number) => {
       router.push(`/products?selected[]=${categoryId}`)
    }
 
-   if (categories.length === 0) {
-      return <div className='text-center text-[var(--color-neutral-900)]'>Loading...</div>
+   if (loading) {
+      return <p>Loading categories...</p>
+   }
+
+   if (error) {
+      return <p>{error}</p>
    }
 
    return (
@@ -59,7 +57,7 @@ export default function CategoriesCarousel() {
                <CardContent className='relative overflow-hidden p-0'>
                   <Carousel setApi={setCarouselApi} className='relative'>
                      <CarouselContent>
-                        {categories.map((category, index) => (
+                        {categories.map(category => (
                            <CarouselItem key={category.id} className='flex items-center justify-between gap-8 p-0'>
                               {/* Lewa strona: Tekst */}
                               <div className='flex w-1/2 flex-col gap-y-10 pt-[132px] pb-20 pl-[120px]'>
@@ -67,7 +65,6 @@ export default function CategoriesCarousel() {
                                     <Text as='h4' variant='h4medium' className='text-[var(--color-neutral-900)]'>
                                        {category.name}
                                     </Text>
-
                                     <Text as='p' variant='textMregular' className='text-[var(--color-neutral-100)]'>
                                        {category.description}
                                     </Text>
@@ -105,14 +102,13 @@ export default function CategoriesCarousel() {
                   </Carousel>
                </CardContent>
             </Card>
-
             {/* Indykatory */}
             <div className='mt-6 flex justify-center gap-x-4'>
                {categories.map((_, index) => (
                   <div
                      key={index}
                      className={`h-3 w-3 rounded-full ${index === currentIndex ? 'bg-[var(--color-primary-400)]' : 'bg-gray-600'}`}
-                  ></div>
+                  />
                ))}
             </div>
          </div>

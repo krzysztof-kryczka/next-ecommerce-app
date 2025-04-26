@@ -1,11 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import { Label } from '@/components/ui/label'
-
-import { Button } from '@/components/ui/button'
-import CartIcon from '@/components/icons/CartIcon'
 import { Product } from '@/types/Product'
 import { Category } from '@/types/Category'
 import SortBySelect from '@/components/SortBySelect'
@@ -17,6 +13,7 @@ import CategoryList from '@/components/CategoryList'
 import PriceRange from '@/components/PriceRange'
 import { PriceRangeType } from '@/types/PriceRangeType'
 import { useSearchParams } from 'next/navigation'
+import ProductCard from '@/components/ProductCard'
 
 export default function ProductsPage() {
    const [categories, setCategories] = useState<Category[]>([])
@@ -214,42 +211,7 @@ export default function ProductsPage() {
                   ) : (
                      <div className='grid grid-cols-3 gap-x-12 gap-y-8 px-10'>
                         {paginatedProducts.map(product => (
-                           <div
-                              key={product.id}
-                              className='relative z-10 cursor-pointer overflow-hidden rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)]'
-                           >
-                              <Link href={`/add-to-cart/${product.id}`}>
-                                 <div className='absolute top-8 left-8 z-10 flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-base-gray)]'>
-                                    <CartIcon />
-                                 </div>
-                              </Link>
-                              <Link key={product.id} href={`/product/${product.id}`}>
-                                 <div className='relative px-4 pt-4'>
-                                    <img
-                                       src={product.imageUrl?.[0] || 'https://i.ibb.co/xtWHYY7v/brak-zdjecia.png'}
-                                       alt={product.name}
-                                       className='h-48 w-full rounded-md object-cover'
-                                    />
-                                 </div>
-                                 <div className='flex flex-col gap-y-4 px-4 pt-[18px] pb-5'>
-                                    <Button
-                                       variant={'fill'}
-                                       size={'XS'}
-                                       className='h-auto bg-[var(--color-blazeOrange-600)] px-2.5 py-1.5 text-sm font-medium text-[var(--color-primary-100)]'
-                                    >
-                                       {categoriesMap[product.categoryId] || 'Unknown'}
-                                    </Button>
-                                    <div className='flex flex-col gap-y-2'>
-                                       <h2 className='text-lg font-medium text-[var(--color-neutral-900)]'>
-                                          {product.name}
-                                       </h2>
-                                       <p className='text-[28px] font-semibold text-[var(--color-neutral-900)]'>
-                                          ${product.price}
-                                       </p>
-                                    </div>
-                                 </div>
-                              </Link>
-                           </div>
+                           <ProductCard key={product.id} product={product} />
                         ))}
                      </div>
                   )}
