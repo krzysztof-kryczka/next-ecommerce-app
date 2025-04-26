@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import { Label } from '@/components/ui/label'
 import { Product } from '@/types/Product'
-import { Category } from '@/types/Category'
 import SortBySelect from '@/components/SortBySelect'
 import { SortByOptions } from '@/types/SortByOptions'
 import ShowPerPageSelect from '@/components/ShowPerPageSelect'
@@ -14,9 +13,9 @@ import PriceRange from '@/components/PriceRange'
 import { PriceRangeType } from '@/types/PriceRangeType'
 import { useSearchParams } from 'next/navigation'
 import ProductCard from '@/components/ProductCard'
+import { useCategories } from '@/context/CategoriesContext'
 
 export default function ProductsPage() {
-   const [categories, setCategories] = useState<Category[]>([])
    const [products, setProducts] = useState<Product[]>([])
    const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
    const [loading, setLoading] = useState<boolean>(true)
@@ -25,7 +24,6 @@ export default function ProductsPage() {
    const [priceRange, setPriceRange] = useState<PriceRangeType>({ min: '', max: '' })
    const [currentPage, setCurrentPage] = useState<number>(1)
    const [totalPages, setTotalPages] = useState<number>(1)
-   const [categoriesMap, setCategoriesMap] = useState<Record<number, string>>({})
    const [isProductOpen, setIsProductOpen] = useState<boolean>(true)
    const [isPriceOpen, setIsPriceOpen] = useState<boolean>(true)
    const [visibleCategories, setVisibleCategories] = useState<number>(4)
@@ -33,23 +31,7 @@ export default function ProductsPage() {
    const searchParams = useSearchParams()
    const selectedParam = searchParams?.getAll('selected[]') || []
 
-   useEffect(() => {
-      async function fetchCategories() {
-         const response = await fetch('/api/categories')
-         const data = await response.json()
-         setCategories(data)
-
-         const categoryMapping = data.reduce(
-            (acc: Record<number, string>, category: { id: number; name: string }) => {
-               acc[category.id] = category.name
-               return acc
-            },
-            {} as Record<number, string>,
-         ) // Rzutowanie pustego obiektu jako mapa
-         setCategoriesMap(categoryMapping)
-      }
-      fetchCategories()
-   }, [])
+   const { categories, categoriesMap, loading: categoriesLoading, error } = useCategories()
 
    useEffect(() => {
       async function fetchProducts() {
@@ -151,7 +133,7 @@ export default function ProductsPage() {
    }
 
    return (
-      <div className='mx-auto max-w-7xl px-4 py-8'>
+      <div className='px-10'>
          <ResizablePanelGroup
             direction='horizontal'
             className='h-full w-full border-t border-t-[var(--color-gray-800)]'
@@ -166,7 +148,6 @@ export default function ProductsPage() {
                {isProductOpen && (
                   <CategoryList
                      selectedCategories={selectedCategories}
-                     // setSelectedCategories={setSelectedCategories}
                      setSelectedCategories={handleCategoryChange}
                      categories={categories}
                      setCurrentPage={setCurrentPage}
@@ -189,15 +170,15 @@ export default function ProductsPage() {
                <div className='flex w-full flex-col'>
                   <div className='flex w-full items-center gap-[60px] p-10'>
                      <div className='flex gap-x-4'>
-                        <Label variant='custom' className='text-xl font-semibold'>
-                           Sort By:
+                        <Label variant='custom' className='text-xl leading-[30px] font-semibold tracking-[-0.01em]'>
+                           Sort By
                         </Label>
                         <SortBySelect sortBy={sortBy} setSortBy={setSortBy} />
                      </div>
 
                      <div className='flex gap-x-4'>
-                        <Label variant='custom' className='text-xl font-semibold'>
-                           Show:
+                        <Label variant='custom' className='text-xl leading-[30px] font-semibold tracking-[-0.01em]'>
+                           Show
                         </Label>
                         <ShowPerPageSelect
                            showPerPage={showPerPage}
@@ -206,7 +187,7 @@ export default function ProductsPage() {
                         />
                      </div>
                   </div>
-                  {loading ? (
+                  {loading || categoriesLoading ? (
                      <p className='text-center text-lg text-gray-500'>Ładowanie produktów...</p>
                   ) : (
                      <div className='grid grid-cols-3 gap-x-12 gap-y-8 px-10'>

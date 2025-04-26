@@ -1,17 +1,20 @@
 import ChevronDownIcon from './icons/ChevronDownIcon'
 import ChevronUpIcon from './icons/ChevronUpIcon'
+import Text from '@/components/ui/text'
 
 const DropdownSection: React.FC<{
    title: string
    isOpen: boolean
    onToggle: () => void
 }> = ({ title, isOpen, onToggle }) => (
-   <p
+   <Text
+      as='p'
+      variant='h7semiBold'
+      className='flex cursor-pointer items-center justify-between text-[var(--color-neutral-900)]'
       onClick={onToggle}
-      className='flex cursor-pointer items-center justify-between text-xl font-semibold text-[var(--color-neutral-900)]'
    >
       {title} {isOpen ? <ChevronDownIcon /> : <ChevronUpIcon />}
-   </p>
+   </Text>
 )
 
 export default DropdownSection
