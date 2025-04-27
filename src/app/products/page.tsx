@@ -14,11 +14,10 @@ import { PriceRangeType } from '@/types/PriceRangeType'
 import { useSearchParams } from 'next/navigation'
 import ProductCard from '@/components/ProductCard'
 import { useCategories } from '@/context/CategoriesContext'
+import useFetch from '@/hooks/useFetch'
 
 export default function ProductsPage() {
-   const [products, setProducts] = useState<Product[]>([])
    const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
-   const [loading, setLoading] = useState<boolean>(true)
    const [sortBy, setSortBy] = useState<SortByOptions>('latest')
    const [showPerPage, setShowPerPage] = useState<number>(9)
    const [priceRange, setPriceRange] = useState<PriceRangeType>({ min: '', max: '' })
@@ -28,22 +27,10 @@ export default function ProductsPage() {
    const [isPriceOpen, setIsPriceOpen] = useState<boolean>(true)
    const [visibleCategories, setVisibleCategories] = useState<number>(4)
    const [selectedCategories, setSelectedCategories] = useState<number[]>([])
+   const { categories, loading: categoriesLoading } = useCategories()
+   const { data: products, loading, error } = useFetch<Product>('/api/products')
    const searchParams = useSearchParams()
    const selectedParam = searchParams?.getAll('selected[]') || []
-
-   const { categories, categoriesMap, loading: categoriesLoading, error } = useCategories()
-
-   useEffect(() => {
-      async function fetchProducts() {
-         setLoading(true)
-         const response = await fetch('/api/products')
-         const data: Product[] = await response.json()
-         setProducts(data)
-         setFilteredProducts(data)
-         setLoading(false)
-      }
-      fetchProducts()
-   }, [])
 
    useEffect(() => {
       // Zamieniamy URL na tablicę liczb

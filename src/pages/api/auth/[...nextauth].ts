@@ -92,7 +92,7 @@ export const authOptions = {
             id: token.id as string,
             email: token.email as string,
          }
-         session.token = token.encodedToken
+         session.accessToken = token.encodedToken
          session.maxAge = token.maxAge as number
          session.expires = new Date(Date.now() + session.maxAge * 1000).toISOString()
          console.log('Session Callback - Max Age:', session.maxAge)

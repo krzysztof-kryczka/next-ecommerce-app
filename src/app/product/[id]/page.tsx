@@ -10,7 +10,9 @@ import QuantityPicker from '@/components/QuantityPicker'
 import Subtotal from '@/components/Subtotal'
 import ShieldCrossIcon from '@/components/icons/ShieldCrossIcon'
 import { Separator } from '@/components/ui/separator'
-import { toast } from 'react-toastify'
+import { useAddToCart } from '@/hooks/useAddToCart'
+import Text from '@/components/ui/text'
+import { useCategories } from '@/context/CategoriesContext'
 
 const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
    const [product, setProduct] = useState<any>(null)
@@ -18,9 +20,10 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
    const [productId, setProductId] = useState<string | null>(null)
    const [selectedColor, setSelectedColor] = useState<string>('White')
    const [stock, setStock] = useState(0)
-   const [categoriesMap, setCategoriesMap] = useState<Record<number, string>>({})
    const [isFullTextVisible, setIsFullTextVisible] = useState(false)
    const [mainImage, setMainImage] = useState<string>('')
+   const { addToCart, loading } = useAddToCart()
+   const { categoriesMap } = useCategories()
 
    const handleImageClick = (url: string) => {
       setMainImage(url)
@@ -51,68 +54,16 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
       }
    }, [productId])
 
-   useEffect(() => {
-      const fetchCategories = async () => {
-         try {
-            const res = await fetch('/api/categories')
-            if (!res.ok) {
-               throw new Error(`HTTP error! status: ${res.status}`)
-            }
-
-            const categories = await res.json()
-
-            const categoryMapping = categories.reduce(
-               (acc: Record<number, string>, category: { id: number; name: string }) => {
-                  acc[category.id] = category.name
-                  return acc
-               },
-               {},
-            )
-
-            setCategoriesMap(categoryMapping)
-         } catch (error) {
-            console.error('Error fetching categories:', error)
-         }
-      }
-
-      fetchCategories()
-   }, [])
-
    if (!product) {
       return <div className='flex h-screen items-center justify-center'>Ładowanie...</div>
    }
 
-   const handleAddToCart = async () => {
-      try {
-         const cartItem = {
-            productId: product.id,
-            quantity,
-         }
-
-         const response = await fetch('/api/cart', {
-            method: 'POST',
-            headers: {
-               'Content-Type': 'application/json',
-               // userid: session?.user?.id || '',
-               // testy
-               userid: '123',
-            },
-            body: JSON.stringify(cartItem),
-         })
-
-         if (response.ok) {
-            toast.success('Product added to cart!')
-         } else {
-            toast.error('Failed to add product to cart.')
-         }
-      } catch (error) {
-         console.error('Error adding product to cart:', error)
-         toast.error('Something went wrong.')
-      }
+   const handleAddToCart = () => {
+      addToCart(product.id, quantity)
    }
 
    return (
-      <div className='mx-auto flex max-w-[1440px] flex-col gap-y-8 px-4 pb-10 sm:px-6 md:px-10'>
+      <div className='flex flex-col gap-y-8 px-10 pb-10 sm:px-6 md:px-10'>
          {/* Breadcrumb */}
          <Breadcrumb
             paths={[
@@ -156,9 +107,9 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                {/* Kolumna 2 */}
                <div className='flex w-full flex-col gap-y-6 sm:gap-y-8 md:w-[427px]'>
                   <div className='flex flex-col gap-y-3 sm:gap-y-5'>
-                     <h1 className='text-[22px] font-medium text-[var(--color-neutral-900)] sm:text-[28px]'>
+                     <Text as='h1' variant='h5medium' className='text-[var(--color-neutral-900)]'>
                         {product.name}
-                     </h1>
+                     </Text>
                      <Button
                         disabled
                         variant={'fill'}
@@ -168,32 +119,37 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                         {categoriesMap[product.categoryId] || 'Unknown'}
                      </Button>
                   </div>
-                  <p className='text-[26px] font-medium text-[var(--color-neutral-900)] sm:text-[32px]'>
+                  <Text as='p' variant='h4medium' className='text-[var(--color-neutral-900)]'>
                      ${product.price}
-                  </p>
-                  <p className='text-sm text-[var(--color-neutral-900)] sm:text-base'>
+                  </Text>
+                  <Text as='p' variant='textMregular' className='text-[var(--color-neutral-900)]'>
                      {isFullTextVisible ? product.description : product.description.slice(0, 50)}{' '}
-                     <Button variant='text' className='w-auto px-0 text-xs sm:text-sm' onClick={handleToggleText}>
+                     <Button
+                        variant='text'
+                        className='w-auto px-0 text-base leading-[26px] font-medium tracking-normal'
+                        onClick={handleToggleText}
+                     >
                         {isFullTextVisible ? 'View less' : 'View more'}
                      </Button>
-                  </p>
-                  <div className='pb-8 sm:pb-12'>
-                     <p className='pb-2 text-sm font-medium text-[var(--color-neutral-300)] sm:pb-3.5 sm:text-lg'>
+                  </Text>
+
+                  <div className='flex flex-col gap-y-3.5'>
+                     <Text as='p' variant='textLmedium' className='text-[var(--color-neutral-300)]'>
                         Shipping Available
-                     </p>
+                     </Text>
                      <div className='flex w-full flex-col gap-y-1 rounded-md border p-3 sm:w-[312px] sm:p-4'>
                         <div className='flex items-start gap-2'>
                            <ShieldCrossIcon />
                            <div className='flex flex-col gap-y-1'>
-                              <p className='text-sm font-medium text-[var(--color-neutral-900)] sm:text-base'>
+                              <Text as='p' variant='textMmedium' className='text-[var(--color-neutral-900)]'>
                                  NexusHub Courier
-                              </p>
-                              <p className='text-sm font-medium text-[var(--color-neutral-900)] sm:text-base'>
+                              </Text>
+                              <Text as='p' variant='textMregular' className='text-[var(--color-neutral-900)]'>
                                  Estimated arrival{' '}
                                  <span className='font-semibold'>
                                     {product.deliveryDateRange.startDate} - {product.deliveryDateRange.endDate}
                                  </span>
-                              </p>
+                              </Text>
                            </div>
                         </div>
                      </div>
@@ -205,7 +161,7 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
             </div>
 
             {/* Kolumna 3 */}
-            <Card className='w-full rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-4 text-[var(--color-base-white)] sm:max-w-[422px] sm:p-6'>
+            <Card className='max-h-[470px] w-full rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-4 text-[var(--color-base-white)] sm:max-w-[422px] sm:p-6'>
                <CardContent className='flex flex-col gap-y-6 px-0 sm:gap-y-8'>
                   <ColorPicker
                      colors={[
@@ -220,11 +176,14 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                   <Button
                      variant='stroke'
                      size='XXL'
-                     className='flex w-full items-center gap-2 text-xs sm:text-sm'
+                     className='flex h-[54px] w-full items-center gap-2 text-xs sm:text-sm'
                      onClick={handleAddToCart}
+                     disabled={loading}
                   >
-                     Add to Cart
-                     <CartIcon className='text-[var(--color-blazeOrange-600)]' />
+                     <Text as='span' variant='textMmedium'>
+                        {loading ? 'Adding...' : 'Add to Cart'}
+                     </Text>
+                     <CartIcon className='!h-6 !w-6 text-[var(--color-blazeOrange-600)]' />
                   </Button>
                </CardContent>
             </Card>

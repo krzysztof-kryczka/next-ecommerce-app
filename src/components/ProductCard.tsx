@@ -6,16 +6,24 @@ import CartIcon from '@/components/icons/CartIcon'
 import { ProductCardProps } from '@/types/ProductCardProps'
 import { useCategories } from '@/context/CategoriesContext'
 import Text from '@/components/ui/text'
+import { useAddToCart } from '@/hooks/useAddToCart'
 
 export default function ProductCard({ product }: ProductCardProps) {
    const { categoriesMap } = useCategories()
+   const { addToCart } = useAddToCart()
+
+   const handleAddToCart = () => {
+      addToCart(product.id, 1)
+   }
+
    return (
-      <div className='relative w-[300px] h-[386px] z-10 cursor-pointer overflow-hidden rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)]'>
-         <Link href={`/add-to-cart/${product.id}`}>
-            <div className='absolute top-8 left-8 z-10 flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-base-gray)]'>
-               <CartIcon />
-            </div>
-         </Link>
+      <div className='relative z-10 h-[386px] w-[300px] cursor-pointer overflow-hidden rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)]'>
+         <div
+            onClick={handleAddToCart}
+            className='absolute top-8 left-8 z-10 flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-base-gray)] hover:bg-[var(--color-blazeOrange-600)]'
+         >
+            <CartIcon />
+         </div>
          <Link key={product.id} href={`/product/${product.id}`}>
             <div className='px-4 pt-4'>
                <img

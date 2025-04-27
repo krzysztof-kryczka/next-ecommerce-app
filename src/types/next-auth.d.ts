@@ -11,7 +11,7 @@ declare module 'next-auth' {
    interface Session {
       user: User
       maxAge?: number
-      token?: string
+      accessToken?: string
    }
 
    interface JWT {

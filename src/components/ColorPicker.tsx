@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button } from './ui/button'
-import CheckIcon from './icons/CheckIcon'
+import Text from '@/components/ui/text'
 
 const ColorPicker = ({
    colors,
@@ -13,8 +13,10 @@ const ColorPicker = ({
 }) => {
    return (
       <div>
-         <h4 className='pb-4 text-lg font-medium text-[var(--color-neutral-300)]'>Colors:</h4>
-         <div className='mt-2 flex gap-4'>
+         <Text as='h4' variant='textLmedium' className='pb-3.5 text-[var(--color-neutral-300)]'>
+            Colors:
+         </Text>
+         <div className='flex gap-4'>
             {colors.map(color => (
                <Button
                   variant='stroke'

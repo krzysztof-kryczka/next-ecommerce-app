@@ -10,7 +10,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
    const session = await getServerSession(req, res, authOptions)
 
    if (!session || !session.user) {
-      return sendResponse(res, 401, false, 'Unauthorized: User not authenticated')
+      return res.status(401).json({
+         success: false,
+         message: 'Unauthorized: User not authenticated',
+      })
    }
 
    const userId = parseInt(session.user.id, 10)

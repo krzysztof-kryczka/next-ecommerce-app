@@ -39,7 +39,7 @@
    --color-primary-800: #943518;
    --color-primary-900: #40150a;
 
-   --color-success-50:  #295B40; /* #f0fdf5; */
+   --color-success-50: #295b40; /* #f0fdf5; */
    --color-success-100: #dcfce8;
    --color-success-200: #bbf7d1;
    --color-success-300: #86efad;
@@ -61,7 +61,7 @@
    --color-warning-800: #85680e;
    --color-warning-900: #423306;
 
-   --color-danger-50: #842626 /* #fef2f2; */
+   --color-danger-50: #842626; /* #fef2f2; */
    --color-danger-100: #fee2e2;
    --color-danger-200: #fecaca;
    --color-danger-300: #fca5a5;
@@ -161,72 +161,74 @@
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #1a1a1a;
+   --background: #ffffff;
+   --foreground: #1a1a1a;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+   --color-background: var(--background);
+   --color-foreground: var(--foreground);
+   --font-sans: var(--font-geist-sans);
+   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #1a1a1a;
-    --foreground: #fcfcfc;
-  }
+   :root {
+      --background: #1a1a1a;
+      --foreground: #fcfcfc;
+   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+   background: var(--background);
+   color: var(--foreground);
 }
 
 :focus-visible {
-  outline: none;
+   outline: none;
 }
 
 /* Style podstawowe dla kontenera */
 .modal-order-service-checkbox {
-    position: relative;
-    display: inline-block;
-    top: 7px;
+   position: relative;
+   display: inline-block;
+   top: 7px;
 }
 
 /* Styl domyślny dla checkmarka */
 .checkmark {
-    position: absolute;
-    width: 26px;
-    height: 26px;
-    background-color: var(--color-gray-50); /* Kolor tła nieznaczony */
-    border: 2px solid var(--color-gray-400); /* Obramowanie nieznaczone */
-    border-radius: 6px; /* Zaokrąglenie */
-    cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s; /* Płynna animacja */
+   position: absolute;
+   width: 26px;
+   height: 26px;
+   background-color: var(--color-gray-50); /* Kolor tła nieznaczony */
+   border: 2px solid var(--color-gray-400); /* Obramowanie nieznaczone */
+   border-radius: 6px; /* Zaokrąglenie */
+   cursor: pointer;
+   transition:
+      background-color 0.2s,
+      border-color 0.2s; /* Płynna animacja */
 }
 
 /* Stan checked */
 .modal-order-service-checkbox input:checked ~ .checkmark {
-    background-color: var(--color-primary-400); /* Kolor tła zaznaczony */
-    border-color: var(--color-primary-400); /* Obramowanie zaznaczone */
+   background-color: var(--color-primary-400); /* Kolor tła zaznaczony */
+   border-color: var(--color-primary-400); /* Obramowanie zaznaczone */
 }
 
 /* Styl fajeczki */
 .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none; /* Ukryj w stanie nieznaczonym */
+   content: '';
+   position: absolute;
+   display: none; /* Ukryj w stanie nieznaczonym */
 }
 
 /* Styl dla fajeczki w stanie checked */
 .modal-order-service-checkbox input:checked ~ .checkmark:after {
-    display: block; /* Pokaż fajeczkę */
-    content: "✓"; /* Możesz zmienić na inną ikonę */
-    color: black; /* Kolor fajeczki */
-    font-size: 24px; /* Rozmiar fajeczki */
-    font-weight: 900; /* Waga tekstu */
-    left: 3px; /* Pozycjonowanie */
-    top: -8px; /* Pozycjonowanie */
+   display: block; /* Pokaż fajeczkę */
+   content: '✓'; /* Możesz zmienić na inną ikonę */
+   color: black; /* Kolor fajeczki */
+   font-size: 24px; /* Rozmiar fajeczki */
+   font-weight: 900; /* Waga tekstu */
+   left: 3px; /* Pozycjonowanie */
+   top: -8px; /* Pozycjonowanie */
 }

@@ -1,6 +1,7 @@
 import React from 'react'
 import PlusIcon from './icons/PlusIcon'
 import MinusIcon from './icons/MinusIcon'
+import Text from '@/components/ui/text'
 
 const QuantityPicker = ({
    quantity,
@@ -20,12 +21,12 @@ const QuantityPicker = ({
    const sizes = {
       md: {
          button: 'h-5 w-5',
-         container: 'px-[25px] py-3',
+         container: 'px-[25px] py-3 w-[132px] h-[44px]',
          text: 'text-[14px]',
       },
       lg: {
          button: 'h-6 w-6',
-         container: 'px-6 py-[15px]',
+         container: 'px-6 py-[15px] w-[142px] h-[54px]',
          text: 'text-lg',
       },
    }
@@ -40,7 +41,7 @@ const QuantityPicker = ({
    return (
       <div className='flex flex-col'>
          {showTitle && (
-            <h4 className={`pb-4 ${sizes[size].text} font-medium text-[var(--color-neutral-300)]`}>Quantity:</h4>
+            <h4 className={`pb-3.5 ${sizes[size].text} font-medium text-[var(--color-neutral-300)]`}>Quantity:</h4>
          )}
          <div className='flex items-center gap-x-4'>
             <div
@@ -70,7 +71,9 @@ const QuantityPicker = ({
             )}
          </div>
          {quantity >= stock && (
-            <p className='pt-2 text-sm text-[var(--color-blazeOrange-600)]'>Maximum available stock reached.</p>
+            <Text as='p' variant='textSmedium' className='pt-2 text-[var(--color-danger-50)]'>
+               Maximum available stock reached.
+            </Text>
          )}
       </div>
    )
