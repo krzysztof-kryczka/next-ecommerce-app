@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react'
 
-const useFetch = <T>(url: string) => {
+const useFetch = <T>(url: string | null, options?: RequestInit) => {
    const [data, setData] = useState<T[]>([])
    const [loading, setLoading] = useState(false)
    const [error, setError] = useState<string | null>(null)
 
    useEffect(() => {
       const fetchData = async () => {
+         if (!url) return
          try {
             setLoading(true)
-            const response = await fetch(url)
+            setError(null)
+            const response = await fetch(url, options)
             if (!response.ok) {
                throw new Error(`Failed to fetch data from ${url}`)
             }

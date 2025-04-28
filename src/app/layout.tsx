@@ -12,11 +12,11 @@ const inter = Inter({ subsets: ['latin'] })
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
    return (
       <html lang='en'>
-         <body className={`${inter.className} mx-auto flex max-w-[1440px] flex-col antialiased`}>
+         <body className={`${inter.className} antialiased`}>
             <SessionProvider>
                <Header />
                <CategoriesProvider>
-                  <main>{children}</main>
+                  <main className='mx-auto flex max-w-[1440px] flex-col gap-y-[100px] pb-20'>{children}</main>
                </CategoriesProvider>
                <Footer />
                <ToastContainer

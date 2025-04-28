@@ -54,7 +54,12 @@ export const authOptions = {
    ],
    session: {
       strategy: 'jwt' as SessionStrategy, // Poprawne przypisanie z typem
+
       maxAge: 3600, // 1 godzina
+   },
+   jwt: {
+      secret: process.env.JWT_SECRET, // Klucz do podpisu JWT
+      // encryption: true, // Wyłącz szyfrowanie JWE
    },
    callbacks: {
       async jwt({ token, user }) {
@@ -99,6 +104,18 @@ export const authOptions = {
          console.log('Session Callback - Session after:', session)
          return session
       },
+
+   //    cookies: {
+   //       sessionToken: {
+   //          name: 'next-auth.session-token',
+   //          options: {
+   //             httpOnly: true,
+   //             sameSite: 'lax',
+   //             path: '/',
+   //             secure: process.env.NODE_ENV === 'production',
+   //          },
+   //       },
+   //   },
    },
 }
 export default NextAuth(authOptions)
