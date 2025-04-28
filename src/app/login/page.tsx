@@ -7,25 +7,26 @@ import { loginStepOneSchema, loginStepTwoSchema } from '@/schema/loginSchema'
 import { signIn, useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Form, FormField, FormItem, FormControl, FormLabel } from '@/components/ui/form'
-import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription } from '@/components/ui/card'
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { toast } from 'react-toastify'
-import { Separator } from '@radix-ui/react-separator'
 import { Input } from '@/components/ui/input'
+import Text from '@/components/ui/text'
+import { Separator } from '@/components/ui/separator'
+import { useRouter } from 'next/navigation'
 
 const LoginPage: React.FC = () => {
    // Sterowanie krokami logowania (email/telefon -> hasło)
-   const [step, setStep,] = useState<'email' | 'password'>('email')
-   const [emailOrPhone, setEmailOrPhone,] = useState('')
-   const [isSavePasswordChecked, setIsSavePasswordChecked,] = useState(false)
-   const { data: session, } = useSession()
-
-   React.useEffect(() => {
-      console.log('Active session data:', session)
-   }, [session,])
+   const [step, setStep] = useState<'email' | 'password'>('email')
+   const [emailOrPhone, setEmailOrPhone] = useState('')
+   const [isSavePasswordChecked, setIsSavePasswordChecked] = useState(false)
+   const { data: session, status } = useSession()
+   const router = useRouter()
 
    useEffect(() => {
-      console.log('Step changed to:', step) // Sprawdzenie zmiany kroku
-   }, [step,])
+      if (status === 'authenticated') {
+         router.push('/user-profile')
+      }
+   }, [status, router])
 
    const formStepOne = useForm({
       resolver: zodResolver(loginStepOneSchema),
@@ -41,16 +42,14 @@ const LoginPage: React.FC = () => {
       },
    })
 
-   const handleNextStep = async (data: { emailOrPhone: string }) => {
-      console.log('handleNextStep triggered with:', data.emailOrPhone)
-
+   const handleCheckUser = async (data: { emailOrPhone: string }) => {
       try {
          const response = await fetch('/api/check-user', {
             method: 'POST',
             headers: {
                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ emailOrPhone: data.emailOrPhone, }),
+            body: JSON.stringify({ emailOrPhone: data.emailOrPhone }),
          })
 
          const responseData = await response.json()
@@ -60,7 +59,7 @@ const LoginPage: React.FC = () => {
             setEmailOrPhone(data.emailOrPhone)
             setStep('password')
          } else {
-            formStepOne.setError('emailOrPhone', { type: 'manual', message: responseData.message || 'User not found', })
+            formStepOne.setError('emailOrPhone', { type: 'manual', message: responseData.message || 'User not found' })
          }
       } catch (err) {
          console.error('Error in handleNextStep:', err)
@@ -68,27 +67,57 @@ const LoginPage: React.FC = () => {
       }
    }
 
-   const handleLogin = async (data: { password: string }) => {
-      console.log('Attempting login with:', { emailOrPhone, password: data.password, })
+   const handleVerifyPassword = async (data: { password: string }) => {
+      try {
+         const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+               'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ emailOrPhone, password: data.password }),
+         })
 
-      const response = await signIn('credentials', {
-         redirect: false,
-         emailOrPhone,
-         password: data.password,
-         // Jeśli checkbox "Save Password" jest zaznaczony, sesja trwa 30 dni
-         // W przeciwnym razie sesja trwa 1 godzinę
-         savePassword: isSavePasswordChecked,
-      })
+         const responseData = await response.json()
+         console.log('response', response)
+         console.log('responseData', responseData)
 
-      console.log('SignIn response:', response)
+         console.log('SignIn - Sending data:', {
+            emailOrPhone,
+            password: data.password,
+            savePassword: isSavePasswordChecked,
+         })
 
-      if (response?.error) {
-         console.error('Login error:', response.error)
-         toast.error('Invalid credentials')
-      } else {
-         console.log('Login successful!')
-         toast.success('Successfully logged in!')
+         if (response.ok && responseData.success) {
+            const signInResponse = await signIn('credentials', {
+               redirect: false,
+               emailOrPhone,
+               password: data.password,
+               savePassword: isSavePasswordChecked,
+            })
+
+            console.log('NextAuth sign-in response:', signInResponse)
+
+            if (signInResponse?.error) {
+               toast.error('Login failed. Please try again.')
+               return
+            }
+
+            toast.success('Successfully logged in!')
+            router.push('/user-profile')
+         } else {
+            formStepTwo.setError('password', {
+               type: 'manual',
+               message: responseData.message || 'Invalid credentials',
+            })
+         }
+      } catch (err) {
+         console.error('Error in handleVerifyPassword:', err)
+         toast.error('Something went wrong. Please try again later.')
       }
+   }
+
+   if (status === 'authenticated') {
+      return <p>Redirecting...</p>
    }
 
    const handleSavePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,28 +128,26 @@ const LoginPage: React.FC = () => {
    console.log('Is Save Password checked:', isSavePasswordChecked)
    console.log('Session data from useSession:', session)
    return (
-      <div className='my-20 flex flex-col items-center justify-center'>
-         <p className='semi-bold pb-8 text-center text-[40px]'>
+      <div className='my-20 flex flex-col items-center justify-center gap-y-8'>
+         <Text as='p' variant='h2semiBold'>
             <span className='text-[var(--color-primary-400)]'>Nexus</span>
-            <span className='text-[var(--color-base-white)]'>Hub</span>
-         </p>
+            <span className='text-[var(--color-neutral-900)]'>Hub</span>
+         </Text>
          <Card className='w-full max-w-md rounded-md border-0 bg-[var(--color-gray-900)] p-6 text-[var(--color-base-white)] shadow-lg'>
             <CardHeader className='px-0'>
-               <CardTitle className='text-2xl font-medium'>
+               <CardTitle className='text-2xl leading-9 font-medium tracking-[-0.01em]'>
                   {step === 'email' ? 'Sign In' : 'Enter your password'}
                </CardTitle>
-               <CardDescription className='text-muted-foreground'>
-                  <Separator className='my-4 bg-[var(--color-gray-800)]' />
-               </CardDescription>
+               <Separator className='bg-[var(--color-gray-800)]' />
             </CardHeader>
             <CardContent className='px-0'>
                {step === 'email' ? (
                   <Form {...formStepOne}>
-                     <form onSubmit={formStepOne.handleSubmit(handleNextStep)} className='flex flex-col gap-y-6'>
+                     <form onSubmit={formStepOne.handleSubmit(handleCheckUser)} className='flex flex-col gap-y-6'>
                         <FormField
                            control={formStepOne.control}
                            name='emailOrPhone'
-                           render={({ field, }) => (
+                           render={({ field }) => (
                               <FormItem>
                                  <FormLabel>Email or mobile phone number</FormLabel>
                                  <FormControl>
@@ -143,7 +170,7 @@ const LoginPage: React.FC = () => {
                   </Form>
                ) : (
                   <Form {...formStepTwo}>
-                     <form onSubmit={formStepTwo.handleSubmit(handleLogin)} className='flex flex-col gap-y-6'>
+                     <form onSubmit={formStepTwo.handleSubmit(handleVerifyPassword)} className='flex flex-col gap-y-6'>
                         <FormField
                            control={formStepTwo.control}
                            name='password'
@@ -174,28 +201,51 @@ const LoginPage: React.FC = () => {
             </CardContent>
             <CardFooter className='px-0'>
                {step === 'email' ? (
-                  <p>
+                  <Text as='p' variant='textMregular'>
                      Don’t have an account?{' '}
-                     <a href='/register' className='text-[var(--color-primary-400)] hover:underline'>
+                     <Text
+                        as='a'
+                        variant='textMmedium'
+                        href='/register'
+                        className='text-[var(--color-neutral-900)] hover:underline'
+                     >
                         Register
-                     </a>
-                  </p>
+                     </Text>
+                  </Text>
                ) : (
                   <div className='flex w-full items-center justify-between'>
                      <div className='flex items-center gap-2'>
-                        <input
-                           type='checkbox'
-                           id='savePassword'
-                           checked={isSavePasswordChecked}
-                           onChange={handleSavePasswordChange}
-                           className='cursor-pointer'
-                        />
-                        <label htmlFor='savePassword' className='cursor-pointer text-sm text-gray-600'>
-                           Save password
-                        </label>
+                        <div className='modal-order-service-checkbox relative !top-0'>
+                           <label htmlFor='savePassword' className='flex cursor-pointer items-center gap-2'>
+                              <input
+                                 type='checkbox'
+                                 id='savePassword'
+                                 checked={isSavePasswordChecked}
+                                 onChange={handleSavePasswordChange}
+                                 className='absolute h-0 w-0 opacity-0'
+                              />
+                              <span
+                                 className={`checkmark flex h-5 w-5 items-center justify-center rounded-md border-2 transition-all ${
+                                    isSavePasswordChecked
+                                       ? 'border-orange-500 bg-orange-500'
+                                       : 'border-gray-300 bg-white'
+                                 }`}
+                              ></span>
+                              <Text as='span' variant='textMregular' className='pl-10 text-[var(--color-neutral-100)]'>
+                                 Save password
+                              </Text>
+                           </label>
+                        </div>
                      </div>
                      <div>
-                        <a href='#'> Forgot your password?</a>
+                        <Text
+                           as='a'
+                           variant='textMmedium'
+                           href='#'
+                           className='text-[var(--color-neutral-900)] hover:underline'
+                        >
+                           Forgot your password?
+                        </Text>
                      </div>
                   </div>
                )}
