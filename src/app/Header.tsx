@@ -9,6 +9,7 @@ import Text from '@/components/ui/text'
 import { usePathname } from 'next/navigation'
 import { headerNavLinks } from '@/data/navigationData'
 import { Separator } from '@/components/ui/separator'
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu'
 
 export default function Header() {
    const { data: session } = useSession()
@@ -45,19 +46,25 @@ export default function Header() {
                      <Link href='/cart'>
                         <CartIcon />
                      </Link>
-                     <Link href='/user-panel'>
-                        <Image
-                           src={session.user?.image || '/avatar.png'}
-                           alt={session.user?.email || 'Default User Avatar'}
-                           width={40}
-                           height={40}
-                           className='rounded-full'
-                        />
-                     </Link>
-
-                     <Button variant='text' size={buttonSize} onClick={() => signOut()}>
-                        Log Out
-                     </Button>
+                     <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                           <button className='h-10 w-10 overflow-hidden rounded-full'>
+                              <Image
+                                 src={session.user?.image || '/avatar.png'}
+                                 alt={session.user?.email || 'Default User Avatar'}
+                                 width={40}
+                                 height={40}
+                                 className='rounded-full'
+                              />
+                           </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align='end'>
+                           <DropdownMenuItem asChild>
+                              <Link href='/user-profile'>Profile</Link>
+                           </DropdownMenuItem>
+                           <DropdownMenuItem onClick={() => signOut()}>Log Out</DropdownMenuItem>
+                        </DropdownMenuContent>
+                     </DropdownMenu>
                   </div>
                ) : (
                   <Link href='/login'>
