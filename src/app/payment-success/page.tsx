@@ -9,13 +9,16 @@ import { Button } from '@/components/ui/button'
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { SessionDetails } from '@/types/SessionDetails'
+import { useSession } from 'next-auth/react'
+import useFetch from '@/hooks/useFetch'
 
 const PaymentSuccessPage = () => {
    const router = useRouter()
    const searchParams = useSearchParams()
    const sessionId = searchParams?.get('sessionId') || ''
    const [sessionDetails, setSessionDetails] = useState<SessionDetails | null>(null)
-
+   const { data: session } = useSession()
+   const { postData, patchData, deleteData } = useFetch(null, {}, true)
    useEffect(() => {
       const fetchSessionDetails = async () => {
          if (!sessionId) return
@@ -47,6 +50,32 @@ const PaymentSuccessPage = () => {
 
       fetchSessionDetails()
    }, [sessionId])
+
+   useEffect(() => {
+      const finalizeOrder = async () => {
+         if (!sessionDetails || !sessionDetails.items.length) return
+
+         try {
+            await postData('/api/orders', {
+               userId: session?.user?.id,
+               items: sessionDetails.items.map(item => ({
+                  productId: item.id,
+                  name: item.name,
+                  quantity: item.quantity,
+                  price: item.price,
+               })),
+               totalAmount: sessionDetails.amount,
+               purchaseDate: sessionDetails.transactionDate,
+            })
+
+            localStorage.removeItem('checkoutItems')
+         } catch (error) {
+            console.error('❌ Error finalizing order:', error)
+         }
+      }
+
+      finalizeOrder()
+   }, [sessionDetails])
 
    if (!sessionDetails) {
       return <p>Loading payment details...</p>
@@ -111,7 +140,11 @@ const PaymentSuccessPage = () => {
                </div>
                <div className='flex justify-between gap-y-4 text-center'>
                   <p className='text-lg font-medium text-[var(--color-neutral-900)]'>Status:</p>
-                  <Button variant='fill' size='XS' disabled className='bg-[var(--color-success-50)] text-white'>
+                  <Button
+                     variant='fill'
+                     size='XS'
+                     className='pointer-events-none bg-[var(--color-success-50)] text-white'
+                  >
                      Success
                   </Button>
                </div>
