@@ -28,27 +28,45 @@ const useFetch = <T>(url: string | null, options?: RequestInit, disableFetch = f
    }, [url])
 
    const postData = async (postUrl: string, body: object) => {
+      return await sendRequest<T>('POST', postUrl, body)
+   }
+
+   const deleteData = async (deleteUrl: string, body?: object) => {
+      return await sendRequest<T>('DELETE', deleteUrl, body)
+   }
+
+   const patchData = async (patchUrl: string, body: object) => {
+      return await sendRequest<T>('PATCH', patchUrl, body)
+   }
+
+   const putData = async (putUrl: string, body: object) => {
+      return await sendRequest<T>('PUT', putUrl, body)
+   }
+
+   const sendRequest = async <R>(method: string, requestUrl: string, body?: object): Promise<R | null> => {
       try {
          setLoading(true)
          setError(null)
-         const response = await fetch(postUrl, {
-            method: 'POST',
+         const response = await fetch(requestUrl, {
+            method,
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
+            body: body ? JSON.stringify(body) : undefined,
          })
          if (!response.ok) {
-            throw new Error(`Failed to post data to ${postUrl}`)
+            throw new Error(`Failed to ${method} data to ${requestUrl}`)
          }
-         const result: T = await response.json()
+         const result: R = await response.json()
          return result
       } catch (error) {
          setError(error instanceof Error ? error.message : 'Unknown error')
+         console.error(`Error during ${method} request:`, error)
+         return null
       } finally {
          setLoading(false)
       }
    }
 
-   return { data, loading, error, postData }
+   return { data, loading, error, postData, deleteData, patchData, putData }
 }
 
 export default useFetch

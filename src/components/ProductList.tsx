@@ -62,7 +62,7 @@ const ProductList = ({
                      <div className='flex items-start gap-x-8'>
                         {/* Image Card */}
                         <Card className='h-[138px] w-[172px] rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-3'>
-                           <img src={item.imageUrl} alt={item.name} className='h-[114px] w-[148px] rounded-md' />
+                           <img src={item?.imageUrl} alt={item?.name} className='h-[114px] w-[148px] rounded-md' />
                         </Card>
                         {/* Product Details */}
                         <div className='flex flex-1 flex-col gap-y-4'>

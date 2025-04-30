@@ -8,6 +8,8 @@ import { Product } from '@/types/Product'
 import ProductList from '@/components/ProductList'
 import TotalList from '@/components/TotalList'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+import useFetch from '@/hooks/useFetch'
 
 const CartPage = () => {
    const [cartItems, setCartItems] = useState<Product[]>([])
@@ -16,40 +18,29 @@ const CartPage = () => {
    const [isLoading, setIsLoading] = useState<boolean>(false)
    const [isNoteVisible, setIsNoteVisible] = useState<number | null>(null)
    const router = useRouter()
-   // useEffect(() => {
-   const fetchCart = async () => {
-      setIsLoading(true)
-      try {
-         const response = await fetch('/api/cart', { method: 'GET' })
-         const data = await response.json()
-
-         if (Array.isArray(data.items)) {
-            const validatedItems = data.items.map((item: Product) => ({
-               ...item,
-               price: typeof item.price === 'number' ? item.price : 0,
-               quantity: typeof item.quantity === 'number' ? item.quantity : 1,
-               stock: typeof item.stock === 'number' ? item.stock : 0,
-               imageUrl: Array.isArray(item.imageUrl) ? item.imageUrl[0] : item.imageUrl || '',
-               categoryName: item.categoryName,
-            }))
-            setCartItems(validatedItems)
-         } else {
-            console.error('Invalid cart data format:', data)
-            setCartItems([]) // Ustawienie pustej tablicy w przypadku błędnych danych
-         }
-      } catch (error) {
-         console.error('Error fetching cart:', error)
-         setCartItems([])
-      } finally {
-         setIsLoading(false)
-      }
-      // fetchCart()
-   }
-   // }, [])
+   const { data: session, status } = useSession()
+   const { data, loading, error, postData, deleteData, patchData } = useFetch<Product[]>(
+      session ? '/api/cart' : null, //Pobieramy dane TYLKO jeśli użytkownik jest zalogowany
+      {},
+      !session, // Jeśli brak sesji, blokujemy zapytanie
+   )
 
    useEffect(() => {
-      fetchCart() // Wywołanie funkcji podczas montowania komponentu
-   }, [])
+      if (status === 'unauthenticated') {
+         router.push('/login')
+      }
+   })
+
+   useEffect(() => {
+      if (!data || Object.keys(data).length === 0) {
+         return
+      }
+      if (typeof data === 'object' && 'items' in data && Array.isArray(data.items)) {
+         setCartItems(data.items)
+      } else {
+         console.warn('⚠️ Unexpected cart format:', data)
+      }
+   }, [data])
 
    const toggleSelectItem = (id: number) => {
       setSelectedItems(prev => (prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id]))
@@ -67,47 +58,40 @@ const CartPage = () => {
 
    const updateQuantity = async (id: number, quantity: number) => {
       try {
-         const response = await fetch('/api/cart', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productId: id, quantity }),
-         })
-         const data = await response.json()
-
-         if (response.ok) {
-            fetchCart()
-            toast.success(data.message)
+         setCartItems(prevCart => prevCart.map(item => (item.id === id ? { ...item, quantity } : item)))
+         const result = await patchData('/api/cart', { productId: id, quantity })
+         if (result && result.success !== false) {
+            toast.success('Quantity updated!')
          } else {
-            toast.error(data.message)
+            toast.error('Failed to update quantity.')
          }
       } catch (error) {
-         console.error('Error updating quantity:', error)
+         console.error(`❌ Error updating quantity: ${error}`)
          toast.error('An error occurred while updating quantity.')
       }
    }
 
    const removeFromCart = async (id: number) => {
       try {
-         const response = await fetch('/api/cart', {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productId: id }),
-         })
-         const data = await response.json()
+         setCartItems(prevCart => prevCart.filter(item => item.id !== id))
+         setSelectedItems(prevSelected => prevSelected.filter(itemId => itemId !== id))
+         const result = await deleteData('/api/cart', { productId: id })
 
-         if (response.ok) {
-            fetchCart()
-            toast.success(data.message)
+         if (result && result.success !== false) {
+            toast.success('Item removed!')
          } else {
-            toast.error(data.message)
+            toast.error(result?.message || 'Failed to remove item.')
          }
       } catch (error) {
-         console.error('Error removing item:', error)
+         console.error(`❌ Error removing item: ${error}`)
          toast.error('An error occurred while removing the item.')
       }
    }
 
    const handleCheckout = () => {
+      if (cartItems.length === 0) {
+         return
+      }
       const selectedProducts =
          selectedItems.length > 0 ? cartItems.filter(item => selectedItems.includes(item.id)) : cartItems
       localStorage.setItem('checkoutItems', JSON.stringify(selectedProducts))
@@ -123,26 +107,27 @@ const CartPage = () => {
                { name: 'Cart', href: '/cart' },
             ]}
          />
-         <div className='flex items-center gap-x-4'>
-            <input
-               type='checkbox'
-               className='form-checkbox h-6 w-6 accent-[var(--color-blazeOrange-600)]'
-               checked={isSelectAllChecked}
-               onChange={() => {
-                  if (isSelectAllChecked) {
-                     deselectAll()
-                  } else {
-                     selectAll()
-                  }
-                  setIsSelectAllChecked(!isSelectAllChecked)
-               }}
-               id='selectAllCheckbox'
-            />
-            <label htmlFor='selectAllCheckbox' className='text-base font-medium text-[var(--color-neutral-900)]'>
-               {isSelectAllChecked ? 'Deselect all' : 'Select all'}
-            </label>
-         </div>
-
+         {cartItems.length > 0 && (
+            <div className='flex items-center gap-x-4'>
+               <input
+                  type='checkbox'
+                  className='form-checkbox h-6 w-6 accent-[var(--color-blazeOrange-600)]'
+                  checked={isSelectAllChecked}
+                  onChange={() => {
+                     if (isSelectAllChecked) {
+                        deselectAll()
+                     } else {
+                        selectAll()
+                     }
+                     setIsSelectAllChecked(!isSelectAllChecked)
+                  }}
+                  id='selectAllCheckbox'
+               />
+               <label htmlFor='selectAllCheckbox' className='text-base font-medium text-[var(--color-neutral-900)]'>
+                  {isSelectAllChecked ? 'Deselect all' : 'Select all'}
+               </label>
+            </div>
+         )}
          <div className='grid grid-cols-1 gap-x-12 lg:grid-cols-[3fr_1fr]'>
             {/* Product List */}
             <ProductList
@@ -176,7 +161,7 @@ const CartPage = () => {
                   <TotalList
                      items={cartItems}
                      selectedItems={selectedItems}
-                     showCheckoutButton={true}
+                     showCheckoutButton={cartItems.length > 0}
                      onCheckout={handleCheckout}
                      isCheckoutPage={false}
                   />
