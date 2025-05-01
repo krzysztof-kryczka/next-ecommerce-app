@@ -11,6 +11,9 @@ import { Address } from '@/types/Address'
 import TotalList from '@/components/TotalList'
 import { loadStripe } from '@stripe/stripe-js'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+import { toast } from 'react-toastify'
+import { Item } from '@/types/Item'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -20,8 +23,16 @@ const CheckoutPage = () => {
    const [isNoteVisible, setIsNoteVisible] = useState<number | null>(null)
    const [protectedItems, setProtectedItems] = useState<number[]>([])
    const [error, setError] = useState<string | null>(null)
+   const { data: session, status } = useSession()
    const router = useRouter()
    const protectionCostPerItem = 1
+
+   useEffect(() => {
+      if (status === 'unauthenticated') {
+         toast.error('🚫 Musisz się zalogować, aby dokonać zakupu!')
+         setTimeout(() => router.push('/login'), 2000)
+      }
+   }, [status])
 
    const toggleProtection = (id: number) => {
       setProtectedItems(prevState =>
@@ -30,41 +41,24 @@ const CheckoutPage = () => {
    }
 
    useEffect(() => {
-      const checkoutItems = JSON.parse(localStorage.getItem('checkoutItems') || '[]')
+      try {
+         const checkoutItems = JSON.parse(localStorage.getItem('checkoutItems') || '[]')
 
-      const validateCheckoutItems = async () => {
-         try {
-            const response = await fetch('/api/validate-checkout', {
-               method: 'POST',
-               headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify({ items: checkoutItems }),
-            })
-
-            const data = await response.json()
-
-            if (!response.ok) {
-               setError(data.error)
-               return
-            }
-
-            setOrderSummary({
-               items: data.validatedItems.map((item: any) => ({
-                  id: item.id,
-                  name: item.name,
-                  price: item.price,
-                  quantity: item.quantity,
-                  stock: item.stock,
-                  imageUrl: item.imageUrl,
-                  categoryName: item.categoryName,
-               })),
-               totalAmount: data.validatedItems.reduce((sum: number, item: any) => sum + item.quantity * item.price, 0),
-            })
-         } catch (error) {
-            setError('Something went wrong while validating checkout items. Please try again.')
+         if (!Array.isArray(checkoutItems) || checkoutItems.length === 0) {
+            setError('❌ Your cart is empty. Redirecting to cart...')
+            setTimeout(() => router.push('/cart'), 2000)
+            return
          }
-      }
 
-      validateCheckoutItems()
+         setOrderSummary({
+            items: checkoutItems,
+            totalAmount: checkoutItems.reduce((sum: number, item: any) => sum + item.quantity * item.price, 0),
+         })
+      } catch (error) {
+         console.error('❌ Error loading checkout items:', error)
+         setError('❌ Failed to load checkout items. Redirecting...')
+         setTimeout(() => router.push('/cart'), 2000)
+      }
    }, [])
 
    // const calculateProtectionCost = () => {
@@ -84,45 +78,64 @@ const CheckoutPage = () => {
    }
 
    const handleCheckout = async () => {
-      const stripe = await stripePromise
-
-      const orderDetails = {
-         items: orderSummary.items,
-         productProtectionPrice: calculateProtectionCost(),
-         shippingPrice: 5,
-         shippingInsurancePrice: 6,
-         serviceFees: 0.5,
-         grandTotal: orderSummary.totalAmount + calculateProtectionCost() + 5 + 6 + 0.5,
-         paymentMethod: 'Stripe (Credit Card)',
-         shippingMethod: 'NexusHub Courier',
+      if (status !== 'authenticated') {
+         return toast.error('🚫 Musisz się zalogować, aby kontynuować checkout!')
+      }
+      if (!orderSummary || !orderSummary.items.length) {
+         return toast.error('⛔ No items selected for checkout.')
       }
 
-      localStorage.setItem('orderSummary', JSON.stringify(orderDetails))
+      try {
+         const validateResponse = await fetch('/api/validate-checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: orderSummary.items }),
+         })
 
-      const response = await fetch('/api/create-checkout-session', {
-         method: 'POST',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-         body: JSON.stringify({
-            items: orderSummary.items.map(item => ({
-               id: item.id,
-               name: item.name,
-               price: item.price,
-               quantity: item.quantity,
-            })),
-            productProtectionPrice: orderDetails.productProtectionPrice,
-            shippingPrice: orderDetails.shippingPrice,
-            shippingInsurancePrice: orderDetails.shippingInsurancePrice,
-            serviceFees: orderDetails.serviceFees,
-         }),
-      })
+         const validateData = await validateResponse.json()
 
-      const { id } = await response.json()
+         console.log('API Response:', validateData)
 
-      const { error } = await stripe?.redirectToCheckout({ sessionId: id })
-      if (error) {
-         console.error('Stripe checkout error:', error)
+         if (!validateResponse.ok) {
+            return toast.error(`🚫 ${validateData.error || 'Invalid checkout items.'}`)
+         }
+
+         const orderDetails = {
+            items: validateData.validatedItems,
+            productProtectionPrice: calculateProtectionCost(),
+            shippingPrice: 5,
+            shippingInsurancePrice: 6,
+            serviceFees: 0.5,
+            grandTotal:
+               validateData.validatedItems.reduce((sum: number, item: Item) => sum + item.quantity * item.price, 0) +
+               calculateProtectionCost() +
+               5 +
+               6 +
+               0.5,
+            paymentMethod: 'Stripe (Credit Card)',
+            shippingMethod: 'NexusHub Courier',
+         }
+
+         localStorage.setItem('orderSummary', JSON.stringify(orderDetails))
+
+         const stripe = await stripePromise
+         const response = await fetch('/api/create-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderDetails),
+         })
+
+         if (!response.ok) {
+            throw new Error('⚠️ Failed to create Stripe session.')
+         }
+
+         const { id } = await response.json()
+         const stripeResponse = await stripe?.redirectToCheckout({ sessionId: id })
+         console.error('❌ Stripe checkout error:', stripeResponse?.error?.message)
+         toast.error('⚠️ Failed to redirect to payment.')
+      } catch (error) {
+         console.error('❌ Checkout process failed:', error)
+         toast.error('❌ Something went wrong during checkout.')
       }
    }
 
