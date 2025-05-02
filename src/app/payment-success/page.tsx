@@ -19,12 +19,15 @@ const PaymentSuccessPage = () => {
    const [sessionDetails, setSessionDetails] = useState<SessionDetails | null>(null)
    const { data: session } = useSession()
    const { postData, patchData, deleteData } = useFetch(null, {}, true)
+
    useEffect(() => {
       const fetchSessionDetails = async () => {
          if (!sessionId) return
 
          const response = await fetch(`/api/session-details?sessionId=${sessionId}`)
          const data = await response.json()
+
+         console.log('Payment - API Response:', data)
 
          setSessionDetails({
             transactionDate: new Date(data.created * 1000).toLocaleString('en-US', {
@@ -37,6 +40,7 @@ const PaymentSuccessPage = () => {
                second: '2-digit',
             }),
             paymentIntentId: data.paymentIntentId,
+            status: data.status,
             amount: data.amount_total / 100,
             paymentMethod: data.paymentMethod,
             shippingMethod: data.shippingMethod,
@@ -52,19 +56,27 @@ const PaymentSuccessPage = () => {
    }, [sessionId])
 
    useEffect(() => {
+      console.log('Payment - Finalizing order with:', sessionDetails)
+
       const finalizeOrder = async () => {
          if (!sessionDetails || !sessionDetails.items.length) return
 
          try {
+            const checkOrder = await fetch(`/api/orders/exists?paymentIntentId=${sessionDetails.paymentIntentId}`)
+            const { exists } = await checkOrder.json()
+
+            if (exists) return
+
             await postData('/api/orders', {
                userId: session?.user?.id,
+               paymentIntentId: sessionDetails.paymentIntentId,
+               status: sessionDetails.status,
                items: sessionDetails.items.map(item => ({
                   productId: item.id,
                   name: item.name,
                   quantity: item.quantity,
                   price: item.price,
                })),
-               totalAmount: sessionDetails.amount,
                purchaseDate: sessionDetails.transactionDate,
             })
 

@@ -23,6 +23,7 @@ export async function GET(req: Request) {
 
       return NextResponse.json({
          paymentIntentId: session.payment_intent as string,
+         status: session.status as string,
          created: session.created,
          amount_total: session.amount_total,
          paymentMethod: session.metadata.payment_method || 'Not specified',

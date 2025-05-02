@@ -3,4 +3,7 @@ export type Item = {
    name: string
    price: number
    quantity: number
+   imageUrl: string
+   stock : number | 0
+   categoryName : string
 }

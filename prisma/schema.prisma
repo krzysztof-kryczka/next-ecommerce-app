@@ -87,7 +87,7 @@ model Order {
   user            User        @relation(fields: [userId], references: [id])
   createdAt       DateTime    @default(now())
   status          String      @default("pending")
-  paymentIntentId String
+  paymentIntentId String?
   items           OrderItem[]
 }
 

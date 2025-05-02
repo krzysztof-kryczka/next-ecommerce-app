@@ -27,7 +27,7 @@ const ProductList = ({
       price: number
       stock: number
       imageUrl: string
-      categoryName?: string
+      categoryName: string
    }>
    showCheckbox?: boolean
    selectedItems?: number[]
@@ -115,7 +115,7 @@ const ProductList = ({
                                     <QuantityPicker
                                        quantity={item.quantity}
                                        setQuantity={newQuantity => onQuantityChange(item.id, newQuantity as number)}
-                                       stock={item.stock}
+                                       stock={item?.stock}
                                        showTitle={false}
                                        size='md'
                                        hideStock={true}
