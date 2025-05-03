@@ -13,9 +13,11 @@ const CategoriesContext = createContext<CategoriesContextType>({
 })
 
 export const CategoriesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-   const { data: categories, loading, error } = useFetch<Category>('/api/categories')
+   const { data: categories, loading, error } = useFetch<Category>('/api/categories', {}, false, true)
 
-   const categoriesMap = categories.reduce(
+   const safeCategories = Array.isArray(categories) ? categories : []
+
+   const categoriesMap = safeCategories.reduce(
       (acc, category) => {
          acc[category.id] = category.name
          return acc
@@ -24,7 +26,7 @@ export const CategoriesProvider: React.FC<{ children: React.ReactNode }> = ({ ch
    )
 
    return (
-      <CategoriesContext.Provider value={{ categories, categoriesMap, loading, error }}>
+      <CategoriesContext.Provider value={{ categories: safeCategories, categoriesMap, loading, error }}>
          {children}
       </CategoriesContext.Provider>
    )

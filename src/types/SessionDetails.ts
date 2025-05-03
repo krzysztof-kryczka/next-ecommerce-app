@@ -1,7 +1,6 @@
-import { Item } from "./Item"
+import { Item } from './Item'
 
 export type SessionDetails = {
-   items: Item[]
    transactionDate: string
    amount: number
    paymentIntentId: string
@@ -11,4 +10,7 @@ export type SessionDetails = {
    shippingPrice: number
    shippingInsurancePrice: number
    serviceFees: number
+   status: string
+   created: number
+   products: Item[]
 }

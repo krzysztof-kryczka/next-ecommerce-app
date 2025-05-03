@@ -21,7 +21,7 @@ const categoryIcons: Record<string, JSX.Element> = {
 }
 
 const Categories = () => {
-   const { data: categories, loading, error } = useFetch<Category>('/api/categories')
+   const { data: categories, loading, error } = useFetch<Category>('/api/categories', {}, false, true)
    if (loading) return <p>Loading categories...</p>
    if (error) return <p>{error}</p>
    return (

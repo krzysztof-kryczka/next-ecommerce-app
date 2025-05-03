@@ -8,7 +8,7 @@ import { ProductCardProps } from '@/types/ProductCardProps'
 import { toast } from 'react-toastify'
 
 export default function Recommendations() {
-   const { data: recommendations, loading, error } = useFetch<ProductCardProps>('/api/recommendations')
+   const { data: recommendations, loading, error } = useFetch<ProductCardProps>('/api/recommendations', {}, false, true)
 
    if (loading) {
       return (

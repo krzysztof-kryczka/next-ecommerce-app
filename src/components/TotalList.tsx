@@ -32,7 +32,7 @@ const TotalList = ({
 }: TotalListProps) => {
    const filteredItems = selectedItems.length > 0 ? items.filter(item => selectedItems.includes(item.id)) : items
 
-   const subtotal = filteredItems.reduce((total, item) => total + item.price * item.quantity, 0)
+   const subtotal = filteredItems?.reduce((total, item) => total + item.price * item.quantity, 0)
    const grandTotal =
       subtotal + (isCheckoutPage ? productProtectionPrice + shippingPrice + shippingInsurancePrice + serviceFees : 0)
 
@@ -40,7 +40,7 @@ const TotalList = ({
       <CardContent className='px-0'>
          <div className='flex flex-col gap-y-4'>
             <div className='flex flex-col gap-y-2 text-base font-medium text-[var(--color-neutral-900)]'>
-               {filteredItems.map(item => (
+               {filteredItems?.map(item => (
                   <div key={item.id} className='flex justify-between'>
                      <span>
                         {item.name} ({item.quantity} × ${item.price.toFixed(2)})

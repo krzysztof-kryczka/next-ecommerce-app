@@ -1,31 +1,44 @@
 import { useState, useEffect } from 'react'
 
-const useFetch = <T>(url: string | null, options?: RequestInit, disableFetch = false) => {
-   const [data, setData] = useState<T[]>([])
+const useFetch = <T>(url: string | null, options?: RequestInit, disableFetch = false, defaultToArray = false) => {
+   // const [data, setData] = useState<T[]>([])
+   // const [data, setData] = useState<T | T[] | null>(null) // not working
+   const [data, setData] = useState<T | T[]>(defaultToArray ? ([] as T[]) : (null as T))
    const [loading, setLoading] = useState(false)
    const [error, setError] = useState<string | null>(null)
 
    useEffect(() => {
       if (!url || disableFetch) return
-      const fetchData = async () => {
-         try {
-            setLoading(true)
-            setError(null)
-            const response = await fetch(url, options)
-            if (!response.ok) {
-               throw new Error(`Failed to fetch data from ${url}`)
-            }
-            const result = await response.json()
-            setData(result)
-         } catch (error) {
-            setError(error instanceof Error ? error.message : 'Unknown error')
-            console.error('Error:', error)
-         } finally {
-            setLoading(false)
-         }
-      }
-      fetchData()
+      fetchData(url)
    }, [url])
+
+   const fetchData = async (url: string) => {
+      try {
+         setLoading(true)
+         setError(null)
+         console.log(`🔄 Fetching data from: ${url}`)
+         const response = await fetch(url, options)
+         if (!response.ok) {
+            throw new Error(`Failed to fetch data`)
+         }
+         // const result: T = await response.json()
+         const result = await response.json()
+
+         // setData(result)
+
+         setData(
+            Array.isArray(result) ? (result.length > 0 ? result : []) : Object.keys(result).length > 0 ? result : null,
+         )
+
+         return result
+      } catch (error) {
+         setError(error instanceof Error ? error.message : 'Unknown error')
+         console.error('❌ Fetch error:', error)
+         return null
+      } finally {
+         setLoading(false)
+      }
+   }
 
    const postData = async (postUrl: string, body: object) => {
       return await sendRequest<T>('POST', postUrl, body)
@@ -66,7 +79,7 @@ const useFetch = <T>(url: string | null, options?: RequestInit, disableFetch = f
       }
    }
 
-   return { data, loading, error, postData, deleteData, patchData, putData }
+   return { data, loading, error, fetchData, postData, deleteData, patchData, putData }
 }
 
 export default useFetch

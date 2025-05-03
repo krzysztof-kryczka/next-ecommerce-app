@@ -45,7 +45,7 @@ const ProductList = ({
 }) => {
    return (
       <div className='flex flex-col gap-y-8'>
-         {items.map(item => (
+         {items?.map(item => (
             <div key={item.id} className='flex items-center gap-x-8'>
                {/* Checkbox */}
                {showCheckbox && toggleSelectItem && (

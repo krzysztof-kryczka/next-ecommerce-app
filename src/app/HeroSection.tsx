@@ -20,7 +20,7 @@ import ArrowRightIcon from '@/components/icons/ArrowRightIcon'
 export default function CategoriesCarousel() {
    const [carouselApi, setCarouselApi] = useState<CarouselApi>()
    const [currentIndex, setCurrentIndex] = useState(0)
-   const { data: categories, loading, error } = useFetch<Category>('/api/categories')
+   const { data: categories, loading, error } = useFetch<Category>('/api/categories', {}, false, true)
    const router = useRouter()
 
    useEffect(() => {

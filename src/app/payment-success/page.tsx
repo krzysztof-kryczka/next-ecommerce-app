@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import ProductList from '@/components/ProductList'
@@ -8,70 +8,42 @@ import TotalList from '@/components/TotalList'
 import { Button } from '@/components/ui/button'
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { SessionDetails } from '@/types/SessionDetails'
 import { useSession } from 'next-auth/react'
 import useFetch from '@/hooks/useFetch'
+import { SessionDetails } from '@/types/SessionDetails'
+import Text from '@/components/ui/text'
 
 const PaymentSuccessPage = () => {
    const router = useRouter()
    const searchParams = useSearchParams()
    const sessionId = searchParams?.get('sessionId') || ''
-   const [sessionDetails, setSessionDetails] = useState<SessionDetails | null>(null)
    const { data: session } = useSession()
    const { postData, patchData, deleteData } = useFetch(null, {}, true)
+   const { data: orderExists, loading, error, fetchData } = useFetch<boolean>(null)
+
+   const { data: dataSessionDetails } = useFetch<SessionDetails>(`/api/session-details?sessionId=${sessionId}`)
+   const sessionDetails = Array.isArray(dataSessionDetails) ? dataSessionDetails[0] : dataSessionDetails
 
    useEffect(() => {
-      const fetchSessionDetails = async () => {
-         if (!sessionId) return
-
-         const response = await fetch(`/api/session-details?sessionId=${sessionId}`)
-         const data = await response.json()
-
-         console.log('Payment - API Response:', data)
-
-         setSessionDetails({
-            transactionDate: new Date(data.created * 1000).toLocaleString('en-US', {
-               weekday: 'long',
-               year: 'numeric',
-               month: 'long',
-               day: 'numeric',
-               hour: '2-digit',
-               minute: '2-digit',
-               second: '2-digit',
-            }),
-            paymentIntentId: data.paymentIntentId,
-            status: data.status,
-            amount: data.amount_total / 100,
-            paymentMethod: data.paymentMethod,
-            shippingMethod: data.shippingMethod,
-            productProtectionPrice: data.productProtectionPrice,
-            shippingPrice: data.shippingPrice,
-            shippingInsurancePrice: data.shippingInsurancePrice,
-            serviceFees: data.serviceFees,
-            items: data.products,
-         })
-      }
-
-      fetchSessionDetails()
+      if (!sessionDetails) return
+      fetchData(`/api/session-details?sessionId=${sessionId}`)
+      console.log('Payment - API Response:', sessionDetails)
    }, [sessionId])
 
    useEffect(() => {
       console.log('Payment - Finalizing order with:', sessionDetails)
 
       const finalizeOrder = async () => {
-         if (!sessionDetails || !sessionDetails.items.length) return
+         if (!sessionDetails) return
 
          try {
-            const checkOrder = await fetch(`/api/orders/exists?paymentIntentId=${sessionDetails.paymentIntentId}`)
-            const { exists } = await checkOrder.json()
-
-            if (exists) return
+            if (orderExists) return
 
             await postData('/api/orders', {
                userId: session?.user?.id,
                paymentIntentId: sessionDetails.paymentIntentId,
                status: sessionDetails.status,
-               items: sessionDetails.items.map(item => ({
+               items: sessionDetails.products.map(item => ({
                   productId: item.id,
                   name: item.name,
                   quantity: item.quantity,
@@ -79,6 +51,15 @@ const PaymentSuccessPage = () => {
                })),
                purchaseDate: sessionDetails.transactionDate,
             })
+
+            await patchData('/api/update-stock', {
+               items: sessionDetails.products.map(item => ({
+                  productId: item.id,
+                  quantityPurchased: item.quantity,
+               })),
+            })
+
+            await deleteData('/api/clear-cart', { items: sessionDetails.products })
 
             localStorage.removeItem('checkoutItems')
          } catch (error) {
@@ -108,40 +89,49 @@ const PaymentSuccessPage = () => {
 
             <CardContent className='px-0'>
                <div className='flex flex-col gap-y-4'>
-                  <p className='text-lg font-medium text-[var(--color-neutral-900)]'>Transaction Date:</p>
-                  <span className='text-base font-medium text-[var(--color-neutral-100)]'>
-                     {sessionDetails.transactionDate}
-                  </span>
+                  <Text as='p' variant='textLmedium' className='text-[var(--color-neutral-900)]'>
+                     Transaction Date:
+                  </Text>
+                  <Text as='span' variant='textMmedium' className='text-[var(--color-neutral-100)]'>
+                     {sessionDetails?.created
+                        ? new Date(sessionDetails.created * 1000).toLocaleString('en-US', {
+                             weekday: 'long',
+                             year: 'numeric',
+                             month: 'long',
+                             day: 'numeric',
+                             hour: '2-digit',
+                             minute: '2-digit',
+                             second: '2-digit',
+                          })
+                        : 'Loading...'}
+                  </Text>
                </div>
 
                <Separator className='my-6 bg-[var(--color-gray-800)]' />
                <div className='flex flex-col'>
                   <div className='flex flex-col gap-y-4'>
-                     <p className='text-lg font-medium text-[var(--color-neutral-900)]'>Payment Method:</p>
-                     <span className='text-base font-medium text-[var(--color-neutral-100)]'>
+                     <Text as='p' variant='textLmedium' className='text-[var(--color-neutral-900)]'>
+                        Payment Method:
+                     </Text>
+                     <Text as='span' variant='textMmedium' className='text-[var(--color-neutral-100)]'>
                         {sessionDetails.paymentMethod}
-                     </span>
-                  </div>
-                  <Separator className='my-6 bg-[var(--color-gray-800)]' />
-                  <div className='flex flex-col gap-y-4'>
-                     <p className='text-lg font-medium text-[var(--color-neutral-900)]'>Shipping Method: </p>
-                     <span className='text-base font-medium text-[var(--color-neutral-100)]'>
-                        {sessionDetails.shippingMethod}
-                     </span>
+                     </Text>
                   </div>
                   <Separator className='my-6 bg-[var(--color-gray-800)]' />
                </div>
                <div className='flex flex-col gap-y-4'>
-                  <p className='text-lg font-medium text-[var(--color-neutral-900)]'>Your Order</p>
+                  <Text as='p' variant='textLmedium' className='text-[var(--color-neutral-900)]'>
+                     Your Order
+                  </Text>
                   <ProductList
-                     items={sessionDetails.items}
+                     items={sessionDetails.products}
                      showCheckbox={false}
                      showTrashIcon={false}
                      onQuantityChange={undefined}
                      showNotes={false}
                   />
                   <TotalList
-                     items={sessionDetails.items}
+                     items={sessionDetails.products}
                      productProtectionPrice={sessionDetails.productProtectionPrice}
                      shippingPrice={sessionDetails.shippingPrice}
                      shippingInsurancePrice={sessionDetails.shippingInsurancePrice}
@@ -151,7 +141,9 @@ const PaymentSuccessPage = () => {
                   />
                </div>
                <div className='flex justify-between gap-y-4 text-center'>
-                  <p className='text-lg font-medium text-[var(--color-neutral-900)]'>Status:</p>
+                  <Text as='p' variant='textLmedium' className='text-[var(--color-neutral-900)]'>
+                     Status:
+                  </Text>
                   <Button
                      variant='fill'
                      size='XS'
