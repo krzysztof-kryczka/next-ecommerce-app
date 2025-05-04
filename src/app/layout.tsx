@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { CategoriesProvider } from '@/context/CategoriesContext'
+import { CurrencyProvider } from '@/context/CurrencyContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -15,9 +16,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
          <body className={`${inter.className} antialiased`}>
             <SessionProvider>
                <Header />
-               <CategoriesProvider>
-                  <main className='mx-auto flex max-w-[1440px] flex-col gap-y-[100px] pb-20'>{children}</main>
-               </CategoriesProvider>
+               <CurrencyProvider>
+                  <CategoriesProvider>
+                     <main className='mx-auto flex max-w-[1440px] flex-col gap-y-[100px] pb-20'>{children}</main>
+                  </CategoriesProvider>
+               </CurrencyProvider>
                <Footer />
                <ToastContainer
                   position='top-right'

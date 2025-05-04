@@ -14,6 +14,7 @@ type ElementVariants =
    | 'h3semiBold'
    | 'h5medium'
    | 'h6medium'
+   | 'h7medium'
    | 'h5semiBold'
    | 'h7semiBold'
 
@@ -33,6 +34,7 @@ const Text = ({ as = 'p', variant, children, className, onClick, href }: TextPro
       h4medium: 'text-[32px] leading-11 font-medium tracking-[-0.01em]', // 32/44/medium/
       h5medium: 'text-[28px] leading-10 font-medium tracking-[-0.01em]', // 28/40/medium
       h6medium: 'text-2xl leading-9 font-medium tracking-[-0.01em]', // 24/36/medium
+      h7medium: 'text-xl leading-[30px] font-medium tracking-[-0.01em]', // 20/30/medium
       h2semiBold: 'text-[40px] leading-[50px] font-semibold tracking-[-0.01em]', // 40/50/semi-bold
       h3semiBold: 'text-4xl leading-[46px] font-semibold tracking-[-0.01em]', // 36/46/semi-bold
       h5semiBold: 'text-[28px] leading-10 font-semibold tracking-[-0.01em]', // 28/40/semi-bold

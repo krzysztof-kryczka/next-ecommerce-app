@@ -14,7 +14,8 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { toast } from 'react-toastify'
 import { Item } from '@/types/Item'
-
+import Text from '@/components/ui/text'
+import { useCurrency } from '@/context/CurrencyContext'
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
 const CheckoutPage = () => {
@@ -24,6 +25,7 @@ const CheckoutPage = () => {
    const [protectedItems, setProtectedItems] = useState<number[]>([])
    const [error, setError] = useState<string | null>(null)
    const { data: session, status } = useSession()
+   const { currency, currencySymbols } = useCurrency()
    const router = useRouter()
    const protectionCostPerItem = 1
 
@@ -102,6 +104,7 @@ const CheckoutPage = () => {
 
          const orderDetails = {
             items: validateData.validatedItems,
+            currency,
             productProtectionPrice: calculateProtectionCost(),
             shippingPrice: 5,
             shippingInsurancePrice: 6,
@@ -216,7 +219,9 @@ const CheckoutPage = () => {
             <div className='w-[423px]'>
                <Card className='rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-6'>
                   <CardHeader className='gap-0 px-0'>
-                     <h2 className='text-lg font-medium text-[var(--color-neutral-900)]'>Total Product</h2>
+                     <Text as='h2' variant='textLmedium' className='text-[var(--color-neutral-900)]'>
+                        Total Product
+                     </Text>
                   </CardHeader>
                   {orderSummary ? (
                      <TotalList

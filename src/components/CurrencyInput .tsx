@@ -2,20 +2,27 @@ import React, { useState } from 'react'
 import { Input } from './ui/input'
 import { Select, SelectTrigger, SelectContent, SelectItem } from './ui/select'
 
-const CurrencyInput: React.FC<{
+type CurrencyInputProps = {
    value: string
    onChange: (newValue: string) => void
    placeholder?: string
-}> = ({ value, onChange, placeholder }) => {
-   const [inputValue, setInputValue] = useState<string>(value || '')
-   const [currency, setCurrency] = useState<string>('USD')
+   currency: string
+   setCurrency: (newCurrency: string) => void
+}
 
+const CurrencyInput: React.FC<CurrencyInputProps> = ({ value, onChange, placeholder, currency, setCurrency }) => {
+   const [inputValue, setInputValue] = useState<string>(value || '')
    const currencies = ['USD', 'EUR', 'GBP', 'PLN']
 
    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value
+      if (isNaN(Number(newValue))) return
       setInputValue(newValue)
       onChange(newValue)
+   }
+
+   const handleCurrencyChange = (newCurrency: string) => {
+      setCurrency(newCurrency)
    }
 
    return (
@@ -29,8 +36,7 @@ const CurrencyInput: React.FC<{
             className='rounded-tr-none rounded-br-none'
          />
 
-         {/* Select z shadcn/ui */}
-         <Select value={currency} onValueChange={setCurrency}>
+         <Select value={currency} onValueChange={handleCurrencyChange}>
             <SelectTrigger variant='custom' className='rounded-tl-none rounded-bl-none border-l-0'>
                {currency}
             </SelectTrigger>

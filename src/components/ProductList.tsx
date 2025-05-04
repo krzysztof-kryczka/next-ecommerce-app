@@ -1,8 +1,10 @@
 import Trash2Icon from './icons/Trash2Icon'
 import QuantityPicker from './QuantityPicker'
 import { Button } from './ui/button'
+import Text from '@/components/ui/text'
 import { Card, CardContent } from './ui/card'
 import { Separator } from './ui/separator'
+import { useCurrency } from '@/context/CurrencyContext'
 
 const ProductList = ({
    items,
@@ -43,6 +45,7 @@ const ProductList = ({
    isNoteVisible?: number | null
    toggleNote?: (id: number) => void
 }) => {
+   const { currency, convertCurrency, currencySymbols } = useCurrency()
    return (
       <div className='flex flex-col gap-y-8'>
          {items?.map(item => (
@@ -68,7 +71,9 @@ const ProductList = ({
                         <div className='flex flex-1 flex-col gap-y-4'>
                            <div className='flex flex-col gap-y-3'>
                               <div className='flex items-center justify-between'>
-                                 <p className='text-xl font-medium text-[var(--color-neutral-900)]'>{item.name}</p>
+                                 <Text as='p' variant='h7medium' className='text-[var(--color-neutral-900))]'>
+                                    {item.name}
+                                 </Text>
                                  {/* Trash Icon */}
                                  {showTrashIcon && onRemove && (
                                     <Trash2Icon
@@ -84,7 +89,10 @@ const ProductList = ({
                            </div>
 
                            <div className='flex items-center justify-between'>
-                              <p className='text-2xl text-[var(--color-neutral-900)]'>${item.price.toFixed(2)}</p>
+                              <Text as='p' variant='h6medium' className='text-[var(--color-neutral-900))]'>
+                                 {currencySymbols[currency] || currency}{' '}
+                                 {convertCurrency(item.price.toFixed(2).toString(), 'USD', currency)}
+                              </Text>
 
                               {/* Quantity and Write Note */}
                               <div className='flex items-center justify-end gap-x-6'>
@@ -144,12 +152,20 @@ const ProductList = ({
                               onChange={() => toggleProtection(item.id)}
                               id={`protection-${item.id}`}
                            />
-                           <label
-                              htmlFor={`protection-${item.id}`}
-                              className='text-base font-medium text-[var(--color-neutral-900)]'
-                           >
-                              Product Protection ${protectionCost.toFixed(2)}
-                              <p>The claim process is easy and instant, valid for 6 months</p>
+                           <label htmlFor={`protection-${item.id}`} className='w-full text-[var(--color-neutral-900)]'>
+                              <div className='flex justify-between'>
+                                 <Text as='p' variant='textMmedium' className='text-[var(--color-neutral-900))]'>
+                                    Product Protection
+                                 </Text>
+
+                                 <Text as='p' variant='textLmedium' className='text-[var(--color-neutral-900))]'>
+                                    {currencySymbols[currency] || currency}{' '}
+                                    {convertCurrency(protectionCost.toFixed(2).toString(), 'USD', currency)}
+                                 </Text>
+                              </div>
+                              <Text as='p' variant='textSmedium' className='text-[var(--color-neutral-900))]'>
+                                 The claim process is easy and instant, valid for 6 months
+                              </Text>
                            </label>
                         </div>
                      )}

@@ -7,5 +7,10 @@ export type Product = {
    createdAt: string
    quantity: number
    stock: number
+   description?: string
+   deliveryDateRange: {
+      startDate?: string
+      endDate?: string
+   }
    categoryName?: string
 }

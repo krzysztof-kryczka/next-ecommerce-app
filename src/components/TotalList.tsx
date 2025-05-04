@@ -1,6 +1,8 @@
 import { Separator } from '@/components/ui/separator'
 import { CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import Text from '@/components/ui/text'
+import { useCurrency } from '@/context/CurrencyContext'
 
 interface TotalListProps {
    items: {
@@ -30,6 +32,8 @@ const TotalList = ({
    shippingInsurancePrice = 0,
    serviceFees = 0,
 }: TotalListProps) => {
+   const { currency, convertCurrency, currencySymbols } = useCurrency()
+
    const filteredItems = selectedItems.length > 0 ? items.filter(item => selectedItems.includes(item.id)) : items
 
    const subtotal = filteredItems?.reduce((total, item) => total + item.price * item.quantity, 0)
@@ -38,14 +42,18 @@ const TotalList = ({
 
    return (
       <CardContent className='px-0'>
-         <div className='flex flex-col gap-y-4'>
-            <div className='flex flex-col gap-y-2 text-base font-medium text-[var(--color-neutral-900)]'>
+         <div className='flex flex-col pb-4'>
+            <div className='flex flex-col gap-y-4 text-base font-medium text-[var(--color-neutral-900)]'>
                {filteredItems?.map(item => (
                   <div key={item.id} className='flex justify-between'>
-                     <span>
-                        {item.name} ({item.quantity} × ${item.price.toFixed(2)})
-                     </span>
-                     <span>${(item.quantity * item.price).toFixed(2)}</span>
+                     <Text as='p' variant='textMmedium' className='text-[var(--color-neutral-100))]'>
+                        {item.name} ({item.quantity}×
+                        {convertCurrency(item.price.toFixed(2).toString(), 'USD', currency)})
+                     </Text>
+                     <Text as='p' variant='textLmedium' className='text-[var(--color-neutral-900))]'>
+                        {currencySymbols[currency] || currency}{' '}
+                        {convertCurrency((item.quantity * item.price).toFixed(2).toString(), 'USD', currency)}
+                     </Text>
                   </div>
                ))}
             </div>
@@ -54,34 +62,59 @@ const TotalList = ({
          {isCheckoutPage && (
             <div className='flex flex-col gap-y-4'>
                <div className='flex justify-between'>
-                  <span className='text-base text-[var(--color-neutral-900)]'>Product Protection:</span>
-                  <span>${productProtectionPrice.toFixed(2)}</span>
+                  <Text as='p' variant='textMmedium' className='text-[var(--color-neutral-100))]'>
+                     Product Protection:
+                  </Text>
+                  <Text as='p' variant='textLmedium' className='text-[var(--color-neutral-900))]'>
+                     {currencySymbols[currency] || currency}{' '}
+                     {convertCurrency(productProtectionPrice.toFixed(2).toString(), 'USD', currency)}
+                  </Text>
                </div>
                <div className='flex justify-between'>
-                  <span className='text-base text-[var(--color-neutral-900)]'>Shipping Price:</span>
-                  <span>${shippingPrice.toFixed(2)}</span>
+                  <Text as='p' variant='textMmedium' className='text-[var(--color-neutral-100))]'>
+                     Shipping Price:
+                  </Text>
+                  <Text as='p' variant='textLmedium' className='text-[var(--color-neutral-900))]'>
+                     {currencySymbols[currency] || currency}{' '}
+                     {convertCurrency(shippingPrice.toFixed(2).toString(), 'USD', currency)}
+                  </Text>
                </div>
                <div className='flex justify-between'>
-                  <span className='text-base text-[var(--color-neutral-900)]'>Shipping Insurance:</span>
-                  <span>${shippingInsurancePrice.toFixed(2)}</span>
+                  <Text as='p' variant='textMmedium' className='text-[var(--color-neutral-100))]'>
+                     Shipping Insurance:
+                  </Text>
+                  <Text as='p' variant='textLmedium' className='text-[var(--color-neutral-900))]'>
+                     {currencySymbols[currency] || currency}{' '}
+                     {convertCurrency(shippingInsurancePrice.toFixed(2).toString(), 'USD', currency)}
+                  </Text>
                </div>
-               <div className='col-span-full my-6'>
-                  <Separator className='bg-[var(--color-gray-800)]' />
-               </div>
-               <div className='flex flex-col justify-between'>
-                  <p>Transaction Fees</p>
-                  <p className='text-base text-[var(--color-neutral-900)]'>Service Fees:</p>
-                  <span>${serviceFees.toFixed(2)}</span>
+               <Separator className='my-2 bg-[var(--color-gray-800)]' />
+               <div className='flex flex-col gap-y-4'>
+                  <Text as='p' variant='textLmedium' className='text-[var(--color-neutral-900))]'>
+                     Transaction Fees
+                  </Text>
+                  <div className='flex justify-between'>
+                     <Text as='p' variant='textMmedium' className='text-[var(--color-neutral-100))]'>
+                        Service Fees:
+                     </Text>
+                     <Text as='p' variant='textLmedium' className='text-[var(--color-neutral-900))]'>
+                        {currencySymbols[currency] || currency}{' '}
+                        {convertCurrency(serviceFees.toFixed(2).toString(), 'USD', currency)}
+                     </Text>
+                  </div>
                </div>
             </div>
          )}
 
-         <div className='col-span-full my-6'>
-            <Separator className='bg-[var(--color-gray-800)]' />
-         </div>
-         <div className='align-center flex justify-between pb-6'>
-            <p className='text-lg font-medium text-[var(--color-neutral-900)]'>Grand Total:</p>
-            <p className='text-[28px] font-medium text-[var(--color-neutral-900)]'>${grandTotal.toFixed(2)}</p>
+         <Separator className='my-6 bg-[var(--color-gray-800)]' />
+         <div className='align-center flex justify-between pb-6 items-center'>
+            <Text as='p' variant='textLmedium' className='text-[var(--color-neutral-900))]'>
+               Grand Total:
+            </Text>
+            <Text as='p' variant='h5medium' className='text-[var(--color-neutral-900))]'>
+               {currencySymbols[currency] || currency}{' '}
+               {convertCurrency(grandTotal.toFixed(2).toString(), 'USD', currency)}
+            </Text>
          </div>
          {showCheckoutButton && (
             <Button

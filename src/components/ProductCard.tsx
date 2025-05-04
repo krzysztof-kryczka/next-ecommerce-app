@@ -7,11 +7,12 @@ import { ProductCardProps } from '@/types/ProductCardProps'
 import { useCategories } from '@/context/CategoriesContext'
 import Text from '@/components/ui/text'
 import { useAddToCart } from '@/hooks/useAddToCart'
+import { useCurrency } from '@/context/CurrencyContext'
 
 export default function ProductCard({ product }: ProductCardProps) {
    const { categoriesMap } = useCategories()
    const { addToCart } = useAddToCart()
-
+   const { currency, convertCurrency, currencySymbols } = useCurrency()
    const handleAddToCart = () => {
       addToCart(product.id, 1)
    }
@@ -44,8 +45,13 @@ export default function ProductCard({ product }: ProductCardProps) {
                   <Text as='h2' variant='textLregular' className='text-[var(--color-neutral-900)]'>
                      {product.name}
                   </Text>
-                  <Text as='h5' variant='h5semiBold' className='text-[var(--color-neutral-900)]'>
-                     ${product.price}
+                  <Text
+                     as='h5'
+                     variant='h5semiBold'
+                     className='flex items-center gap-2 text-[var(--color-neutral-900)]'
+                  >
+                     {currencySymbols[currency] || currency}{' '}
+                     {convertCurrency(product.price.toString(), 'USD', currency)}
                   </Text>
                </div>
             </div>

@@ -1,50 +1,68 @@
 import Stripe from 'stripe'
 import { NextResponse } from 'next/server'
 import { Item } from '@/types/Item'
+import { exchangeRates } from '@/utils/exchangeRates'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-03-31.basil' })
 
+const convertCurrency = (amount: number, fromCurrency: string, toCurrency: string): number => {
+   if (!exchangeRates[fromCurrency] || !exchangeRates[toCurrency]) return amount
+   const baseValue = amount / exchangeRates[fromCurrency]
+   return Math.round(baseValue * exchangeRates[toCurrency] * 100)
+}
+
 export async function POST(req: Request) {
    try {
-      const { items, productProtectionPrice, shippingPrice, shippingInsurancePrice, serviceFees } = await req.json()
+      const body = await req.json()
+      console.log('🔍 Dane przesłane do Stripe:', body)
+
+      const {
+         items,
+         currency = 'USD',
+         productProtectionPrice,
+         shippingPrice,
+         shippingInsurancePrice,
+         serviceFees,
+      } = body
+
       const lineItems = [
          ...items.map((item: Item) => ({
             price_data: {
-               currency: 'usd',
+               currency,
                product_data: { name: item.name },
-               unit_amount: Math.round(item.price * 100),
+               unit_amount: convertCurrency(item.price, 'USD', currency),
             },
             quantity: item.quantity,
          })),
          {
             price_data: {
-               currency: 'usd',
+               currency,
                product_data: { name: 'Product Protection' },
-               unit_amount: Math.round(productProtectionPrice * 100),
+               unit_amount: convertCurrency(productProtectionPrice, 'USD', currency),
             },
             quantity: 1,
          },
          {
             price_data: {
-               currency: 'usd',
+               currency,
                product_data: { name: 'Shipping Price' },
-               unit_amount: Math.round(shippingPrice * 100),
+               unit_amount: convertCurrency(shippingPrice, 'USD', currency),
             },
             quantity: 1,
          },
          {
             price_data: {
-               currency: 'usd',
+               currency,
                product_data: { name: 'Shipping Insurance' },
-               unit_amount: Math.round(shippingInsurancePrice * 100),
+               unit_amount: convertCurrency(shippingInsurancePrice, 'USD', currency),
             },
             quantity: 1,
          },
          {
             price_data: {
-               currency: 'usd',
+               currency,
                product_data: { name: 'Service Fees' },
-               unit_amount: Math.round(serviceFees * 100),
+               unit_amount: convertCurrency(serviceFees, 'USD', currency),
             },
             quantity: 1,
          },
@@ -57,6 +75,7 @@ export async function POST(req: Request) {
          success_url: `${req.headers.get('origin')}/payment-success?sessionId={CHECKOUT_SESSION_ID}`,
          cancel_url: `${req.headers.get('origin')}/payment-failed`,
          metadata: {
+            currency,
             products: JSON.stringify(items),
             payment_method: 'Stripe (Credit Card)',
             shipping_method: 'NexusHub Courier',

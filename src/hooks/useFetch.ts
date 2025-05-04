@@ -19,7 +19,9 @@ const useFetch = <T>(url: string | null, options?: RequestInit, disableFetch = f
          console.log(`🔄 Fetching data from: ${url}`)
          const response = await fetch(url, options)
          if (!response.ok) {
-            throw new Error(`Failed to fetch data`)
+            const errorMessage = `Error ${response.status}: ${response.statusText}`
+            setError(errorMessage)
+            throw new Error(errorMessage)
          }
          // const result: T = await response.json()
          const result = await response.json()

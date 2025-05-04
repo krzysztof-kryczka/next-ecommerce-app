@@ -10,17 +10,17 @@ import Pagination from '@/components/Pagination'
 import DropdownSection from '@/components/DropdownSection'
 import CategoryList from '@/components/CategoryList'
 import PriceRange from '@/components/PriceRange'
-import { PriceRangeType } from '@/types/PriceRangeType'
 import { useSearchParams } from 'next/navigation'
 import ProductCard from '@/components/ProductCard'
 import { useCategories } from '@/context/CategoriesContext'
 import useFetch from '@/hooks/useFetch'
+import { useCurrency } from '@/context/CurrencyContext'
 
 export default function ProductsPage() {
    const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
    const [sortBy, setSortBy] = useState<SortByOptions>('latest')
    const [showPerPage, setShowPerPage] = useState<number>(9)
-   const [priceRange, setPriceRange] = useState<PriceRangeType>({ min: '', max: '' })
+   const [priceRange, setPriceRange] = useState({ min: '', max: '' })
    const [currentPage, setCurrentPage] = useState<number>(1)
    const [totalPages, setTotalPages] = useState<number>(1)
    const [isProductOpen, setIsProductOpen] = useState<boolean>(true)
@@ -28,9 +28,10 @@ export default function ProductsPage() {
    const [visibleCategories, setVisibleCategories] = useState<number>(4)
    const [selectedCategories, setSelectedCategories] = useState<number[]>([])
    const { categories, loading: categoriesLoading } = useCategories()
-   const { data: products, loading, error } = useFetch<Product>('/api/products')
+   const { data: products, loading, error } = useFetch<Product>('/api/products', {}, false, true)
    const searchParams = useSearchParams()
    const selectedParam = searchParams?.getAll('selected[]') || []
+   const { currency, setCurrency, convertCurrency } = useCurrency()
 
    useEffect(() => {
       // Zamieniamy URL na tablicę liczb
@@ -58,17 +59,13 @@ export default function ProductsPage() {
    }
 
    useEffect(() => {
-      let filtered = products
+      const minPriceUSD = priceRange.min ? convertCurrency(priceRange.min, currency, 'USD') : 0
+      const maxPriceUSD = priceRange.max ? convertCurrency(priceRange.max, currency, 'USD') : Number.MAX_SAFE_INTEGER
+      // let filtered = products
+      let filtered = products.filter(product => product.price >= minPriceUSD && product.price <= maxPriceUSD)
 
       if (selectedCategories.length > 0) {
          filtered = filtered.filter(product => selectedCategories.includes(product.categoryId))
-      }
-
-      if (priceRange.min) {
-         filtered = filtered.filter(product => product.price >= parseFloat(priceRange.min))
-      }
-      if (priceRange.max) {
-         filtered = filtered.filter(product => product.price <= parseFloat(priceRange.max))
       }
 
       if (sortBy === 'price_asc') {
@@ -84,9 +81,8 @@ export default function ProductsPage() {
       }
 
       setFilteredProducts(filtered)
-
       setTotalPages(Math.ceil(filtered.length / showPerPage))
-   }, [selectedCategories, priceRange, sortBy, products, showPerPage])
+   }, [selectedCategories, priceRange, sortBy, products, showPerPage, currency])
 
    const paginatedProducts = filteredProducts.slice((currentPage - 1) * showPerPage, currentPage * showPerPage)
 
@@ -118,6 +114,7 @@ export default function ProductsPage() {
       // Usuń zduplikowane ...
       return buttons.filter((value, index, self) => !(value === '...' && self[index - 1] === '...'))
    }
+   console.log('waluta:', currency)
 
    return (
       <div className='px-10'>

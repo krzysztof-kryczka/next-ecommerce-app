@@ -12,10 +12,13 @@ import ShieldCrossIcon from '@/components/icons/ShieldCrossIcon'
 import { Separator } from '@/components/ui/separator'
 import { useAddToCart } from '@/hooks/useAddToCart'
 import Text from '@/components/ui/text'
+import useFetch from '@/hooks/useFetch'
 import { useCategories } from '@/context/CategoriesContext'
+import { useCurrency } from '@/context/CurrencyContext'
+import { Product } from '@/types/Product'
 
 const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
-   const [product, setProduct] = useState<any>(null)
+   // const [product, setProduct] = useState<any>(null)
    const [quantity, setQuantity] = useState<number>(1)
    const [productId, setProductId] = useState<string | null>(null)
    const [selectedColor, setSelectedColor] = useState<string>('White')
@@ -24,6 +27,21 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
    const [mainImage, setMainImage] = useState<string>('')
    const { addToCart, loading } = useAddToCart()
    const { categoriesMap } = useCategories()
+   const { currency, convertCurrency, currencySymbols } = useCurrency()
+
+   const {
+      data: productData,
+      loading: productLoading,
+      error,
+   } = useFetch<{ success: boolean; data: Product }>(
+      productId ? `/api/product/${productId}` : null,
+      {},
+      !productId,
+      false,
+   )
+
+   const product = Array.isArray(productData) ? null : productData?.data
+   // const product = Array.isArray(productData) ? productData[0] : productData
 
    const handleImageClick = (url: string) => {
       setMainImage(url)
@@ -36,30 +54,36 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
    useEffect(() => {
       const unwrapParams = async () => {
          const unwrappedParams = await params
+         console.log('productId form parameters:', unwrappedParams.id)
          setProductId(unwrappedParams.id)
       }
       unwrapParams()
    }, [params])
 
    useEffect(() => {
-      if (productId) {
-         const fetchProduct = async () => {
-            const res = await fetch(`/api/product/${productId}`)
-            const { data } = await res.json()
-            setProduct(data)
-            setStock(data.stock)
-            setMainImage(data.imageUrl[0])
-         }
-         fetchProduct()
+      console.log('Details product:', product)
+      if (product) {
+         setStock(product.stock)
+         setMainImage(product.imageUrl[0])
       }
-   }, [productId])
-
-   if (!product) {
-      return <div className='flex h-screen items-center justify-center'>Ładowanie...</div>
-   }
+   }, [product])
 
    const handleAddToCart = () => {
-      addToCart(product.id, quantity)
+      if (product) {
+         addToCart(product.id, quantity)
+      }
+   }
+
+   if (productLoading) {
+      return <div className='flex h-screen items-center justify-center'>Loading...</div>
+   }
+
+   if (!product || error) {
+      return (
+         <div className='flex h-screen items-center justify-center text-[var(--color-danger-50)]'>
+            ⚠️ Product not exists! ({error})
+         </div>
+      )
    }
 
    return (
@@ -81,17 +105,13 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                   {/* Główne zdjęcie */}
                   <Card className='w-full rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-3'>
                      <CardContent className='px-0'>
-                        <img
-                           src={mainImage}
-                           alt={product?.name || 'Product'}
-                           className='h-auto max-w-full rounded-md'
-                        />
+                        <img src={mainImage} alt={product.name || 'Product'} className='h-auto max-w-full rounded-md' />
                      </CardContent>
                   </Card>
 
                   {/* Miniatury */}
                   <div className='flex gap-x-2 overflow-x-auto sm:gap-x-4'>
-                     {product?.imageUrl.map((url: string, index: number) => (
+                     {product.imageUrl?.map((url: string, index: number) => (
                         <img
                            key={index}
                            src={url}
@@ -120,10 +140,11 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                      </Button>
                   </div>
                   <Text as='p' variant='h4medium' className='text-[var(--color-neutral-900)]'>
-                     ${product.price}
+                     {currencySymbols[currency] || currency}{' '}
+                     {convertCurrency(product.price.toString(), 'USD', currency)}
                   </Text>
                   <Text as='p' variant='textMregular' className='text-[var(--color-neutral-900)]'>
-                     {isFullTextVisible ? product.description : product.description.slice(0, 50)}{' '}
+                     {isFullTextVisible ? product.description : product.description?.slice(0, 50)}{' '}
                      <Button
                         variant='text'
                         className='w-auto px-0 text-base leading-[26px] font-medium tracking-normal'

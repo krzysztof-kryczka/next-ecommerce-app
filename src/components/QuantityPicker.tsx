@@ -50,18 +50,21 @@ const QuantityPicker = ({
                }`}
             >
                <div
-                  onClick={decreaseQuantity}
-                  className={`flex cursor-pointer items-center justify-center ${sizes[size].button}`}
+                  onClick={quantity <= 1 ? undefined : decreaseQuantity}
+                  className={`flex items-center justify-center ${sizes[size].button} ${
+                     quantity <= 1 ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                  }`}
+                  aria-disabled={quantity <= 1}
                >
                   <MinusIcon />
                </div>
                <span className={`${sizes[size].text} font-medium text-[var(--color-neutral-900)]`}>{quantity}</span>
                <div
-                  onClick={increaseQuantity}
-                  className={`flex cursor-pointer items-center justify-center ${sizes[size].button} ${
-                     quantity >= stock ? 'cursor-not-allowed opacity-50' : ''
+                  onClick={quantity >= stock ? undefined : increaseQuantity}
+                  className={`flex items-center justify-center ${sizes[size].button} ${
+                     quantity >= stock ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
                   }`}
-                  disabled={quantity >= stock}
+                  aria-disabled={quantity >= stock}
                >
                   <PlusIcon />
                </div>

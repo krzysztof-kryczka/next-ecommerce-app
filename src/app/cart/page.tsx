@@ -10,6 +10,8 @@ import TotalList from '@/components/TotalList'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import useFetch from '@/hooks/useFetch'
+import Text from '@/components/ui/text'
+import { useCurrency } from '@/context/CurrencyContext'
 
 const CartPage = () => {
    const [cartItems, setCartItems] = useState<Product[]>([])
@@ -18,8 +20,9 @@ const CartPage = () => {
    const [isLoading, setIsLoading] = useState<boolean>(false)
    const [isNoteVisible, setIsNoteVisible] = useState<number | null>(null)
    const router = useRouter()
+   const { currency, convertCurrency, currencySymbols } = useCurrency()
    const { data: session, status } = useSession()
-   const { data, loading, error, postData, deleteData, patchData } = useFetch<Product[]>(
+   const { data, loading, error, deleteData, patchData } = useFetch<Product[]>(
       session ? '/api/cart' : null, //Pobieramy dane TYLKO jeśli użytkownik jest zalogowany
       {},
       !session, // Jeśli brak sesji, blokujemy zapytanie
@@ -58,9 +61,11 @@ const CartPage = () => {
 
    const updateQuantity = async (id: number, quantity: number) => {
       try {
-         setCartItems(prevCart => prevCart.map(item => (item.id === id ? { ...item, quantity } : item)))
+         setIsLoading(true)
          const result = await patchData('/api/cart', { productId: id, quantity })
-         if (result && result.success !== false) {
+
+         if (result) {
+            setCartItems(prevCart => prevCart.map(item => (item.id === id ? { ...item, quantity } : item)))
             toast.success('Quantity updated!')
          } else {
             toast.error('Failed to update quantity.')
@@ -68,23 +73,28 @@ const CartPage = () => {
       } catch (error) {
          console.error(`❌ Error updating quantity: ${error}`)
          toast.error('An error occurred while updating quantity.')
+      } finally {
+         setIsLoading(false)
       }
    }
 
    const removeFromCart = async (id: number) => {
       try {
-         setCartItems(prevCart => prevCart.filter(item => item.id !== id))
-         setSelectedItems(prevSelected => prevSelected.filter(itemId => itemId !== id))
+         setIsLoading(true)
          const result = await deleteData('/api/cart', { productId: id })
 
-         if (result && result.success !== false) {
+         if (result) {
+            setCartItems(prevCart => prevCart.filter(item => item.id !== id))
+            setSelectedItems(prevSelected => prevSelected.filter(itemId => itemId !== id))
             toast.success('Item removed!')
          } else {
-            toast.error(result?.message || 'Failed to remove item.')
+            toast.error('Failed to remove item.')
          }
       } catch (error) {
          console.error(`❌ Error removing item: ${error}`)
          toast.error('An error occurred while removing the item.')
+      } finally {
+         setIsLoading(false)
       }
    }
 
@@ -98,7 +108,10 @@ const CartPage = () => {
       router.push('/checkout')
    }
 
-   if (isLoading) return <div className='text-center'>Loading cart...</div>
+   isLoading && <div className='text-center text-blue-500'>Processing...</div>
+   loading && <div className='text-center'>Loading cart...</div>
+   error && <div className='text-center text-red-500'>Error loading cart: {error}</div>
+
    return (
       <div className='mx-auto flex max-w-[1440px] flex-col gap-y-8 px-4 pb-10 sm:px-6 md:px-10'>
          <Breadcrumb
@@ -138,7 +151,7 @@ const CartPage = () => {
                   price: item.price,
                   stock: item.stock,
                   imageUrl: Array.isArray(item.imageUrl) ? item.imageUrl[0] : item.imageUrl,
-                  categoryName: item.categoryName,
+                  categoryName: item.categoryName || 'Unknown',
                }))}
                showCheckbox={true}
                selectedItems={selectedItems}
@@ -156,7 +169,9 @@ const CartPage = () => {
                {/* Total Product */}
                <Card className='rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-6'>
                   <CardHeader className='gap-0 px-0'>
-                     <h2 className='text-lg font-medium text-[var(--color-neutral-900)]'>Total Product</h2>
+                     <Text as='h2' variant='textLmedium' className='text-[var(--color-neutral-900)]'>
+                        Total Product
+                     </Text>
                   </CardHeader>
                   <TotalList
                      items={cartItems}

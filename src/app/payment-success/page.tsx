@@ -153,7 +153,7 @@ const PaymentSuccessPage = () => {
                   </Button>
                </div>
 
-               <div className='text-center'>
+               <div className='pt-6 text-center'>
                   <Button variant='fill' size='XXL' className='w-full' onClick={() => router.push('/products')}>
                      Continue Shopping
                   </Button>
