@@ -30,7 +30,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                <img
                   src={product.imageUrl?.[0] || 'https://i.ibb.co/xtWHYY7v/brak-zdjecia.png'}
                   alt={product.name}
-                  className='h-[204px] rounded-md object-cover'
+                  className='h-[204px] w-[268px] rounded-md border border-[var(--color-neutral-900)] object-cover'
                />
             </div>
             <div className='flex flex-col gap-y-4 px-4 pt-[18px] pb-5'>

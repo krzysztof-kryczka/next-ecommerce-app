@@ -47,11 +47,20 @@ model Product {
   price       Float
   stock       Int
   imageUrl    String[]
+  brandId     Int
+  brand       Brand       @relation(fields: [brandId], references: [id])
   categoryId  Int
   category    Category    @relation(fields: [categoryId], references: [id])
   createdAt   DateTime    @default(now())
   cartItems   CartItem[]
   orderItems  OrderItem[]
+}
+
+model Brand {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  logo     String?
+  products Product[]
 }
 
 model Category {

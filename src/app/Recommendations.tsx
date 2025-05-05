@@ -31,11 +31,17 @@ export default function Recommendations() {
 
             <Carousel className='w-full'>
                <CarouselContent className='m-0 flex gap-x-8'>
-                  {recommendations.map(product => (
-                     <CarouselItem key={product.id} className='basis-[22%] p-0'>
-                        <ProductCard product={product} />
-                     </CarouselItem>
-                  ))}
+                  {Array.isArray(recommendations) ? (
+                     recommendations.map(product => (
+                        <CarouselItem key={product.id} className='basis-[22%] p-0'>
+                           <ProductCard product={product} />
+                        </CarouselItem>
+                     ))
+                  ) : (
+                     <Text as='p' variant='textMregular' className='text-center text-gray-500'>
+                        No products available.
+                     </Text>
+                  )}
                </CarouselContent>
                <CarouselPrevious className='absolute top-1/2 -left-15 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-gray-300 shadow hover:bg-gray-400 focus:outline-none' />
                <CarouselNext className='absolute top-1/2 -right-15 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-gray-300 shadow hover:bg-gray-400 focus:outline-none' />

@@ -1,6 +1,7 @@
 import HeroSection from './HeroSection'
 import Categories from './Categories'
 import Recommendations from './Recommendations'
+import Brands from './Brands'
 
 export default function Home() {
    return (
@@ -8,6 +9,7 @@ export default function Home() {
          <HeroSection />
          <Categories />
          <Recommendations />
+         <Brands />
       </>
    )
 }

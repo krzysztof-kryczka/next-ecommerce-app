@@ -32,27 +32,33 @@ const Categories = () => {
                   Category
                </Text>
                <div className='grid grid-cols-1 gap-x-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5'>
-                  {categories.map(category => (
-                     <Link
-                        key={category.id}
-                        href={{
-                           pathname: '/products',
-                           query: { 'selected[]': [category.id] },
-                        }}
-                     >
-                        <Card className='w-full cursor-pointer gap-0 rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] px-[70px] py-7 text-[var(--color-base-white)] hover:shadow-lg sm:max-w-[422px]'>
-                           <CardHeader className='flex flex-col items-center gap-y-6 p-0'>
-                              {/* Ikona na podstawie nazwy kategorii */}
-                              {categoryIcons[category.name] || <span className='text-gray-500'>No Icon</span>}
-                              <CardTitle>
-                                 <Text variant='h6mobileMedium' className='text-[var(--color-neutral-900)'>
-                                    {category.name}
-                                 </Text>
-                              </CardTitle>
-                           </CardHeader>
-                        </Card>
-                     </Link>
-                  ))}
+                  {Array.isArray(categories) ? (
+                     categories.map(category => (
+                        <Link
+                           key={category.id}
+                           href={{
+                              pathname: '/products',
+                              query: { 'selected[]': [category.id] },
+                           }}
+                        >
+                           <Card className='w-full cursor-pointer gap-0 rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] px-[70px] py-7 text-[var(--color-base-white)] hover:shadow-lg sm:max-w-[422px]'>
+                              <CardHeader className='flex flex-col items-center gap-y-6 p-0'>
+                                 {/* Ikona na podstawie nazwy kategorii */}
+                                 {categoryIcons[category.name] || <span className='text-gray-500'>No Icon</span>}
+                                 <CardTitle>
+                                    <Text variant='h6mobileMedium' className='text-[var(--color-neutral-900)'>
+                                       {category.name}
+                                    </Text>
+                                 </CardTitle>
+                              </CardHeader>
+                           </Card>
+                        </Link>
+                     ))
+                  ) : (
+                     <Text as='p' variant='textMregular' className='text-center text-gray-500'>
+                        No categories available.
+                     </Text>
+                  )}
                </div>
             </div>
          </div>

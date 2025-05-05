@@ -103,9 +103,13 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                {/* Kolumna 1 */}
                <div className='flex flex-col gap-y-6 sm:gap-y-8'>
                   {/* Główne zdjęcie */}
-                  <Card className='w-full rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-3'>
+                  <Card className='w-[422px] h-[341px] rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-3'>
                      <CardContent className='px-0'>
-                        <img src={mainImage} alt={product.name || 'Product'} className='h-auto max-w-full rounded-md' />
+                        <img
+                           src={mainImage}
+                           alt={product.name || 'Product'}
+                           className='w-[398px] h-[317px] rounded-md'
+                        />
                      </CardContent>
                   </Card>
 

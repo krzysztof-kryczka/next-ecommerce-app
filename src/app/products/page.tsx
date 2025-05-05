@@ -31,6 +31,7 @@ export default function ProductsPage() {
    const { data: products, loading, error } = useFetch<Product>('/api/products', {}, false, true)
    const searchParams = useSearchParams()
    const selectedParam = searchParams?.getAll('selected[]') || []
+   const brandIdParam = searchParams?.get('brandId')
    const { currency, setCurrency, convertCurrency } = useCurrency()
 
    useEffect(() => {
@@ -59,10 +60,19 @@ export default function ProductsPage() {
    }
 
    useEffect(() => {
+      let filtered = products
+
+      if (brandIdParam) {
+         const brandId = parseInt(brandIdParam, 10)
+         if (!isNaN(brandId)) {
+            filtered = filtered.filter(product => product.brandId === brandId)
+         }
+      }
+
       const minPriceUSD = priceRange.min ? convertCurrency(priceRange.min, currency, 'USD') : 0
       const maxPriceUSD = priceRange.max ? convertCurrency(priceRange.max, currency, 'USD') : Number.MAX_SAFE_INTEGER
-      // let filtered = products
-      let filtered = products.filter(product => product.price >= minPriceUSD && product.price <= maxPriceUSD)
+
+      filtered = filtered.filter(product => product.price >= minPriceUSD && product.price <= maxPriceUSD)
 
       if (selectedCategories.length > 0) {
          filtered = filtered.filter(product => selectedCategories.includes(product.categoryId))
@@ -73,16 +83,12 @@ export default function ProductsPage() {
       } else if (sortBy === 'price_desc') {
          filtered = filtered.sort((a, b) => b.price - a.price)
       } else if (sortBy === 'latest') {
-         filtered = filtered.sort((a, b) => {
-            const dateA = new Date(a.createdAt).getTime() || 0
-            const dateB = new Date(b.createdAt).getTime() || 0
-            return dateB - dateA
-         })
+         filtered = filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       }
 
       setFilteredProducts(filtered)
       setTotalPages(Math.ceil(filtered.length / showPerPage))
-   }, [selectedCategories, priceRange, sortBy, products, showPerPage, currency])
+   }, [brandIdParam, selectedCategories, priceRange, sortBy, products, showPerPage, currency])
 
    const paginatedProducts = filteredProducts.slice((currentPage - 1) * showPerPage, currentPage * showPerPage)
 
