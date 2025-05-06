@@ -1,49 +1,57 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import Image from 'next/image'
+import { startTransition, useEffect, useState } from 'react'
+import CheckCircleIcon from '@/components/icons/CheckCircleIcon'
 
 const RegistrationSuccess = () => {
    const router = useRouter()
-   const [isAuthorized, setIsAuthorized,] = useState(false)
-   const [isLoading, setIsLoading,] = useState(true)
-   const [remainingTime, setRemainingTime,] = useState<number | null>(null)
+   const [isAuthorized, setIsAuthorized] = useState(false)
+   const [isLoading, setIsLoading] = useState(true)
+   const [remainingTime, setRemainingTime] = useState<number | null>(null)
 
    useEffect(() => {
       const registeredData = sessionStorage.getItem('registered')
+      console.log('SessionStorage on RegistrationSuccess:', registeredData)
+
       if (registeredData) {
-         const { expiresAt, } = JSON.parse(registeredData)
+         const { expiresAt } = JSON.parse(registeredData)
          const currentTime = new Date().getTime()
 
          if (currentTime < expiresAt) {
-            // Flaga istnieje i jest ważna
             setIsAuthorized(true)
-            setRemainingTime(Math.floor((expiresAt - currentTime) / 1000)) // Ustaw początkowy czas pozostały
+            setRemainingTime(Math.floor((expiresAt - currentTime) / 1000))
          } else {
-            console.log('Flaga wygasła.')
+            console.log('Flaga registered wygasła. Usuwam sesję i przekierowuję na stronę główną.')
             sessionStorage.removeItem('registered')
             router.push('/')
          }
       } else {
+         console.log('Brak sesji, przekierowanie na stronę główną.')
          router.push('/')
       }
       setIsLoading(false)
-   }, [router,])
+   }, [router])
+
+   /// BUGS:
+   // Aktualizujemy remainingTime co sekundę, ale za każdym razem, gdy wartość się zmienia, powoduje ponowne renderowanie. Problem prawdopodobnie rozwiązuje useRef ale jak zastosować do Setinterwału ???
 
    useEffect(() => {
-      if (remainingTime !== null) {
+      if (remainingTime !== null && remainingTime > 0) {
          const intervalId = setInterval(() => {
             setRemainingTime(prev => {
-               if (prev !== null && prev > 0) {
-                  return prev - 1 // Zmniejszaj czas pozostały co sekundę
+               if (prev !== null && prev > 1) {
+                  return prev - 1
                } else {
-                  // Gdy czas się skończy, przekieruj użytkownika
-                  console.log('Flaga wygasła, przekierowanie na stronę główną.')
+                  console.log('Sesja wygasła – przekierowanie na stronę główną.')
                   sessionStorage.removeItem('registered')
                   setIsAuthorized(false)
                   clearInterval(intervalId)
-                  router.push('/')
+                  // startTransition, aby uniknąć błędu React
+                  startTransition(() => {
+                     router.push('/')
+                  })
+
                   return null
                }
             })
@@ -51,7 +59,7 @@ const RegistrationSuccess = () => {
 
          return () => clearInterval(intervalId) // Czyszczenie interwału przy odmontowaniu
       }
-   }, [remainingTime, router,])
+   }, [remainingTime, router])
 
    if (isLoading) {
       // Zablokuj renderowanie, dopóki flaga nie zostanie sprawdzona
@@ -66,7 +74,7 @@ const RegistrationSuccess = () => {
       <div className='my-20 flex items-center justify-center bg-[var(--color-background)] text-white'>
          <div className='text-center'>
             <div className='mb-10 flex items-center justify-center'>
-               <Image src='/check-circle.svg' alt='Success Icon' width={100} height={100} />
+               <CheckCircleIcon />
             </div>
             <h2 className='text-[44px] font-bold text-[var(--color-base-white2)]'>Thank you!</h2>
             <p className='pt-4 pb-8 text-2xl font-medium text-[var(--color-base-white2)]'>
@@ -84,7 +92,7 @@ const RegistrationSuccess = () => {
          </div>
          {remainingTime !== null && (
             <p className='mt-4 text-lg'>
-               Ta strona zniknie za: <span className='font-bold'>{remainingTime} sekund</span>
+               This page will disappear in: <span className='font-bold'>{remainingTime} seconds</span>
             </p>
          )}
       </div>
