@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import { Label } from '@/components/ui/label'
 import { Product } from '@/types/Product'
@@ -18,7 +18,7 @@ import { useCurrency } from '@/context/CurrencyContext'
 
 export default function ProductsPage() {
    const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
-   const [sortBy, setSortBy] = useState<SortByOptions>('latest')
+  const [sortBy, setSortBy] = useState<SortByOptions>(SortByOptions.Latest)
    const [showPerPage, setShowPerPage] = useState<number>(9)
    const [priceRange, setPriceRange] = useState({ min: '', max: '' })
    const [currentPage, setCurrentPage] = useState<number>(1)
@@ -28,11 +28,16 @@ export default function ProductsPage() {
    const [visibleCategories, setVisibleCategories] = useState<number>(4)
    const [selectedCategories, setSelectedCategories] = useState<number[]>([])
    const { categories, loading: categoriesLoading } = useCategories()
-   const { data: products, loading, error } = useFetch<Product>('/api/products', {}, false, true)
    const searchParams = useSearchParams()
    const selectedParam = searchParams?.getAll('selected[]') || []
    const brandIdParam = searchParams?.get('brandId')
-   const { currency, setCurrency, convertCurrency } = useCurrency()
+   const { currency, convertCurrency } = useCurrency()
+   const {
+      data: response,
+      loading,
+      error,
+   } = useFetch<{ success: boolean; data: Product[] }>('/api/products', {}, false, false)
+   const products = response && 'data' in response ? response.data : []
 
    useEffect(() => {
       // Zamieniamy URL na tablicę liczb
@@ -60,7 +65,9 @@ export default function ProductsPage() {
    }
 
    useEffect(() => {
-      let filtered = products
+      if (!products || loading) return
+
+      let filtered = [...products]
 
       if (brandIdParam) {
          const brandId = parseInt(brandIdParam, 10)
@@ -72,22 +79,26 @@ export default function ProductsPage() {
       const minPriceUSD = priceRange.min ? convertCurrency(priceRange.min, currency, 'USD') : 0
       const maxPriceUSD = priceRange.max ? convertCurrency(priceRange.max, currency, 'USD') : Number.MAX_SAFE_INTEGER
 
-      filtered = filtered.filter(product => product.price >= minPriceUSD && product.price <= maxPriceUSD)
+      filtered = filtered.filter(
+         product => Number(product.price) >= Number(minPriceUSD) && Number(product.price) <= Number(maxPriceUSD),
+      )
 
       if (selectedCategories.length > 0) {
          filtered = filtered.filter(product => selectedCategories.includes(product.categoryId))
       }
 
       if (sortBy === 'price_asc') {
-         filtered = filtered.sort((a, b) => a.price - b.price)
+         filtered = filtered.sort((a, b) => Number(a.price) - Number(b.price))
       } else if (sortBy === 'price_desc') {
-         filtered = filtered.sort((a, b) => b.price - a.price)
+         filtered = filtered.sort((a, b) => Number(b.price) - Number(a.price))
       } else if (sortBy === 'latest') {
          filtered = filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       }
 
-      setFilteredProducts(filtered)
-      setTotalPages(Math.ceil(filtered.length / showPerPage))
+      if (JSON.stringify(filteredProducts) !== JSON.stringify(filtered)) {
+         setFilteredProducts(filtered)
+         setTotalPages(Math.ceil(filtered.length / showPerPage))
+      }
    }, [brandIdParam, selectedCategories, priceRange, sortBy, products, showPerPage, currency])
 
    const paginatedProducts = filteredProducts.slice((currentPage - 1) * showPerPage, currentPage * showPerPage)
@@ -121,6 +132,14 @@ export default function ProductsPage() {
       return buttons.filter((value, index, self) => !(value === '...' && self[index - 1] === '...'))
    }
    console.log('waluta:', currency)
+
+   const handleSortChange = useCallback(
+      (value: SortByOptions) => {
+         setSortBy(value)
+         setCurrentPage(1)
+      },
+      [setSortBy, setCurrentPage],
+   )
 
    return (
       <div className='px-10'>
@@ -163,7 +182,7 @@ export default function ProductsPage() {
                         <Label variant='custom' className='text-xl leading-[30px] font-semibold tracking-[-0.01em]'>
                            Sort By
                         </Label>
-                        <SortBySelect sortBy={sortBy} setSortBy={setSortBy} />
+                        <SortBySelect sortBy={sortBy} setSortBy={handleSortChange} />
                      </div>
 
                      <div className='flex gap-x-4'>
@@ -177,8 +196,10 @@ export default function ProductsPage() {
                         />
                      </div>
                   </div>
-                  {loading || categoriesLoading ? (
-                     <p className='text-center text-lg text-gray-500'>Ładowanie produktów...</p>
+                  {error ? (
+                     <p className='text-center text-lg text-red-500'>{error}</p>
+                  ) : loading || categoriesLoading ? (
+                     <p className='text-center text-lg text-gray-500'>Loading products...</p>
                   ) : (
                      <div className='grid grid-cols-3 gap-x-12 gap-y-8 px-10'>
                         {paginatedProducts.map(product => (

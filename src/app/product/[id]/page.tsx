@@ -18,7 +18,6 @@ import { useCurrency } from '@/context/CurrencyContext'
 import { Product } from '@/types/Product'
 
 const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
-   // const [product, setProduct] = useState<any>(null)
    const [quantity, setQuantity] = useState<number>(1)
    const [productId, setProductId] = useState<string | null>(null)
    const [selectedColor, setSelectedColor] = useState<string>('White')
@@ -41,7 +40,6 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
    )
 
    const product = Array.isArray(productData) ? null : productData?.data
-   // const product = Array.isArray(productData) ? productData[0] : productData
 
    const handleImageClick = (url: string) => {
       setMainImage(url)
@@ -103,29 +101,35 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                {/* Kolumna 1 */}
                <div className='flex flex-col gap-y-6 sm:gap-y-8'>
                   {/* Główne zdjęcie */}
-                  <Card className='w-[422px] h-[341px] rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-3'>
+                  <Card className='h-[341px] w-[422px] rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-3'>
                      <CardContent className='px-0'>
-                        <img
-                           src={mainImage}
-                           alt={product.name || 'Product'}
-                           className='w-[398px] h-[317px] rounded-md'
-                        />
+                        {mainImage ? (
+                           <img
+                              src={mainImage}
+                              alt={product.name || 'Product'}
+                              className='h-[317px] w-[398px] rounded-md'
+                           />
+                        ) : null}
                      </CardContent>
                   </Card>
 
                   {/* Miniatury */}
                   <div className='flex gap-x-2 overflow-x-auto sm:gap-x-4'>
-                     {product.imageUrl?.map((url: string, index: number) => (
-                        <img
-                           key={index}
-                           src={url}
-                           alt={`Thumbnail ${index}`}
-                           className={`h-[72px] w-[90px] cursor-pointer rounded-md border-2 sm:h-[99px] sm:w-[130px] ${
-                              mainImage === url ? 'border-[var(--color-primary-400)]' : 'border-[var(--color-gray-800)]'
-                           }`}
-                           onClick={() => handleImageClick(url)}
-                        />
-                     ))}
+                     {product.imageUrl?.map((url: string, index: number) =>
+                        url ? (
+                           <img
+                              key={index}
+                              src={url}
+                              alt={`Thumbnail ${index}`}
+                              className={`h-[72px] w-[90px] cursor-pointer rounded-md border-2 sm:h-[99px] sm:w-[130px] ${
+                                 mainImage === url
+                                    ? 'border-[var(--color-primary-400)]'
+                                    : 'border-[var(--color-gray-800)]'
+                              }`}
+                              onClick={() => handleImageClick(url)}
+                           />
+                        ) : null,
+                     )}
                   </div>
                </div>
                {/* Kolumna 2 */}

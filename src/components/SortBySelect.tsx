@@ -1,15 +1,12 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
-import { SortByOptions } from '@/types/SortByOptions'
+import { SortBySelectProps } from '@/types/SortBySelectProps'
 
-const SortBySelect: React.FC<{
-   sortBy: SortByOptions
-   setSortBy: (value: SortByOptions) => void
-}> = ({ sortBy, setSortBy }) => {
+const SortBySelect: React.FC<SortBySelectProps> = memo(({ sortBy, setSortBy }) => {
    return (
       <Select value={sortBy} onValueChange={setSortBy}>
-         <SelectTrigger className='px-4 py-2 text-sm font-medium'>
-            {sortBy === 'latest' ? 'Latest' : sortBy === 'price_asc' ? 'Descending' : 'Ascending'}
+         <SelectTrigger className='px-4 py-2 text-sm font-medium' aria-label='Sort products'>
+            {sortBy === 'latest' ? 'Latest' : sortBy === 'price_asc' ? 'Ascending' : 'Descending'}
          </SelectTrigger>
          <SelectContent>
             <SelectItem value='latest'>Latest</SelectItem>
@@ -18,6 +15,6 @@ const SortBySelect: React.FC<{
          </SelectContent>
       </Select>
    )
-}
+})
 
 export default SortBySelect
