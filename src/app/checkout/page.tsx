@@ -81,10 +81,14 @@ const CheckoutPage = () => {
 
    const handleCheckout = async () => {
       if (status !== 'authenticated') {
-         return toast.error('🚫 Musisz się zalogować, aby kontynuować checkout!')
+         return toast.error('🚫 You must log in to continue checkout!')
       }
       if (!orderSummary || !orderSummary.items.length) {
          return toast.error('⛔ No items selected for checkout.')
+      }
+
+      if (!mainAddress) {
+         return toast.error('🚫 Please add a shipping address before proceeding!')
       }
 
       try {
@@ -154,7 +158,11 @@ const CheckoutPage = () => {
          />
          <div className='grid grid-cols-1 gap-x-12 lg:grid-cols-[3fr_1fr]'>
             {/* Lista produktów */}
+
             <div className='flex w-[889px] flex-col gap-y-8'>
+               <Text as='h6' variant='h6medium' className='text-[var(--color-neutral-900)]'>
+                  Your order
+               </Text>
                {orderSummary ? (
                   <ProductList
                      items={orderSummary.items}
@@ -184,29 +192,41 @@ const CheckoutPage = () => {
 
                <div className='flex flex-col gap-y-6'>
                   {/* Sekcja adresu wysyłki */}
+                  <Text as='h6' variant='h6medium' className='text-[var(--color-neutral-900)]'>
+                     Address
+                  </Text>
                   <ShippingAddress onMainAddressSelect={setMainAddress} />
                   {mainAddress && (
                      <div className='mt-4'>
-                        <p>Selected Shipping Address:</p>
-                        <p>{mainAddress.addressLine}</p>
+                        <Text as='p' variant='textMmedium' className='text-[var(--color-neutral-100)]'>
+                           Selected Shipping Address:
+                        </Text>
+                        <Text as='p' variant='textLmedium' className='text-[var(--color-neutral-900)]'>
+                           {mainAddress.addressLine}
+                        </Text>
                      </div>
                   )}
                   {/* Sekcja metody wysyłki */}
-                  Shipping
+                  <Text as='h6' variant='h6medium' className='text-[var(--color-neutral-900)]'>
+                     Shipping
+                  </Text>
                   <Card className='w-full rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-3'>
                      <CardContent>
                         <div className='flex items-start gap-2'>
                            <ShieldCrossIcon />
                            <div className='flex flex-col gap-y-1'>
-                              <p className='text-sm font-medium text-[var(--color-neutral-900)] sm:text-base'>
+                              <Text as='p' variant='textLmedium' className='text-[var(--color-neutral-900)]'>
                                  NexusHub Courier
-                              </p>
+                              </Text>
                            </div>
                         </div>
                      </CardContent>
                   </Card>
                   {/* Sekcja metody płatności */}
-                  Payment Method
+                  <Text as='h6' variant='h6medium' className='text-[var(--color-neutral-900)]'>
+                     Payment Method
+                  </Text>
+
                   <Card className='w-full rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-3'>
                      <CardContent>
                         <div className='flex items-start gap-2'>

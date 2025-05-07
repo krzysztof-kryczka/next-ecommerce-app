@@ -42,8 +42,8 @@ const useFetch = <T>(url: string | null, options?: RequestInit, disableFetch = f
       }
    }
 
-   const postData = async (postUrl: string, body: object) => {
-      return await sendRequest<T>('POST', postUrl, body)
+   const postData = async (postUrl: string, body: object, headers: Record<string, string> = {}) => {
+      return await sendRequest<T>('POST', postUrl, body, headers)
    }
 
    const deleteData = async (deleteUrl: string, body?: object) => {
@@ -58,28 +58,39 @@ const useFetch = <T>(url: string | null, options?: RequestInit, disableFetch = f
       return await sendRequest<T>('PUT', putUrl, body)
    }
 
-   const sendRequest = async <R>(method: string, requestUrl: string, body?: object): Promise<R | null> => {
-      try {
-         setLoading(true)
-         setError(null)
-         const response = await fetch(requestUrl, {
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            body: body ? JSON.stringify(body) : undefined,
-         })
-         if (!response.ok) {
-            throw new Error(`Failed to ${method} data to ${requestUrl}`)
-         }
-         const result: R = await response.json()
-         return result
-      } catch (error) {
-         setError(error instanceof Error ? error.message : 'Unknown error')
-         console.error(`Error during ${method} request:`, error)
-         return null
-      } finally {
-         setLoading(false)
+const sendRequest = async <R>(
+   method: string,
+   requestUrl: string,
+   body?: object,
+   headers: Record<string, string> = {},
+): Promise<R | null> => {
+   try {
+      setLoading(true)
+      setError(null)
+
+      const response = await fetch(requestUrl, {
+         method,
+         headers: {
+            'Content-Type': 'application/json',
+            ...headers,
+         },
+         body: body ? JSON.stringify(body) : undefined,
+      })
+
+      if (!response.ok) {
+         throw new Error(`Failed to ${method} data to ${requestUrl}`)
       }
+
+      return await response.json()
+   } catch (error) {
+      setError(error instanceof Error ? error.message : 'Unknown error')
+      console.error(`Error during ${method} request:`, error)
+      return null
+   } finally {
+      setLoading(false)
    }
+}
+
 
    return { data, loading, error, fetchData, postData, deleteData, patchData, putData }
 }

@@ -35,7 +35,7 @@
    --color-primary-400: #f29145; /* */
    --color-primary-500: #ee701d;
    --color-primary-600: #e05816;
-   --color-primary-700: #b94315;
+   --color-primary-700: #b94315; /* */
    --color-primary-800: #943518;
    --color-primary-900: #40150a;
 
@@ -144,7 +144,7 @@
    --color-blazeOrange-600: #e5610a; /* */
    --color-blazeOrange-700: #b34c08;
    --color-blazeOrange-800: #8b3b06;
-   --color-blazeOrange-900: #6a2d05;
+   --color-blazeOrange-900: #6a2d05;  /* */
 }
 
 @layer utilities {

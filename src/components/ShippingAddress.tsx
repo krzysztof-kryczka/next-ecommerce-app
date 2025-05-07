@@ -1,98 +1,102 @@
 import { useEffect, useState } from 'react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { useSession } from 'next-auth/react'
 import { Address } from '@/types/Address'
-import { Button } from './ui/button'
+import useFetch from '@/hooks/useFetch'
+import { toast } from 'react-toastify'
+import { AddressFormData } from '@/schema/addressSchema'
+import AddressForm from './AddressForm'
+import MainAddressDisplay from './MainAddressDisplay'
 
 const ShippingAddress = ({ onMainAddressSelect }: { onMainAddressSelect: (address: Address) => void }) => {
+   const [addresses, setAddresses] = useState<Address[]>([])
    const { data: session } = useSession()
    const userId = session?.user?.id
-   const [addresses, setAddresses] = useState<Address[]>([])
-   const [error, setError] = useState<string | null>(null)
-   const [loading, setLoading] = useState<boolean>(true)
+
+   const { error, loading, fetchData, postData } = useFetch<{ success: boolean; addresses: Address[] }>(
+      `/api/addresses?userId=${userId}`,
+      {
+         headers: {
+            Authorization: `Bearer ${session?.accessToken}`,
+         },
+      },
+      false,
+      true,
+   )
 
    useEffect(() => {
-      const fetchAddresses = async () => {
-         try {
-            if (!session || !session.user || !session.token) {
-               setError('User is not logged in or token is missing')
-               return
-            }
+      if (!userId) {
+         console.warn('🚨 userId is undefined, skipping fetch')
+         return
+      }
 
-            const response = await fetch(`/api/address?userId=${session.user.id}`, {
-               method: 'GET',
-               headers: {
-                  Authorization: `Bearer ${session.token}`,
-               },
-            })
-
-            if (!response.ok) throw new Error(`HTTP Error ${response.status}`)
-
-            const data = await response.json()
-            setAddresses(data.addresses)
-
-            const mainAddress = data.addresses.find((address: Address) => address.isMain)
-            if (mainAddress) {
-               onMainAddressSelect(mainAddress)
-            }
-         } catch (err: unknown) {
-            if (err instanceof Error) {
-               setError(err.message || 'An unknown error occurred')
-            }
-         } finally {
-            setLoading(false)
+      fetchData(`/api/addresses?userId=${userId}`).then(result => {
+         console.log('API returned:', result)
+         if (result?.addresses) {
+            setAddresses(result.addresses)
          }
+      })
+   }, [userId])
+
+   useEffect(() => {
+      if (addresses.length === 0) return
+      const defaultMainAddress = addresses.find(address => address.isMain)
+      if (defaultMainAddress) {
+         console.log('🟢 Setting default main address:', defaultMainAddress)
+         onMainAddressSelect(defaultMainAddress)
       }
+   }, [addresses])
 
-      if (userId) {
-         fetchAddresses()
+   useEffect(() => {
+      if (session?.user?.id) {
+         console.log('Reloading addresses after session update')
+         fetchData(`/api/addresses?userId=${session.user.id}`).then(result => {
+            if (result?.addresses) {
+               setAddresses(result.addresses)
+            }
+         })
       }
-   }, [userId, session])
+   }, [session])
 
-   const handleAddAddress = async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault()
+   const handleAddAddress = async (data: AddressFormData) => {
+      console.log('Sending address data:', { ...data, userId })
 
-      const formData = new FormData(e.currentTarget)
-      const newAddress: Address = {
-         id: Date.now(),
-         country: formData.get('country') as string,
-         province: formData.get('province') as string,
-         city: formData.get('city') as string,
-         postalCode: formData.get('postalCode') as string,
-         addressLine: formData.get('address') as string,
-         isMain: formData.get('mainAddress') === 'on',
-      }
+      const response = await postData(
+         '/api/addresses',
+         { ...data, userId },
+         {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session?.accessToken}`,
+         },
+      )
 
-      try {
-         if (!session || !session.token) {
-            setError('User is not logged in or token is missing')
-            return
+      if (response?.success) {
+         console.log('✅ Address added successfully')
+
+         const newAddress: Address = {
+            ...data,
+            id: response.addresses?.[response.addresses.length - 1]?.id || Date.now(),
+            isMain: !!data.isMain,
          }
 
-         const response = await fetch(`/api/address?userId=${userId}`, {
-            method: 'POST',
-            headers: {
-               'Content-Type': 'application/json',
-               Authorization: `Bearer ${session.token}`,
-            },
-            body: JSON.stringify(newAddress),
+         setAddresses(prevAddresses => {
+            if (newAddress.isMain) {
+               return prevAddresses.map(addr => ({ ...addr, isMain: false })).concat(newAddress)
+            } else {
+               return [...prevAddresses, newAddress]
+            }
          })
 
-         if (!response.ok) throw new Error(`HTTP Error ${response.status}`)
-
-         const data = await response.json()
-
-         if (newAddress.isMain) {
-            setAddresses(prev => prev.map(addr => ({ ...addr, isMain: false })))
-            onMainAddressSelect(data.address)
-         }
-         setAddresses(prev => [...prev, data.address])
-      } catch (err: unknown) {
-         if (err instanceof Error) {
-            setError(err.message || 'An unknown error occurred')
-         }
+         toast.success('🏠 Address added successfully!')
+      } else {
+         toast.error('❌ Failed to add address. Please try again.')
       }
+   }
+
+   const handleSelectAddress = (address: Address) => {
+      console.log('📦 Selected address:', address)
+      onMainAddressSelect(address) // Przekazanie adresu do CheckoutPage
    }
 
    return (
@@ -115,107 +119,18 @@ const ShippingAddress = ({ onMainAddressSelect }: { onMainAddressSelect: (addres
 
             <TabsContent value='existing'>
                <CardContent className='p-0 pt-8'>
-                  {loading ? (
-                     <p>Loading addresses...</p>
-                  ) : error ? (
-                     <p className='text-red-500'>{error}</p>
-                  ) : addresses.length > 0 ? (
-                     <>
-                        {addresses.map((address: any) => (
-                           <div className='flex flex-col' key={address.id}>
-                              {address.isMain && (
-                                 <div className='flex items-center gap-x-4 pb-3'>
-                                    <p className='text-base font-medium text-[var(--color-neutral-100)]'>Address</p>
-                                    <Button variant='fill' size='XS' disabled className=''>
-                                       Main Address
-                                    </Button>
-                                 </div>
-                              )}
-
-                              <p className='pb-8 text-lg font-medium text-[var(--color-neutral-900)]'>
-                                 {address.addressLine}
-                              </p>
-                              <div className='flex gap-x-[177.3px]'>
-                                 <div className='flex flex-col gap-y-2'>
-                                    <p className='text-base font-medium text-[var(--color-neutral-100)]'>Country:</p>
-                                    <p className='text-lg font-medium text-[var(--color-neutral-900)]'>
-                                       {address.country}
-                                    </p>
-                                 </div>
-                                 <div className='flex flex-col gap-y-2'>
-                                    <p className='text-base font-medium text-[var(--color-neutral-100)]'>Province:</p>
-                                    <p className='text-lg font-medium text-[var(--color-neutral-900)]'>
-                                       {address.province}
-                                    </p>
-                                 </div>
-                                 <div className='flex flex-col gap-y-2'>
-                                    <p className='text-base font-medium text-[var(--color-neutral-100)]'>City:</p>
-                                    <p className='text-lg font-medium text-[var(--color-neutral-900)]'>
-                                       {address.city}
-                                    </p>
-                                 </div>
-                                 <div className='flex flex-col gap-y-2'>
-                                    <p className='text-base font-medium text-[var(--color-neutral-100)]'>
-                                       Postal Code:
-                                    </p>
-                                    <p className='text-lg font-medium text-[var(--color-neutral-900)]'>
-                                       {address.postalCode}
-                                    </p>
-                                 </div>
-                              </div>
-                           </div>
-                        ))}
-                     </>
-                  ) : (
-                     <p>No addresses found.</p>
-                  )}
+                  <MainAddressDisplay
+                     loading={loading}
+                     error={error}
+                     addresses={addresses}
+                     onSelectAddress={handleSelectAddress}
+                  />
                </CardContent>
             </TabsContent>
 
             <TabsContent value='new'>
-               <CardHeader>
-                  <CardTitle>Shipping Address</CardTitle>
-                  <CardDescription>Provide your shipping information below:</CardDescription>
-               </CardHeader>
-               <CardContent>
-                  <form className='flex flex-col gap-y-4' onSubmit={handleAddAddress}>
-                     <input
-                        type='text'
-                        name='country'
-                        placeholder='Country'
-                        className='rounded-lg border border-gray-300 p-2'
-                     />
-                     <input
-                        type='text'
-                        name='province'
-                        placeholder='Province'
-                        className='rounded-lg border border-gray-300 p-2'
-                     />
-                     <input
-                        type='text'
-                        name='city'
-                        placeholder='City'
-                        className='rounded-lg border border-gray-300 p-2'
-                     />
-                     <input
-                        type='text'
-                        name='postalCode'
-                        placeholder='Postal Code'
-                        className='rounded-lg border border-gray-300 p-2'
-                     />
-                     <input
-                        type='text'
-                        name='address'
-                        placeholder='Complete Address'
-                        className='rounded-lg border border-gray-300 p-2'
-                     />
-                     <label className='flex items-center'>
-                        <input type='checkbox' name='mainAddress' className='mr-2' /> Make this my main address
-                     </label>
-                     <button type='submit' className='mt-2 rounded bg-blue-500 p-2 text-white'>
-                        Add Address
-                     </button>
-                  </form>
+               <CardContent className='px-0 pt-8'>
+                  <AddressForm onSubmit={handleAddAddress} />
                </CardContent>
             </TabsContent>
          </Tabs>
