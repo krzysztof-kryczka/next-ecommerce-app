@@ -4,28 +4,47 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
 import CustomFormField from '@/components/CustomFormField'
 import { UpdateUserFormData, updateUserSchema } from '@/schema/updateSchema'
-import Text from '@/components/ui/text'
 import { useState } from 'react'
+import { toast } from 'react-toastify'
+import { signIn, useSession } from 'next-auth/react'
 
 interface UserFormProps {
    userData: any
 }
 
 export default function UserUpdateForm({ userData }: UserFormProps) {
+   const [isPhoneEditable, setIsPhoneEditable] = useState(false)
    const [isPasswordEditable, setIsPasswordEditable] = useState(false)
 
+   const { data: session } = useSession()
    const form = useForm<UpdateUserFormData>({
       resolver: zodResolver(updateUserSchema),
       defaultValues: userData,
    })
 
    const onSubmit = async (formData: UpdateUserFormData) => {
-      await fetch('/api/user-profile', {
+      const response = await fetch('/api/user-profile', {
          method: 'PUT',
          headers: { 'Content-Type': 'application/json' },
          body: JSON.stringify(formData),
       })
-      alert('Profile updated successfully!')
+
+      const responseData = await response.json()
+
+      if (response.ok) {
+         toast.success('Profile updated successfully!')
+
+         // Jeśli zmieniono e-mail, wymuś ponowne logowanie, aby odświeżyć sesję
+         if (formData.email !== session?.user?.email) {
+            await signIn(undefined, { callbackUrl: '/login' })
+         }
+      } else {
+         if (responseData.message === 'Email already in use') {
+            toast.error('❌ This email is already taken. Please choose another one.')
+         } else {
+            toast.error(`❌ Update failed: ${responseData.message}`)
+         }
+      }
    }
 
    return (
@@ -38,25 +57,23 @@ export default function UserUpdateForm({ userData }: UserFormProps) {
                   type='text'
                   placeholder='Your Name'
                   classNameItem='justify-between'
-                  disabled
                />
-
                <CustomFormField
                   name='email'
                   label='Email'
                   type='email'
                   placeholder='Your Email'
                   classNameItem='justify-between'
-                  disabled
                />
-
                <CustomFormField
                   name='phone'
                   label='Phone Number'
                   type='tel'
                   placeholder='Your Phone'
                   classNameItem='justify-between'
-                  disabled
+                  disabled={!isPhoneEditable}
+                  actionText='Change Phone Number'
+                  onActionClick={() => setIsPhoneEditable(true)}
                />
 
                <CustomFormField
@@ -67,16 +84,9 @@ export default function UserUpdateForm({ userData }: UserFormProps) {
                   placeholder='Enter Password'
                   classNameItem='justify-between'
                   disabled={!isPasswordEditable}
+                  actionText='Change Password'
+                  onActionClick={() => setIsPasswordEditable(true)}
                />
-
-               <Text
-                  as='p'
-                  variant='textMmedium'
-                  onClick={() => setIsPasswordEditable(true)}
-                  className='text-[var(--color-primary-400)]'
-               >
-                  Change Password
-               </Text>
 
                <Button variant='fill' type='submit'>
                   Update Profile

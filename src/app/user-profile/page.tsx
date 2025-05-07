@@ -10,17 +10,18 @@ import useFetch from '@/hooks/useFetch'
 import UserUpdateForm from './UserUpdateForm'
 import { Separator } from '@/components/ui/separator'
 import Text from '@/components/ui/text'
+import { TabsEnum } from '@/enum/TabsEnum'
 
 export default function UserProfilePage() {
    const router = useRouter()
    const { data: session, status } = useSession()
-   const [activeTab, setActiveTab] = useState<'profile' | 'transaction'>('profile')
+   const [activeTab, setActiveTab] = useState<TabsEnum>(TabsEnum.Profile)
 
    useEffect(() => {
       if (status === 'unauthenticated') {
          router.push('/login')
       }
-   })
+   }, [status])
 
    const { data: userData, loading, error } = useFetch('/api/user-profile')
 
@@ -33,13 +34,13 @@ export default function UserProfilePage() {
          <UserSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
          {/* PRAWY PANEL */}
          <Card className='w-3/4 rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-6'>
-            <Tabs value={activeTab} onValueChange={tab => setActiveTab(tab)}>
+            <Tabs value={activeTab} onValueChange={tab => setActiveTab(tab as TabsEnum)}>
                <TabsList>
-                  <TabsTrigger value='profile'>User Profile</TabsTrigger>
-                  <TabsTrigger value='address'>My Address</TabsTrigger>
-                  <TabsTrigger value='payment'>Payment Method</TabsTrigger>
-                  <TabsTrigger value='transaction'>Transaction</TabsTrigger>
-                  <TabsTrigger value='notification'>Notification</TabsTrigger>
+                  <TabsTrigger value={TabsEnum.Profile}>User Profile</TabsTrigger>
+                  <TabsTrigger value={TabsEnum.Address}>My Address</TabsTrigger>
+                  <TabsTrigger value={TabsEnum.Payment}>Payment Method</TabsTrigger>
+                  <TabsTrigger value={TabsEnum.Transaction}>Transaction</TabsTrigger>
+                  <TabsTrigger value={TabsEnum.Notification}>Notification</TabsTrigger>
                </TabsList>
                <TabsContent value='profile'>
                   <div className='flex flex-col gap-y-10'>
@@ -54,7 +55,7 @@ export default function UserProfilePage() {
                         <Separator className='mt-2 bg-[var(--color-gray-800)]' />
                      </div>
                      <div className='flex gap-x-12'>
-                        <UserAvatar session={session} />
+                        {session?.user && <UserAvatar session={session} />}
                         <UserUpdateForm userData={userData} />
                      </div>
                   </div>

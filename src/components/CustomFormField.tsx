@@ -12,6 +12,8 @@ export default function CustomFormField({
    classNameItem = '',
    disabled = false,
    isPassword = false,
+   actionText,
+   onActionClick,
 }: CustomFormFieldProps) {
    const {
       control,
@@ -19,7 +21,7 @@ export default function CustomFormField({
    } = useFormContext()
 
    const maskPhoneNumber = (phone: string): string => {
-      return phone.replace(/\d(?=\d{2})/g, '*')
+      return phone.replace(/\d(?=\d{2})/g, '∗')
    }
 
    return (
@@ -33,7 +35,7 @@ export default function CustomFormField({
                   <Input
                      type={isPassword ? 'password' : type}
                      variant='custom'
-                     state={errors.name ? 'error' : 'neutral'}
+                     state={errors[name] ? 'error' : 'neutral'}
                      placeholder={placeholder}
                      {...field}
                      value={
@@ -43,6 +45,8 @@ export default function CustomFormField({
                      error={typeof errors[name]?.message === 'string' ? errors[name]?.message : undefined}
                      className={`${classNameInput}`}
                      disabled={disabled}
+                     actionText={actionText}
+                     onActionClick={onActionClick}
                   />
                </FormControl>
             </FormItem>

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import Text from '@/components/ui/text'
 
 const inputVariants = cva(
    'flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:opacity-50 md:text-sm',
@@ -30,11 +31,22 @@ interface InputProps extends React.ComponentProps<'input'>, VariantProps<typeof 
    error?: string
 }
 
-const Input: React.FC<InputProps> = ({ className, type, variant, state, isPassword, error, ...props }) => {
+const Input: React.FC<InputProps> = ({
+   className,
+   type,
+   variant,
+   state,
+   isPassword,
+   error,
+   actionText,
+   onActionClick,
+   ...props
+}) => {
    const [isVisible, setIsVisible] = React.useState(false)
+
    return (
-      <div>
-         <div className='relative space-y-1'>
+      <div className='flex flex-col'>
+         <div className='relative'>
             <input
                type={isPassword ? (isVisible ? 'text' : 'password') : type}
                className={cn(inputVariants({ variant, state }), 'pr-12', className)}
@@ -50,7 +62,21 @@ const Input: React.FC<InputProps> = ({ className, type, variant, state, isPasswo
                </span>
             )}
          </div>
-         {error && <p className='text-sm text-[var(--color-danger-500)]'>{error}</p>}
+         {actionText && (
+            <Text
+               as='p'
+               variant='textMmedium'
+               className='mt-2 cursor-pointer text-[var(--color-primary-400)]'
+               onClick={onActionClick}
+            >
+               {actionText}
+            </Text>
+         )}
+         {error && (
+            <Text as='p' variant='textSregular' className='text-[var(--color-danger-500)]'>
+               {error}
+            </Text>
+         )}
       </div>
    )
 }

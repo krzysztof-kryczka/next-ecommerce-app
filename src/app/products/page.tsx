@@ -4,7 +4,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/componen
 import { Label } from '@/components/ui/label'
 import { Product } from '@/types/Product'
 import SortBySelect from '@/components/SortBySelect'
-import { SortByOptions } from '@/types/SortByOptions'
+import { SortByOptions } from '@/enum/SortByOptions'
 import ShowPerPageSelect from '@/components/ShowPerPageSelect'
 import Pagination from '@/components/Pagination'
 import DropdownSection from '@/components/DropdownSection'
@@ -18,7 +18,7 @@ import { useCurrency } from '@/context/CurrencyContext'
 
 export default function ProductsPage() {
    const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
-  const [sortBy, setSortBy] = useState<SortByOptions>(SortByOptions.Latest)
+   const [sortBy, setSortBy] = useState<SortByOptions>(SortByOptions.Latest)
    const [showPerPage, setShowPerPage] = useState<number>(9)
    const [priceRange, setPriceRange] = useState({ min: '', max: '' })
    const [currentPage, setCurrentPage] = useState<number>(1)

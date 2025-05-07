@@ -8,4 +8,6 @@ export type CustomFormFieldProps = {
    classNameItem?: string
    disabled?: boolean
    isPassword?: boolean
+   actionText?: string
+   onActionClick?: () => void
 }

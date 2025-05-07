@@ -1,4 +1,4 @@
-import { SortByOptions } from "./SortByOptions"
+import { SortByOptions } from '../enum/SortByOptions'
 
 export type SortBySelectProps = {
    sortBy: SortByOptions
