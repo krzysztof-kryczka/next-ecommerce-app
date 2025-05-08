@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { JSX, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Card } from '@/components/ui/card'
@@ -8,12 +8,12 @@ import UserAvatar from './UserAvatar'
 import { useRouter } from 'next/navigation'
 import useFetch from '@/hooks/useFetch'
 import UserUpdateForm from './UserUpdateForm'
-import { Separator } from '@/components/ui/separator'
-import Text from '@/components/ui/text'
 import { TabsEnum } from '@/enum/TabsEnum'
 import UserAddress from './UserAddress'
+import UserTransaction from './UserTransaction'
+import TabHeader from './UserTabHeader'
 
-export default function UserProfilePage() {
+export default function UserProfilePage(): JSX.Element {
    const router = useRouter()
    const { data: session, status } = useSession()
    const [activeTab, setActiveTab] = useState<TabsEnum>(TabsEnum.Profile)
@@ -45,16 +45,10 @@ export default function UserProfilePage() {
                </TabsList>
                <TabsContent value='profile'>
                   <div className='flex flex-col gap-y-10'>
-                     <div className='flex flex-col gap-y-2'>
-                        <Text as='h6' variant='h6medium' className='text-[var(--color-neutral-900)]'>
-                           My Profile
-                        </Text>
-
-                        <Text as='p' variant='textMregular' className='text-[var(--color-neutral-100)]'>
-                           Organize profile info for account control and security{' '}
-                        </Text>
-                        <Separator className='mt-2 bg-[var(--color-gray-800)]' />
-                     </div>
+                     <TabHeader
+                        title='My Profile'
+                        description='Organize profile info for account control and security'
+                     />
                      <div className='flex gap-x-12'>
                         {session?.user && <UserAvatar session={session} />}
                         <UserUpdateForm userData={userData} />
@@ -63,29 +57,21 @@ export default function UserProfilePage() {
                </TabsContent>
                <TabsContent value='address'>
                   <div className='flex flex-col gap-y-10'>
-                     <div className='flex flex-col gap-y-2'>
-                        <Text as='h6' variant='h6medium' className='text-[var(--color-neutral-900)]'>
-                           Address
-                        </Text>
-                        <Text as='p' variant='textMregular' className='text-[var(--color-neutral-100)]'>
-                           Complete your address for your ordering purpose.
-                        </Text>
-                        <Separator className='mt-2 bg-[var(--color-gray-800)]' />
-                     </div>
+                     <TabHeader title='Address' description='Complete your address for your ordering purpose.' />
                      <div className='flex gap-x-12'>{session?.user && <UserAddress />}</div>
                   </div>
                </TabsContent>
                <TabsContent value='payment'>
-                  <h2 className='text-xl font-bold'>Payment Method</h2>
-                  <p>Coming soon...</p>
+                  <TabHeader title='Payment Method' description='Coming soon...' />
                </TabsContent>
                <TabsContent value='transaction'>
-                  <h2 className='text-xl font-bold'>Transaction History</h2>
-                  <p>Coming soon...</p>
+                  <div className='flex flex-col gap-y-10'>
+                     <TabHeader title='Transaction' description='View your purchase history and track orders.' />
+                     <div className='flex gap-x-12'>{session?.user && <UserTransaction />}</div>
+                  </div>
                </TabsContent>
                <TabsContent value='notification'>
-                  <h2 className='text-xl font-bold'>Notification Settings</h2>
-                  <p>Coming soon...</p>
+                  <TabHeader title='Notification Settings' description='Coming soon...' />
                </TabsContent>
             </Tabs>
          </Card>
