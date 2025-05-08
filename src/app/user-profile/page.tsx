@@ -11,6 +11,7 @@ import UserUpdateForm from './UserUpdateForm'
 import { Separator } from '@/components/ui/separator'
 import Text from '@/components/ui/text'
 import { TabsEnum } from '@/enum/TabsEnum'
+import UserAddress from './UserAddress'
 
 export default function UserProfilePage() {
    const router = useRouter()
@@ -61,8 +62,18 @@ export default function UserProfilePage() {
                   </div>
                </TabsContent>
                <TabsContent value='address'>
-                  <h2 className='text-xl font-bold'>My Address</h2>
-                  <p>Coming soon...</p>
+                  <div className='flex flex-col gap-y-10'>
+                     <div className='flex flex-col gap-y-2'>
+                        <Text as='h6' variant='h6medium' className='text-[var(--color-neutral-900)]'>
+                           Address
+                        </Text>
+                        <Text as='p' variant='textMregular' className='text-[var(--color-neutral-100)]'>
+                           Complete your address for your ordering purpose.
+                        </Text>
+                        <Separator className='mt-2 bg-[var(--color-gray-800)]' />
+                     </div>
+                     <div className='flex gap-x-12'>{session?.user && <UserAddress />}</div>
+                  </div>
                </TabsContent>
                <TabsContent value='payment'>
                   <h2 className='text-xl font-bold'>Payment Method</h2>

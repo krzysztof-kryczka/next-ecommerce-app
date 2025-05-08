@@ -12,6 +12,7 @@ const buttonVariants = cva(
             stroke:
                'color-base-white border border-primary-500 text-primary-500 disabled:border-primary-300 disabled:text-primary-300 cursor-pointer',
             text: 'text-[var(--color-primary-500)] cursor-pointer',
+            ghost: 'text-[var(--color-neutral-900)] cursor-pointer hover:bg-[var(--color-primary-600)]',
          },
          size: {
             XXL: 'w-[174px] h-[60px] px-5 py-4 rounded-md text-xl',
@@ -40,7 +41,7 @@ function Button({
       asChild?: boolean
    }) {
    const Comp = asChild ? Slot : 'button'
-   return <Comp data-slot='button' className={cn(buttonVariants({ variant, size, className, }))} {...props} />
+   return <Comp data-slot='button' className={cn(buttonVariants({ variant, size, className }))} {...props} />
 }
 
 export { Button, buttonVariants }

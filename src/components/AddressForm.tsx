@@ -5,10 +5,18 @@ import CustomFormField from './CustomFormField'
 import { AddressFormData, AddressSchema } from '@/schema/addressSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 
-const AddressForm = ({ onSubmit }: { onSubmit: (data: AddressFormData) => void }) => {
+const AddressForm = ({
+   onSubmit,
+   initialData,
+   onCancel,
+}: {
+   onSubmit: (data: AddressFormData) => void
+   initialData?: AddressFormData
+   onCancel: () => void
+}) => {
    const methods = useForm<AddressFormData>({
       resolver: zodResolver(AddressSchema),
-      defaultValues: {
+      defaultValues: initialData ?? {
          country: '',
          province: '',
          city: '',
@@ -18,9 +26,16 @@ const AddressForm = ({ onSubmit }: { onSubmit: (data: AddressFormData) => void }
       },
    })
 
+   const handleSubmit = methods.handleSubmit(data => {
+      const finalData = initialData ? { ...data, id: initialData.id } : data
+      console.log('🔄 Debug:', initialData ? 'Editing existing address' : 'Adding new address', finalData)
+      onSubmit(finalData)
+   })
+
    return (
       <FormProvider {...methods}>
-         <form onSubmit={methods.handleSubmit(onSubmit)} className='flex flex-col gap-y-8'>
+         {/* <form onSubmit={methods.handleSubmit(onSubmit)} className='flex flex-col gap-y-8'> */}
+         <form onSubmit={handleSubmit} className='flex flex-col gap-y-8'>
             {/* Pierwszy rząd: Kraj + Prowincja */}
             <div className='flex gap-x-[41px]'>
                <CustomFormField name='country' type='select' label='' placeholder='Country' classNameItem='gap-0' />
@@ -43,7 +58,6 @@ const AddressForm = ({ onSubmit }: { onSubmit: (data: AddressFormData) => void }
                classNameItem='gap-0'
             />
 
-            {/* Checkbox powiązany z isMain */}
             <div className='flex justify-between'>
                <label className='flex cursor-pointer items-center'>
                   <div className='modal-order-service-checkbox relative'>
@@ -54,9 +68,14 @@ const AddressForm = ({ onSubmit }: { onSubmit: (data: AddressFormData) => void }
                      Make it the main address
                   </Text>
                </label>
-               <Button type='submit' className=''>
-                  Add Address
-               </Button>
+               <div className='flex gap-x-4'>
+                  <Button type='submit'>{initialData ? 'Update Address' : 'Add Address'}</Button>
+                  {initialData && (
+                     <Button type='button' onClick={onCancel}>
+                        Cancel
+                     </Button>
+                  )}
+               </div>
             </div>
          </form>
       </FormProvider>

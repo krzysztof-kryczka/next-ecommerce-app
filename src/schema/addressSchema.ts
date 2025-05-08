@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 export const AddressSchema = z.object({
+   id: z.number().optional(),
    country: z.string().min(2, 'Country is required'),
    province: z.string().min(2, 'Province is required'),
    city: z.string().min(2, 'City is required'),
