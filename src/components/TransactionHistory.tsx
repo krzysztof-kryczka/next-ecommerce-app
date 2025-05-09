@@ -30,33 +30,29 @@ const TransactionHistory = ({ orders }: { orders: Order[] }): JSX.Element => {
                   </Text>
                </div>
 
-               {/* Dolna sekcja: zdjęcie + pozostałe dane */}
-               <div className='flex items-center gap-x-6'>
-                  {order.items.length > 0 && (
-                     <div className='flex h-[80px] w-[100px] items-center justify-center overflow-hidden rounded-md border border-[var(--color-gray-800)] p-[12px]'>
-                        <img
-                           src={order.items[0].imageUrl}
-                           alt={order.items[0].productName}
-                           className='h-full w-full object-cover'
-                        />
+               {/* Dolna sekcja: lista produktów w zamówieniu */}
+               <div className='flex flex-col gap-y-4'>
+                  {order.items.map(item => (
+                     <div key={item.productName} className='flex items-center gap-x-6'>
+                        <div className='flex h-[80px] w-[100px] items-center justify-center overflow-hidden rounded-md border border-[var(--color-gray-800)] p-[12px]'>
+                           <img src={item.imageUrl} alt={item.productName} className='h-full w-full object-cover' />
+                        </div>
+                        <div className='flex flex-col'>
+                           <Text as='p' variant='textMregular' className='font-semibold'>
+                              {item.productName}
+                           </Text>
+                           <Text as='p' variant='textSmedium' className='text-[var(--color-neutral-400)]'>
+                              {currencySymbols[currency] || currency}{' '}
+                              {convertCurrency(item.priceAtPurchase, 'USD', currency)} x {item.quantity}
+                           </Text>
+                        </div>
                      </div>
-                  )}
+                  ))}
 
-                  <div className='flex flex-col'>
-                     <Text as='p' variant='textMregular' className='font-semibold'>
-                        {order.items.length > 0 ? order.items[0].productName : 'Brak produktów'}
-                     </Text>
-                     {order.items.length > 0 && (
-                        <Text as='p' variant='textSmedium' className='text-[var(--color-neutral-400)]'>
-                           {currencySymbols[currency] || currency}{' '}
-                           {convertCurrency(order.items[0].priceAtPurchase, 'USD', currency)} x{' '}
-                           {order.items[0].quantity}
-                        </Text>
-                     )}
-                     <Text as='p' variant='textSmedium' className='text-[var(--color-neutral-400)]'>
-                        Order no INV/{new Date().getFullYear()}/{order.orderNumber}
-                     </Text>
-                  </div>
+                  {/* Numer zamówienia */}
+                  <Text as='p' variant='textSmedium' className='text-[var(--color-neutral-400)]'>
+                     Order no INV/{new Date().getFullYear()}/{order.orderNumber}
+                  </Text>
                </div>
             </Card>
          ))}

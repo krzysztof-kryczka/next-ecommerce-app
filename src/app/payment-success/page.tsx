@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { JSX, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import ProductList from '@/components/ProductList'
@@ -12,45 +12,60 @@ import { useSession } from 'next-auth/react'
 import useFetch from '@/hooks/useFetch'
 import { SessionDetails } from '@/types/SessionDetails'
 import Text from '@/components/ui/text'
+import useAuthFetch from '@/hooks/useAuthFetch'
 
-const PaymentSuccessPage = () => {
+const PaymentSuccessPage = (): JSX.Element => {
    const router = useRouter()
    const searchParams = useSearchParams()
    const sessionId = searchParams?.get('sessionId') || ''
    const { data: session } = useSession()
-   const { postData, patchData, deleteData } = useFetch(null, {}, true)
-   const { data: orderExists, loading, error, fetchData } = useFetch<boolean>(null)
-
+   const { postData, patchData, deleteData } = useFetch(
+      null,
+      {
+         headers: {
+            Authorization: `Bearer ${session?.accessToken}`,
+         },
+      },
+      true,
+   )
+   const { fetchWithAuth } = useAuthFetch()
    const { data: dataSessionDetails } = useFetch<SessionDetails>(`/api/session-details?sessionId=${sessionId}`)
    const sessionDetails = Array.isArray(dataSessionDetails) ? dataSessionDetails[0] : dataSessionDetails
-
-   useEffect(() => {
-      if (!sessionDetails) return
-      fetchData(`/api/session-details?sessionId=${sessionId}`)
-      console.log('Payment - API Response:', sessionDetails)
-   }, [sessionId])
 
    useEffect(() => {
       console.log('Payment - Finalizing order with:', sessionDetails)
 
       const finalizeOrder = async () => {
          if (!sessionDetails) return
-
          try {
-            if (orderExists) return
+            const orderExists = (await fetchWithAuth<{ exists: boolean }>(
+               `/api/orders/exists?paymentIntentId=${sessionDetails.paymentIntentId}`,
+               {},
+               true,
+            )) as { exists: boolean } | null
 
-            await postData('/api/orders', {
-               userId: session?.user?.id,
-               paymentIntentId: sessionDetails.paymentIntentId,
-               status: sessionDetails.status,
-               items: sessionDetails.products.map(item => ({
-                  productId: item.id,
-                  name: item.name,
-                  quantity: item.quantity,
-                  price: item.price,
-               })),
-               purchaseDate: sessionDetails.transactionDate,
-            })
+            if (orderExists?.exists === true) {
+               return
+            }
+
+            await postData(
+               '/api/orders',
+               {
+                  userId: session?.user?.id,
+                  paymentIntentId: sessionDetails.paymentIntentId,
+                  status: sessionDetails.status,
+                  items: sessionDetails.products.map(item => ({
+                     productId: item.id,
+                     name: item.name,
+                     quantity: item.quantity,
+                     price: item.price,
+                  })),
+                  purchaseDate: sessionDetails.transactionDate,
+               },
+               {
+                  Authorization: `Bearer ${session?.accessToken}`,
+               },
+            )
 
             await patchData('/api/update-stock', {
                items: sessionDetails.products.map(item => ({
@@ -59,7 +74,13 @@ const PaymentSuccessPage = () => {
                })),
             })
 
-            await deleteData('/api/clear-cart', { items: sessionDetails.products })
+            await deleteData(
+               '/api/clear-cart',
+               { items: sessionDetails.products },
+               {
+                  Authorization: `Bearer ${session?.accessToken}`,
+               },
+            )
 
             localStorage.removeItem('checkoutItems')
          } catch (error) {

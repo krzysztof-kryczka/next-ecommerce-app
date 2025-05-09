@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { handleError } from '@/lib/helpers'
 
 export async function PATCH(req: Request) {
    try {
@@ -14,7 +15,6 @@ export async function PATCH(req: Request) {
 
       return NextResponse.json({ success: true })
    } catch (error) {
-      console.error('❌ Error updating stock:', error)
-      return NextResponse.json({ error: 'Failed to update stock' }, { status: 500 })
+      return handleError(error)
    }
 }
