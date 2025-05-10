@@ -7,7 +7,7 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import { CategoriesProvider } from '@/context/CategoriesContext'
 import { CurrencyProvider } from '@/context/CurrencyContext'
-import { JSX } from 'react'
+import { JSX, Suspense } from 'react'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,7 +19,9 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>): JSX.
                <Header />
                <CurrencyProvider>
                   <CategoriesProvider>
-                     <main className='mx-auto flex max-w-[1440px] flex-col gap-y-[100px] pb-20'>{children}</main>
+                     <Suspense fallback={<p>Loading...</p>}>
+                        <main className='mx-auto flex max-w-[1440px] flex-col gap-y-[100px] pb-20'>{children}</main>
+                     </Suspense>
                   </CategoriesProvider>
                </CurrencyProvider>
                <Footer />

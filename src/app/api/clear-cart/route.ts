@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { handleError } from '@/lib/helpers'
 import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/utils/authOptions'
 import { CartClearItem } from '@/types/CartClearItem'
 import prisma from '@/lib/prisma'
 

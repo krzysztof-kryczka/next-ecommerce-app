@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth/next'
 import bcrypt from 'bcryptjs'
 import { User } from '@/types/User'
 import { handleError } from '@/lib/helpers'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/utils/authOptions'
 import prisma from '@/lib/prisma'
 
 export async function GET() {

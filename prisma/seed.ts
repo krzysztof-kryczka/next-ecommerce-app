@@ -1,6 +1,17 @@
+/* eslint-disable */
 
 import { PrismaClient } from '../src/generated/prisma/index.js'
 const prisma = new PrismaClient()
+
+type ProductType = {
+   name: string
+   description: string
+   price: number
+   stock: number
+   imageUrl: string[]
+   categoryId: number
+   brandId: number
+}
 
 async function main() {
    console.log('🌱 Seeding database...')
@@ -14,7 +25,7 @@ async function main() {
       { name: 'Rexus', logo: 'https://i.ibb.co/4wJBzRr2/Rexus-Logo.png' },
    ]
    const savedBrands = await Promise.all(brands.map(brand => prisma.brand.create({ data: brand })))
-   const brandMap = new Map(savedBrands.map(brand => [brand.name, brand.id]))
+   const brandMap: Map<string, number> = new Map(savedBrands.map(brand => [brand.name, brand.id]))
 
    console.log('✅ Brands seeded successfully!')
 
@@ -59,11 +70,11 @@ async function main() {
    ]
 
    const savedCategories = await Promise.all(categories.map(category => prisma.category.create({ data: category })))
-   const categoryMap = new Map(savedCategories.map(category => [category.name, category.id]))
+   const categoryMap: Map<string, number> = new Map(savedCategories.map(category => [category.name, category.id]))
 
    console.log('✅ Categories seeded successfully!')
 
-   const products = [
+   const products: ProductType[] = [
       // Mouse (6 produktów)
       {
          name: 'Logitech G502 Hero',
@@ -76,8 +87,8 @@ async function main() {
             'https://i.ibb.co/RkNWcn3B/g502-side.webp',
             'https://i.ibb.co/23LBjqjh/g502-back.webp',
          ],
-         categoryId: categoryMap.get('Mouse'),
-         brandId: brandMap.get('Logitech'),
+         categoryId: categoryMap.get('Mouse') ?? 0,
+         brandId: brandMap.get('Logitech') ?? 0,
       },
       {
          name: 'Razer DeathAdder V2',
@@ -90,8 +101,8 @@ async function main() {
             'https://i.ibb.co/v43jg3Y4/Razer-Death-Adder-side.webp',
             'https://i.ibb.co/XrbYL8cb/Razer-Death-Adder-back.webp',
          ],
-         categoryId: savedCategories.find(category => category.name === 'Mouse')?.id,
-         brandId: brandMap.get('Razer'),
+         categoryId: savedCategories.find(category => category.name === 'Mouse')?.id ?? 0,
+         brandId: brandMap.get('Razer') ?? 0,
       },
       {
          name: 'Logitech MX Master 3',
@@ -104,8 +115,8 @@ async function main() {
             'https://i.ibb.co/RTCbtD7q/Logitech-mx-master-3-side.webp',
             'https://i.ibb.co/zVgp83Fv/Logitech-mx-master-3-back.webp',
          ],
-         categoryId: categoryMap.get('Mouse'),
-         brandId: brandMap.get('Logitech'),
+         categoryId: categoryMap.get('Mouse') ?? 0,
+         brandId: brandMap.get('Logitech') ?? 0,
       },
       {
          name: 'AOC GM500',
@@ -118,8 +129,8 @@ async function main() {
             'https://i.ibb.co/XZrPK0yS/AOC-GM500-side.png',
             'https://i.ibb.co/4R8cWhbn/AOC-GM500-back.png',
          ],
-         categoryId: categoryMap.get('Mouse'),
-         brandId: brandMap.get('AOC'),
+         categoryId: categoryMap.get('Mouse') ?? 0,
+         brandId: brandMap.get('AOC') ?? 0,
       },
       {
          name: 'Razer Viper Ultimate',
@@ -132,8 +143,8 @@ async function main() {
             'https://i.ibb.co/qLwrHyGq/Razer-Viper-Ultimate-side.jpg',
             ' https://i.ibb.co/tpMQYxC3/Razer-Viper-Ultimate-back.jpg',
          ],
-         categoryId: categoryMap.get('Mouse'),
-         brandId: brandMap.get('Razer'),
+         categoryId: categoryMap.get('Mouse') ?? 0,
+         brandId: brandMap.get('Razer') ?? 0,
       },
       {
          name: 'Rexus Xierra 100',
@@ -146,8 +157,8 @@ async function main() {
             'https://i.ibb.co/8LKvFJd3/Rexus-Xierra-100-side.jpg',
             'https://i.ibb.co/tTtFV8M4/Rexus-Xierra-100-back.jpg',
          ],
-         categoryId: categoryMap.get('Mouse'),
-         brandId: brandMap.get('Rexus'),
+         categoryId: categoryMap.get('Mouse') ?? 0,
+         brandId: brandMap.get('Rexus') ?? 0,
       },
 
       // Monitor (5 produktów)
@@ -162,8 +173,8 @@ async function main() {
             'https://i.ibb.co/whszfJPc/ROG-Swift-PG259-QN-side.png',
             'https://i.ibb.co/YB8y0D6x/ROG-Swift-PG259-QN-back.png',
          ],
-         categoryId: categoryMap.get('Monitor'),
-         brandId: brandMap.get('ROG'),
+         categoryId: categoryMap.get('Monitor') ?? 0 ?? 0,
+         brandId: brandMap.get('ROG') ?? 0,
       },
       {
          name: 'Logitech L27Q',
@@ -176,8 +187,8 @@ async function main() {
             'https://i.ibb.co/Q7N2p0hw/Logitech-L27-Q-side.jpg',
             'https://i.ibb.co/LdtvVxqj/Logitech-L27-Q-back.jpg',
          ],
-         categoryId: categoryMap.get('Monitor'),
-         brandId: brandMap.get('Logitech'),
+         categoryId: categoryMap.get('Monitor') ?? 0 ?? 0,
+         brandId: brandMap.get('Logitech') ?? 0,
       },
       {
          name: 'AOC C32G2ZE',
@@ -190,8 +201,8 @@ async function main() {
             'https://i.ibb.co/fYSvrMR0/AOC-C32-G2-ZE-side.webp',
             'https://i.ibb.co/Kx1N897b/AOC-C32-G2-ZE-back.webp',
          ],
-         categoryId: categoryMap.get('Monitor'),
-         brandId: brandMap.get('AOC'),
+         categoryId: categoryMap.get('Monitor') ?? 0 ?? 0,
+         brandId: brandMap.get('AOC') ?? 0,
       },
       {
          name: 'Razer Raptor 27',
@@ -204,8 +215,8 @@ async function main() {
             'https://i.ibb.co/6J1qxV46/Razer-Raptor-27-side.webp',
             'https://i.ibb.co/DHPGRVVd/Razer-Raptor-27-back.webp',
          ],
-         categoryId: categoryMap.get('Monitor'),
-         brandId: brandMap.get('Razer'),
+         categoryId: categoryMap.get('Monitor') ?? 0 ?? 0,
+         brandId: brandMap.get('Razer') ?? 0,
       },
       {
          name: 'AOC AGON AG274QXM',
@@ -218,8 +229,8 @@ async function main() {
             'https://i.ibb.co/h1hRPJms/AOC-AGON-PRO-AG274-QXM-side.png',
             'https://i.ibb.co/jZ4wnZ6n/AOC-AGON-PRO-AG274-QXM-back.png',
          ],
-         categoryId: categoryMap.get('Monitor'),
-         brandId: brandMap.get('AOC'),
+         categoryId: categoryMap.get('Monitor') ?? 0 ?? 0,
+         brandId: brandMap.get('AOC') ?? 0,
       },
 
       // Headphone (6 produktów)
@@ -234,8 +245,8 @@ async function main() {
             'https://i.ibb.co/TMLKb52n/ROG-Delta-S-side.webp',
             'https://i.ibb.co/C3NWV77G/ROG-Delta-S-back.webp',
          ],
-         categoryId: categoryMap.get('Headphone'),
-         brandId: brandMap.get('ROG'),
+         categoryId: categoryMap.get('Headphone') ?? 0 ?? 0,
+         brandId: brandMap.get('ROG') ?? 0,
       },
       {
          name: 'Logitech G Pro X Wireless',
@@ -248,8 +259,8 @@ async function main() {
             'https://i.ibb.co/jxTnmxm/Logitech-G-Pro-X-Wireless-side.webp',
             'https://i.ibb.co/LD8nLGpk/Logitech-G-Pro-X-Wireless-back.webp',
          ],
-         categoryId: categoryMap.get('Headphone'),
-         brandId: brandMap.get('Logitech'),
+         categoryId: categoryMap.get('Headphone') ?? 0 ?? 0,
+         brandId: brandMap.get('Logitech') ?? 0,
       },
       {
          name: 'JBL Quantum One',
@@ -262,8 +273,8 @@ async function main() {
             'https://i.ibb.co/BVBqffSc/JBL-Quantum-One-side.png',
             'https://i.ibb.co/whXWdkwH/JBL-Quantum-One-back.png',
          ],
-         categoryId: categoryMap.get('Headphone'),
-         brandId: brandMap.get('JBL'),
+         categoryId: categoryMap.get('Headphone') ?? 0 ?? 0,
+         brandId: brandMap.get('JBL') ?? 0,
       },
       {
          name: 'AOC GH300 Headset',
@@ -276,8 +287,8 @@ async function main() {
             'https://i.ibb.co/rRry25YF/AOC-GH300-Gaming-Headset-side.png',
             'https://i.ibb.co/YBc7zhgq/AOC-GH300-Gaming-Headset-back.png',
          ],
-         categoryId: categoryMap.get('Headphone'),
-         brandId: brandMap.get('AOC'),
+         categoryId: categoryMap.get('Headphone') ?? 0 ?? 0,
+         brandId: brandMap.get('AOC') ?? 0,
       },
       {
          name: 'Razer BlackShark V2 Pro',
@@ -290,8 +301,8 @@ async function main() {
             'https://i.ibb.co/9MMyzYK/Razer-Black-Shark-V2-Pro-side.webp',
             'https://i.ibb.co/Kx8fzLkv/Razer-Black-Shark-V2-Pro-back.webp',
          ],
-         categoryId: categoryMap.get('Headphone'),
-         brandId: brandMap.get('Razer'),
+         categoryId: categoryMap.get('Headphone') ?? 0 ?? 0,
+         brandId: brandMap.get('Razer') ?? 0,
       },
       {
          name: 'Rexus Daxa TS1',
@@ -304,8 +315,8 @@ async function main() {
             'https://i.ibb.co/CKpzz15T/Rexus-Daxa-TS1-side.webp',
             'https://i.ibb.co/WW9Y7qFc/Rexus-Daxa-TS1-back.webp',
          ],
-         categoryId: categoryMap.get('Headphone'),
-         brandId: brandMap.get('Rexus'),
+         categoryId: categoryMap.get('Headphone') ?? 0 ?? 0,
+         brandId: brandMap.get('Rexus') ?? 0,
       },
 
       // Keyboard (9 produktów)
@@ -320,8 +331,8 @@ async function main() {
             'https://i.ibb.co/gMKvpPX0/ROG-Strix-Scope-RX-front.png',
             'https://i.ibb.co/sS9Rp0X/ROG-Strix-Scope-RX-back.png',
          ],
-         categoryId: categoryMap.get('Keyboard'),
-         brandId: brandMap.get('ROG'),
+         categoryId: categoryMap.get('Keyboard') ?? 0,
+         brandId: brandMap.get('ROG') ?? 0,
       },
       {
          name: 'Logitech G915 Lightspeed',
@@ -334,8 +345,8 @@ async function main() {
             'https://i.ibb.co/S4x4ZMYc/Logitech-G915-TKL-Lightspeed-side.webp',
             'https://i.ibb.co/x8LcJY8X/Logitech-G915-TKL-Lightspeed-back.webp',
          ],
-         categoryId: categoryMap.get('Keyboard'),
-         brandId: brandMap.get('Logitech'),
+         categoryId: categoryMap.get('Keyboard') ?? 0,
+         brandId: brandMap.get('Logitech') ?? 0,
       },
       {
          name: 'AOC GK500 RGB',
@@ -348,8 +359,8 @@ async function main() {
             'https://i.ibb.co/Xx06spNQ/AOC-GK500-side.png',
             'https://i.ibb.co/GQxH3vhp/AOC-GK500-back.png',
          ],
-         categoryId: categoryMap.get('Keyboard'),
-         brandId: brandMap.get('AOC'),
+         categoryId: categoryMap.get('Keyboard') ?? 0,
+         brandId: brandMap.get('AOC') ?? 0,
       },
       {
          name: 'Razer Huntsman Mini',
@@ -362,8 +373,8 @@ async function main() {
             'https://i.ibb.co/0yn1WLnq/Razer-Huntsman-Mini-side.webp',
             'https://i.ibb.co/ZzL3ZM3s/Razer-Huntsman-Mini-back.webp',
          ],
-         categoryId: categoryMap.get('Keyboard'),
-         brandId: brandMap.get('Razer'),
+         categoryId: categoryMap.get('Keyboard') ?? 0,
+         brandId: brandMap.get('Razer') ?? 0,
       },
       {
          name: 'Rexus Daxa M100',
@@ -376,8 +387,8 @@ async function main() {
             'https://i.ibb.co/vvznbBfM/Rexus-Daxa-M100-X-side.webp',
             'https://i.ibb.co/pFwVSzV/Rexus-Daxa-M100-X-back.webp',
          ],
-         categoryId: categoryMap.get('Keyboard'),
-         brandId: brandMap.get('Rexus'),
+         categoryId: categoryMap.get('Keyboard') ?? 0,
+         brandId: brandMap.get('Rexus') ?? 0,
       },
       {
          name: 'ROG Falchion Wireless',
@@ -390,8 +401,8 @@ async function main() {
             'https://i.ibb.co/Fb2rgGP8/C-SL1500-side.jpg',
             'https://i.ibb.co/cSFhGJjz/AC-SL1500-back.jpg',
          ],
-         categoryId: categoryMap.get('Keyboard'),
-         brandId: brandMap.get('ROG'),
+         categoryId: categoryMap.get('Keyboard') ?? 0,
+         brandId: brandMap.get('ROG') ?? 0,
       },
       {
          name: 'Logitech K780 Multi',
@@ -404,8 +415,8 @@ async function main() {
             'https://i.ibb.co/N6H7BsR4/k780-gallery-speckled-uk-wide-2-side.webp',
             'https://i.ibb.co/r2spHwhM/k780-gallery-speckled-uk-wide-2-back.webp',
          ],
-         categoryId: categoryMap.get('Keyboard'),
-         brandId: brandMap.get('Logitech'),
+         categoryId: categoryMap.get('Keyboard') ?? 0,
+         brandId: brandMap.get('Logitech') ?? 0,
       },
       {
          name: 'AOC GK700 TKL',
@@ -418,8 +429,8 @@ async function main() {
             'https://i.ibb.co/G48Gz45c/AOC-GK700-TKL-side.jpg',
             'https://i.ibb.co/tpZjjFzK/AOC-GK700-TKL-back.jpg',
          ],
-         categoryId: categoryMap.get('Keyboard'),
-         brandId: brandMap.get('AOC'),
+         categoryId: categoryMap.get('Keyboard') ?? 0,
+         brandId: brandMap.get('AOC') ?? 0,
       },
       {
          name: 'Razer BlackWidow V4 Pro',
@@ -432,8 +443,8 @@ async function main() {
             'https://i.ibb.co/nNhJJTcR/Razer-Black-Widow-V4-Pro-side.webp',
             'https://i.ibb.co/c4G68xf/Razer-Black-Widow-V4-Pro-back.webp',
          ],
-         categoryId: categoryMap.get('Keyboard'),
-         brandId: brandMap.get('Razer'),
+         categoryId: categoryMap.get('Keyboard') ?? 0,
+         brandId: brandMap.get('Razer') ?? 0,
       },
 
       // Webcam (5 produktów)
@@ -448,8 +459,8 @@ async function main() {
             'https://i.ibb.co/7tMjrp4B/ROG-Eye-S-side.png',
             'https://i.ibb.co/R4SpNgVD/ROG-Eye-S-back.png',
          ],
-         categoryId: categoryMap.get('Webcam'),
-         brandId: brandMap.get('ROG'),
+         categoryId: categoryMap.get('Webcam') ?? 0,
+         brandId: brandMap.get('ROG') ?? 0,
       },
       {
          name: 'Logitech Brio 4K',
@@ -462,8 +473,8 @@ async function main() {
             'https://i.ibb.co/bjwt7LJz/brio-stream-side.webp',
             'https://i.ibb.co/bMmRjBYF/brio-stream-back.webp',
          ],
-         categoryId: categoryMap.get('Webcam'),
-         brandId: brandMap.get('Logitech'),
+         categoryId: categoryMap.get('Webcam') ?? 0,
+         brandId: brandMap.get('Logitech') ?? 0,
       },
       {
          name: 'Logitech StreamCam 1080',
@@ -476,8 +487,8 @@ async function main() {
             'https://i.ibb.co/ML6bHv8/Logitech-Stream-Cam-side.webp',
             'https://i.ibb.co/DfPkDws5/Logitech-Stream-Cam-back.webp',
          ],
-         categoryId: categoryMap.get('Webcam'),
-         brandId: brandMap.get('Logitech'),
+         categoryId: categoryMap.get('Webcam') ?? 0,
+         brandId: brandMap.get('Logitech') ?? 0,
       },
       {
          name: 'Razer Kiyo Pro',
@@ -490,8 +501,8 @@ async function main() {
             'https://i.ibb.co/C37cQDSs/Razer-Kiyo-Pro-side.webp',
             'https://i.ibb.co/rGK9Ppm2/Razer-Kiyo-Pro-back.webp',
          ],
-         categoryId: categoryMap.get('Webcam'),
-         brandId: brandMap.get('Razer'),
+         categoryId: categoryMap.get('Webcam') ?? 0,
+         brandId: brandMap.get('Razer') ?? 0,
       },
       {
          name: 'Logitech C920 HD Pro',
@@ -504,8 +515,8 @@ async function main() {
             'https://i.ibb.co/CKYtfCGW/c920-side.webp',
             'https://i.ibb.co/Q3YBthv8/c920-back.webp',
          ],
-         categoryId: categoryMap.get('Webcam'),
-         brandId: brandMap.get('Logitech'),
+         categoryId: categoryMap.get('Webcam') ?? 0,
+         brandId: brandMap.get('Logitech') ?? 0 ?? 0,
       },
    ]
 
