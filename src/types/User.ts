@@ -1,4 +1,4 @@
-export interface User {
+export type User = {
    id: number // wymagane dla nextAuth (jwt, session)
    email: string // wymagane dla nextAuth (jwt, session)
    name?: string

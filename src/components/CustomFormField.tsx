@@ -1,9 +1,11 @@
 import { useFormContext } from 'react-hook-form'
 import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { JSX } from 'react'
 import { CustomFormFieldProps } from '@/types/CustomFormFieldProps'
+import { maskPhoneNumber } from '@/lib/helpers'
 
-export default function CustomFormField({
+const CustomFormField = ({
    name,
    type,
    label,
@@ -14,15 +16,11 @@ export default function CustomFormField({
    isPassword = false,
    actionText,
    onActionClick,
-}: CustomFormFieldProps) {
+}: CustomFormFieldProps): JSX.Element => {
    const {
       control,
       formState: { errors },
    } = useFormContext()
-
-   const maskPhoneNumber = (phone: string): string => {
-      return phone.replace(/\d(?=\d{2})/g, '∗')
-   }
 
    return (
       <FormField
@@ -54,3 +52,5 @@ export default function CustomFormField({
       />
    )
 }
+
+export default CustomFormField

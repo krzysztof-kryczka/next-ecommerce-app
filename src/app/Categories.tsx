@@ -20,7 +20,7 @@ const categoryIcons: Record<string, JSX.Element> = {
    Headphone: <HeadphoneIcon />,
 }
 
-const Categories = () => {
+const Categories = (): JSX.Element => {
    const { data: categories, loading, error } = useFetch<Category>('/api/categories', {}, false, true)
    if (loading) return <p>Loading categories...</p>
    if (error) return <p>{error}</p>

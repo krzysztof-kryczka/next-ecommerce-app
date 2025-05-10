@@ -3,8 +3,14 @@ import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { StepFormProps } from '@/types/Auth'
+import { JSX } from 'react'
 
-export const StepForm = <T extends FieldValues>({ form, handleSubmit, fields, buttonLabel }: StepFormProps<T>) => {
+export const StepForm = <T extends FieldValues>({
+   form,
+   handleSubmit,
+   fields,
+   buttonLabel,
+}: StepFormProps<T>): JSX.Element => {
    return (
       <Form {...form}>
          <form onSubmit={form.handleSubmit(handleSubmit)} className='flex flex-col gap-y-6'>

@@ -5,5 +5,5 @@ export type Address = {
    city: string
    postalCode: string
    addressLine: string
-   isMain: boolean
+   isMain?: boolean
 }

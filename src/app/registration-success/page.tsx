@@ -12,7 +12,7 @@ const RegistrationSuccess = () => {
 
    useEffect(() => {
       const registeredData = sessionStorage.getItem('registered')
-      console.log('SessionStorage on RegistrationSuccess:', registeredData)
+      // console.log('SessionStorage on RegistrationSuccess:', registeredData)
 
       if (registeredData) {
          const { expiresAt } = JSON.parse(registeredData)
@@ -22,19 +22,20 @@ const RegistrationSuccess = () => {
             setIsAuthorized(true)
             setRemainingTime(Math.floor((expiresAt - currentTime) / 1000))
          } else {
-            console.log('Flaga registered wygasła. Usuwam sesję i przekierowuję na stronę główną.')
+            // console.log('Flaga registered wygasła. Usuwam sesję i przekierowuję na stronę główną.')
             sessionStorage.removeItem('registered')
             router.push('/')
          }
       } else {
-         console.log('Brak sesji, przekierowanie na stronę główną.')
+         // console.log('Brak sesji, przekierowanie na stronę główną.')
          router.push('/')
       }
       setIsLoading(false)
    }, [router])
 
    /// BUGS:
-   // Aktualizujemy remainingTime co sekundę, ale za każdym razem, gdy wartość się zmienia, powoduje ponowne renderowanie. Problem prawdopodobnie rozwiązuje useRef ale jak zastosować do Setinterwału ???
+   // Aktualizujemy remainingTime co sekundę, ale za każdym razem, gdy wartość się zmienia, powoduje ponowne renderowanie. 
+   // Problem prawdopodobnie rozwiązuje useRef ale jak zastosować do Setinterwału ???
 
    useEffect(() => {
       if (remainingTime !== null && remainingTime > 0) {
@@ -43,7 +44,7 @@ const RegistrationSuccess = () => {
                if (prev !== null && prev > 1) {
                   return prev - 1
                } else {
-                  console.log('Sesja wygasła – przekierowanie na stronę główną.')
+                  // console.log('Sesja wygasła – przekierowanie na stronę główną.')
                   sessionStorage.removeItem('registered')
                   setIsAuthorized(false)
                   clearInterval(intervalId)

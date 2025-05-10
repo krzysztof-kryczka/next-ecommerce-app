@@ -1,5 +1,5 @@
 import { verifyToken } from '@/lib/verifyToken'
-import { handleError } from '@/lib/helpers'
+
 /**
  * 🔐 authenticateRequest(req)
  *
@@ -20,28 +20,27 @@ export const authenticateRequest = async (req: Request): Promise<number> => {
          throw new Error('Server configuration error: Missing JWT_SECRET')
       }
       const authHeader = req.headers.get('Authorization')
-      console.log('🔍 Debug: Authorization Header:', authHeader)
+      //console.log('🔍 Debug: Authorization Header:', authHeader)
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
-         console.error('🚫 Invalid Authorization Header')
+         //console.error('🚫 Invalid Authorization Header')
          throw new Error('Invalid or missing authorization header')
       }
 
       const token = authHeader.split(' ')[1]
       const decoded = verifyToken(token)
-      console.log('🔍 Debug: Decoded Token:', decoded)
+      //console.log('🔍 Debug: Decoded Token:', decoded)
       if (!decoded) {
-         console.error('🚫 Invalid Token')
+         //console.error('🚫 Invalid Token')
          throw new Error('Invalid token')
       }
 
       return Number(decoded.id)
    } catch (err) {
-    if (err instanceof Error) {
-      console.error('❌ Authentication Error:', err.message)
-      throw new Error(`Authentication failed: ${err.message}`)
-    }
-    else {
-         console.error('🚨 Unknown error occurred:', err)
+      if (err instanceof Error) {
+         console.error('❌ Authentication Error:', err.message)
+         throw new Error(`Authentication failed: ${err.message}`)
+      } else {
+         //console.error('🚨 Unknown error occurred:', err)
          throw new Error(`Unknown error occurred: ${err}`)
       }
    }

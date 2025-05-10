@@ -1,8 +1,8 @@
-import { Control } from 'react-hook-form'
+import { Control, FieldErrors, FieldValues, Path } from 'react-hook-form'
 
-export type CountrySelectProps = {
-   name: string
-   control: Control<any>
-   errors?: Record<string, string>
+export type CountrySelectProps<T extends FieldValues> = {
+   name: Path<T>
+   control: Control<T>
+   errors?: FieldErrors<T>
    className?: string
 }

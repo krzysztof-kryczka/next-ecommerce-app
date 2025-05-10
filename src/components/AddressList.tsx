@@ -11,7 +11,6 @@ import {
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import MenuHorizontalIcon from './icons/MenuHorizontalIcon'
 import { Separator } from './ui/separator'
-import { useMemo } from 'react'
 import { AddressListProps } from '@/types/AddressListProps'
 import { Address } from '@/types/Address'
 
@@ -27,9 +26,7 @@ const AddressList = ({
       return <p>No addresses found.</p>
    }
 
-   const sortedAddresses = useMemo(() => {
-      return [...addresses].sort((a, b) => Number(b.isMain) - Number(a.isMain))
-   }, [addresses])
+   const sortedAddresses = addresses
 
    return (
       <div className={`${variant === 'dialog' ? 'max-h-[600px] space-y-4 overflow-y-auto' : 'w-full space-y-4'}`}>
@@ -42,8 +39,8 @@ const AddressList = ({
                         addr?.isMain
                            ? 'border-[var(--color-primary-400)] bg-[var(--color-blazeOrange-900)]'
                            : selectedAddress?.id === addr?.id
-                             ? 'border-blue-500 bg-blue-100'
-                             : 'border-[var(--color-gray-800)] bg-[var(--color-base-gray)]'
+                              ? 'border-blue-500 bg-blue-100'
+                              : 'border-[var(--color-gray-800)] bg-[var(--color-base-gray)]'
                      }`}
                   >
                      {/* Kontener dla danych adresowych */}

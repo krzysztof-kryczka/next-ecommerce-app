@@ -3,23 +3,8 @@ import { CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Text from '@/components/ui/text'
 import { useCurrency } from '@/context/CurrencyContext'
-
-interface TotalListProps {
-   items: {
-      id: number
-      name: string
-      price: number
-      quantity: number
-   }[]
-   selectedItems?: number[]
-   onCheckout?: () => void
-   showCheckoutButton?: boolean
-   isCheckoutPage?: boolean
-   productProtectionPrice?: number
-   shippingPrice?: number
-   shippingInsurancePrice?: number
-   serviceFees?: number
-}
+import { JSX } from 'react'
+import { TotalListProps } from '@/types/TotalListProps'
 
 const TotalList = ({
    items,
@@ -31,7 +16,7 @@ const TotalList = ({
    shippingPrice = 0,
    shippingInsurancePrice = 0,
    serviceFees = 0,
-}: TotalListProps) => {
+}: TotalListProps): JSX.Element => {
    const { currency, convertCurrency, currencySymbols } = useCurrency()
 
    const filteredItems = selectedItems.length > 0 ? items.filter(item => selectedItems.includes(item.id)) : items
@@ -107,7 +92,7 @@ const TotalList = ({
          )}
 
          <Separator className='my-6 bg-[var(--color-gray-800)]' />
-         <div className='align-center flex justify-between pb-6 items-center'>
+         <div className='align-center flex items-center justify-between pb-6'>
             <Text as='p' variant='textLmedium' className='text-[var(--color-neutral-900))]'>
                Grand Total:
             </Text>

@@ -1,21 +1,23 @@
 import { NextResponse } from 'next/server'
-import { authenticateRequest } from '@/lib/authenticateRequest'
 import { handleError, validateAddressData } from '@/lib/helpers'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import prisma from '@/lib/prisma'
 
 export async function GET(req: Request) {
    try {
-      const userId = await authenticateRequest(req)
+      const session = await getServerSession(authOptions)
+      if (!session?.user) {
+         return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
+      }
+      const userId = parseInt(session.user.id, 10)
 
+      if (!userId) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
       const { searchParams } = new URL(req.url)
       const userIdParam = parseInt(searchParams.get('userId') || '', 10)
 
       if (isNaN(userIdParam) || userId !== userIdParam) {
          return NextResponse.json({ error: 'Access denied for this user' }, { status: 403 })
-      }
-
-      if (process.env.NODE_ENV !== 'production') {
-         console.log('🔍 Debug: Fetching addresses for userId:', userId)
       }
 
       const addresses = await prisma.address.findMany({ where: { userId } })
@@ -27,7 +29,12 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
    try {
-      const userId = await authenticateRequest(req)
+      const session = await getServerSession(authOptions)
+      if (!session?.user) {
+         return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
+      }
+      const userId = parseInt(session.user.id, 10)
+
       const body = await req.json()
 
       validateAddressData(body)
@@ -37,7 +44,15 @@ export async function POST(req: Request) {
       }
 
       const newAddress = await prisma.address.create({
-         data: { userId, ...body },
+         data: {
+            userId: userId,
+            country: body.country,
+            province: body.province,
+            city: body.city,
+            postalCode: body.postalCode,
+            addressLine: body.addressLine,
+            isMain: body.isMain,
+         },
       })
 
       return NextResponse.json({ success: true, address: newAddress }, { status: 201 })
@@ -48,7 +63,11 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
    try {
-      const userId = await authenticateRequest(req)
+      const session = await getServerSession(authOptions)
+      if (!session?.user) {
+         return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
+      }
+      const userId = parseInt(session.user.id, 10)
 
       const { searchParams } = new URL(req.url)
       const addressId = parseInt(searchParams.get('id') || '', 10)
@@ -85,7 +104,11 @@ export async function PUT(req: Request) {
 
 export async function DELETE(req: Request) {
    try {
-      const userId = await authenticateRequest(req)
+      const session = await getServerSession(authOptions)
+      if (!session?.user) {
+         return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
+      }
+      const userId = parseInt(session.user.id, 10)
 
       const { searchParams } = new URL(req.url)
       const addressId = parseInt(searchParams.get('id') || '', 10)

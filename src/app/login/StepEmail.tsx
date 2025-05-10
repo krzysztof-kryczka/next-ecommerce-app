@@ -1,7 +1,8 @@
+import { JSX } from 'react'
 import { StepForm } from './StepForm'
 import { StepEmailProps } from '@/types/Auth'
 
-export const StepEmail: React.FC<StepEmailProps> = ({ form, handleCheckUser }) => {
+export const StepEmail = ({ form, handleCheckUser }: StepEmailProps): JSX.Element => {
    return (
       <StepForm
          form={form}

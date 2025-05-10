@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { handleError } from '@/lib/helpers'
 import prisma from '@/lib/prisma'
 
 export async function POST(req: NextRequest) {
@@ -22,7 +23,6 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({ success: true, message: 'User exists' }, { status: 200 })
    } catch (error) {
-      console.error('Error in check-user API:', error)
-      return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 })
+      return handleError(error)
    }
 }

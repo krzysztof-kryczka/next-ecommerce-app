@@ -6,8 +6,10 @@ import useFetch from '@/hooks/useFetch'
 import { Brand } from '@/types/Brand'
 import { toast } from 'react-toastify'
 import { Card, CardHeader, CardContent } from '@/components/ui/card'
+import Image from 'next/image'
+import { JSX } from 'react'
 
-export default function BrandList() {
+const BrandList = (): JSX.Element => {
    const { data: brands, loading, error } = useFetch<Brand>('/api/brands', {}, false, true)
    const router = useRouter()
 
@@ -39,7 +41,13 @@ export default function BrandList() {
                         onClick={() => router.push(`/products?brandId=${brand.id}`)}
                      >
                         <CardHeader className='flex w-full flex-col items-center justify-center'>
-                           <img src={brand.logo} alt={brand.name} className='h-[46px] w-auto object-contain' />
+                           <Image
+                              width={198}
+                              height={46}
+                              src={brand.logo}
+                              alt={brand.name}
+                              className='h-[46px] w-auto object-contain'
+                           />
                         </CardHeader>
                         <CardContent className='px-0 text-center'>
                            <Text as='h6' variant='h6mobileMedium' className='text-[var(--color-neutral-900)]'>
@@ -58,3 +66,5 @@ export default function BrandList() {
       </div>
    )
 }
+
+export default BrandList

@@ -1,14 +1,15 @@
+import { JSX } from 'react'
 import PlusSmallIcon from './icons/PlusSmallIcon'
 import { CategoryListProps } from '@/types/CategoryListProps'
 
-const CategoryList: React.FC<CategoryListProps> = ({
+const CategoryList = ({
    selectedCategories,
    setSelectedCategories,
    categories,
    setCurrentPage,
    visibleCategories,
    setVisibleCategories,
-}) => {
+}: CategoryListProps): JSX.Element => {
    return (
       <div className='pt-4'>
          <ul className='flex flex-col gap-y-5'>

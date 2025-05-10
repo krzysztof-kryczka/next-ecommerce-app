@@ -12,39 +12,25 @@ export default function UserAddresses() {
    const [addresses, setAddresses] = useState<Address[]>([])
    const [editingAddress, setEditingAddress] = useState<Address | null>(null)
    const [isEditing, setIsEditing] = useState(false)
-
    const { data: session } = useSession()
    const userId = session?.user?.id
 
    const { error, loading, fetchData, putData, deleteData } = useFetch<{
       success: boolean
       addresses: Address[]
-   }>(
-      userId ? `/api/addresses?userId=${userId}` : null,
-      {
-         headers: {
-            Authorization: `Bearer ${session?.accessToken}`,
-         },
-      },
-      !userId,
-      true,
-   )
+   }>(`api/addresses?userId=${userId}`)
 
    useEffect(() => {
-      if (!userId) {
-         console.warn('🚨 userId is undefined, skipping fetch')
-         return
-      }
-
-      fetchData(`/api/addresses?userId=${userId}`).then(result => {
-         console.log('🔍 Debug: Result from API:', result)
-
-         if (result?.addresses && Array.isArray(result.addresses)) {
+      const getAddresses = async () => {
+         if (!userId) return
+         const result = await fetchData()
+         if (Array.isArray(result)) {
+            console.error('❌ Unexpected array format:', result)
+         } else if (result?.success && result?.addresses) {
             setAddresses(result.addresses)
-         } else {
-            console.error('🚫 API did not return an array for addresses:', result.addresses)
          }
-      })
+      }
+      getAddresses()
    }, [userId])
 
    const handleEditAddress = (address: Address) => {
@@ -54,15 +40,12 @@ export default function UserAddresses() {
 
    const handleUpdateAddress = async (updatedAddress: Address) => {
       if (!updatedAddress.id) {
-         console.error('🚫 Missing address ID')
          toast.error('Address ID is missing')
          return
       }
 
       try {
-         const response = await putData(`/api/addresses?id=${updatedAddress.id}`, updatedAddress, {
-            Authorization: `Bearer ${session?.accessToken}`,
-         })
+         const response = await putData(`/api/addresses?id=${updatedAddress.id}`, updatedAddress)
 
          if (!response) {
             throw new Error('Failed to update address')
@@ -90,18 +73,13 @@ export default function UserAddresses() {
    }
 
    const handleDeleteAddress = async (id: number) => {
-      if (!session?.accessToken) {
-         console.error('🚫 Missing access token')
+      if (!session?.user?.id) {
          toast.error('Unauthorized: Please log in again')
          return
       }
 
       try {
-         const response = await deleteData(
-            `/api/addresses?id=${id}`,
-            {},
-            { Authorization: `Bearer ${session.accessToken}` },
-         )
+         const response = await deleteData(`/api/addresses?id=${id}`)
 
          if (!response) {
             throw new Error('Failed to delete address')

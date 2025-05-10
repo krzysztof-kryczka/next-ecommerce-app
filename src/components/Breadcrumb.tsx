@@ -1,3 +1,4 @@
+import React, { JSX } from 'react'
 import {
    Breadcrumb as BreadcrumbUI,
    BreadcrumbItem,
@@ -5,9 +6,9 @@ import {
    BreadcrumbList,
    BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
-import React from 'react';
+import { BreadcrumbProps } from '@/types/BreadcrumbProps'
 
-const Breadcrumb = ({ paths }: { paths: { name: string; href: string }[] }) => {
+const Breadcrumb = ({ paths }: BreadcrumbProps): JSX.Element => {
    return (
       <BreadcrumbUI>
          <BreadcrumbList>

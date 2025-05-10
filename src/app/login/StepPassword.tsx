@@ -3,9 +3,7 @@ import { StepForm } from './StepForm'
 
 export const StepPassword: React.FC<StepPasswordProps> = ({
    form,
-   handleVerifyPassword,
-   isSavePasswordChecked,
-   handleSavePasswordChange,
+   handleVerifyPassword
 }) => {
    return (
       <StepForm

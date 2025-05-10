@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import { Label } from '@/components/ui/label'
 import { Product } from '@/types/Product'
@@ -15,12 +15,13 @@ import ProductCard from '@/components/ProductCard'
 import { useCategories } from '@/context/CategoriesContext'
 import useFetch from '@/hooks/useFetch'
 import { useCurrency } from '@/context/CurrencyContext'
+import { PriceRange as PriceRangeType } from '@/types/PriceRange'
 
 export default function ProductsPage() {
    const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
    const [sortBy, setSortBy] = useState<SortByOptions>(SortByOptions.Latest)
    const [showPerPage, setShowPerPage] = useState<number>(9)
-   const [priceRange, setPriceRange] = useState({ min: '', max: '' })
+   const [priceRange, setPriceRange] = useState<PriceRangeType>({ min: '', max: '' })
    const [currentPage, setCurrentPage] = useState<number>(1)
    const [totalPages, setTotalPages] = useState<number>(1)
    const [isProductOpen, setIsProductOpen] = useState<boolean>(true)
@@ -29,7 +30,7 @@ export default function ProductsPage() {
    const [selectedCategories, setSelectedCategories] = useState<number[]>([])
    const { categories, loading: categoriesLoading } = useCategories()
    const searchParams = useSearchParams()
-   const selectedParam = searchParams?.getAll('selected[]') || []
+   // const selectedParam = searchParams?.getAll('selected[]') || []
    const brandIdParam = searchParams?.get('brandId')
    const { currency, convertCurrency } = useCurrency()
    const {
@@ -37,30 +38,26 @@ export default function ProductsPage() {
       loading,
       error,
    } = useFetch<{ success: boolean; data: Product[] }>('/api/products', {}, false, false)
-   const products = response && 'data' in response ? response.data : []
+   //const products = response && 'data' in response ? response.data : []
+   const products = useMemo(() => (response && 'data' in response ? response.data : []), [response])
 
    useEffect(() => {
-      // Zamieniamy URL na tablicę liczb
+      const selectedParam = searchParams?.getAll('selected[]') || []
       const selectedIds = selectedParam.map(id => parseInt(id, 10)).filter(id => !isNaN(id))
-      // gdy stan się różni, zaktualizuj selectedCategories
+
       if (JSON.stringify(selectedCategories) !== JSON.stringify(selectedIds)) {
          setSelectedCategories(selectedIds)
          setCurrentPage(1)
       }
-   }, [selectedParam, selectedCategories])
+   }, [searchParams, selectedCategories])
 
-   const handleCategoryChange = (newCategories: number[]) => {
+   const handleCategoryChange: React.Dispatch<React.SetStateAction<number[]>> = newCategories => {
       setSelectedCategories(newCategories)
-
       if (newCategories.length === 0) {
-         // Usuń wszystkie dodane parametry z adresu URL, jeśli -> All
          window.history.replaceState(null, '', '/products')
       } else {
-         // Dodaj parametry do URL jęsli zaznaczono wiele kategorii
-         // Zamieniamy tablicę na parametry URL
-         const params = newCategories.map(id => `selected[]=${id}`).join('&')
-         const url = `/products?${params}`
-         window.history.replaceState(null, '', url)
+         const params = Array.isArray(newCategories) ? newCategories.map(id => `selected[]=${id}`).join('&') : ''
+         window.history.replaceState(null, '', `/products?${params}`)
       }
    }
 
@@ -99,7 +96,18 @@ export default function ProductsPage() {
          setFilteredProducts(filtered)
          setTotalPages(Math.ceil(filtered.length / showPerPage))
       }
-   }, [brandIdParam, selectedCategories, priceRange, sortBy, products, showPerPage, currency])
+   }, [
+      brandIdParam,
+      selectedCategories,
+      priceRange,
+      sortBy,
+      products,
+      showPerPage,
+      currency,
+      convertCurrency,
+      filteredProducts,
+      loading,
+   ])
 
    const paginatedProducts = filteredProducts.slice((currentPage - 1) * showPerPage, currentPage * showPerPage)
 
@@ -131,7 +139,6 @@ export default function ProductsPage() {
       // Usuń zduplikowane ...
       return buttons.filter((value, index, self) => !(value === '...' && self[index - 1] === '...'))
    }
-   console.log('waluta:', currency)
 
    const handleSortChange = useCallback(
       (value: SortByOptions) => {

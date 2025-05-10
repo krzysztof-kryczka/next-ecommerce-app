@@ -2,7 +2,7 @@ import NextAuth, { RequestInternal, SessionStrategy } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import jwt from 'jsonwebtoken'
 
-console.log('NextAuth API initialized!')
+//console.log('NextAuth API initialized!')
 
 export const authOptions = {
    debug: true,
@@ -22,7 +22,7 @@ export const authOptions = {
             }
 
             const isSavePasswordChecked = req.body.savePassword === 'true'
-            console.log('Authorize - Save Password Checked:', isSavePasswordChecked)
+            //console.log('Authorize - Save Password Checked:', isSavePasswordChecked)
 
             try {
                const res = await fetch(`${process.env.NEXTAUTH_URL}/api/login`, {
@@ -32,10 +32,10 @@ export const authOptions = {
                })
 
                const responseData = await res.json()
-               console.log('Authorize - Response data:', responseData)
+               //console.log('Authorize - Response data:', responseData)
 
                if (res.ok && responseData.success && responseData.data) {
-                  console.log('Authorize - Save Password Checked:', isSavePasswordChecked)
+                  // console.log('Authorize - Save Password Checked:', isSavePasswordChecked)
 
                   return {
                      ...responseData.data,
@@ -43,7 +43,7 @@ export const authOptions = {
                   }
                }
 
-               console.error('Authorize - Authorization failed')
+               // console.error('Authorize - Authorization failed')
                return null
             } catch (err) {
                console.error('Authorize error:', err)
@@ -63,9 +63,9 @@ export const authOptions = {
    },
    callbacks: {
       async jwt({ token, user }) {
-         console.log('=== JWT CALLBACK ===')
-         console.log('JWT Callback - Token before:', token)
-         console.log('JWT Callback - User:', user)
+         // console.log('=== JWT CALLBACK ===')
+         //  console.log('JWT Callback - Token before:', token)
+         //console.log('JWT Callback - User:', user)
 
          if (user) {
             token.id = user.id
@@ -74,24 +74,24 @@ export const authOptions = {
             token.maxAge = user.savePassword ? 30 * 24 * 60 * 60 : 1 * 60 * 60 // 30 dni lub 1 godzina
             token.name = user.name || 'Unknown'
             token.picture = user.picture || './avatar.png'
-            console.log('JWT Callback - Save Password:', user.savePassword)
+            //     console.log('JWT Callback - Save Password:', user.savePassword)
          }
-         console.log('Token Payload:', token)
+         //   console.log('Token Payload:', token)
          // Usuń pole encodedToken przed zakodowaniem tokena
          delete token.encodedToken
          // Zakoduj token jako JWT
-         const secretKey = process.env.JWT_SECRET
+         const secretKey = process.env.JWT_SECRET!
          const encodedToken = jwt.sign(token, secretKey)
-         console.log('JWT Callback - Encoded Token:', encodedToken)
+         //   console.log('JWT Callback - Encoded Token:', encodedToken)
          token.encodedToken = encodedToken
 
-         console.log('JWT Callback - Token after:', token)
+         //  console.log('JWT Callback - Token after:', token)
          return token
       },
       async session({ session, token }) {
-         console.log('=== SESSION CALLBACK ===')
-         console.log('Session Callback - Token:', token)
-         console.log('Session Callback - Session before:', session)
+         //    console.log('=== SESSION CALLBACK ===')
+         //     console.log('Session Callback - Token:', token)
+         //     console.log('Session Callback - Session before:', session)
 
          session.user = {
             id: token.id as string,
@@ -100,22 +100,22 @@ export const authOptions = {
          session.accessToken = token.encodedToken
          session.maxAge = token.maxAge as number
          session.expires = new Date(Date.now() + session.maxAge * 1000).toISOString()
-         console.log('Session Callback - Max Age:', session.maxAge)
-         console.log('Session Callback - Session after:', session)
+         //     console.log('Session Callback - Max Age:', session.maxAge)
+         //     console.log('Session Callback - Session after:', session)
          return session
       },
 
-   //    cookies: {
-   //       sessionToken: {
-   //          name: 'next-auth.session-token',
-   //          options: {
-   //             httpOnly: true,
-   //             sameSite: 'lax',
-   //             path: '/',
-   //             secure: process.env.NODE_ENV === 'production',
-   //          },
-   //       },
-   //   },
+      //    cookies: {
+      //       sessionToken: {
+      //          name: 'next-auth.session-token',
+      //          options: {
+      //             httpOnly: true,
+      //             sameSite: 'lax',
+      //             path: '/',
+      //             secure: process.env.NODE_ENV === 'production',
+      //          },
+      //       },
+      //   },
    },
 }
 export default NextAuth(authOptions)

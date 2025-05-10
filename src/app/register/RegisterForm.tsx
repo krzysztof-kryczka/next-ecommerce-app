@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription } from '@/components/ui/form'
 import { RegisterFormProps } from '@/types/RegisterFormProps'
+import { JSX } from 'react'
 
-export default function RegisterForm({ onSubmit }: RegisterFormProps) {
+const RegisterForm = ({ onSubmit }: RegisterFormProps): JSX.Element => {
    const form = useForm<RegisterFormData>({
       resolver: zodResolver(registerSchema),
       defaultValues: { email: '', phone: '', password: '', repeatPassword: '', country: '', terms: false },
@@ -173,3 +174,5 @@ export default function RegisterForm({ onSubmit }: RegisterFormProps) {
       </Form>
    )
 }
+
+export default RegisterForm

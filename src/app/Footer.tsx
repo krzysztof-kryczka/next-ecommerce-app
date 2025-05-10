@@ -5,8 +5,9 @@ import PaypalIcon from '@/components/icons/PaypalIcon'
 import VisaIcon from '@/components/icons/VisaIcon'
 import Text from '@/components/ui/text'
 import { footerNavLinks } from '@/data/navigationData'
+import { JSX } from 'react'
 
-export default function Footer() {
+const Footer = (): JSX.Element => {
    return (
       <footer className='w-full bg-[var(--color-gray-50)]'>
          <div className='mx-auto flex max-w-[1440px] flex-col'>
@@ -57,3 +58,5 @@ export default function Footer() {
       </footer>
    )
 }
+
+export default Footer

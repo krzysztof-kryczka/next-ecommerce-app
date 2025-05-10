@@ -4,11 +4,18 @@ import ProductCard from '@/components/ProductCard'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 import Text from '@/components/ui/text'
 import useFetch from '@/hooks/useFetch'
-import { ProductCardProps } from '@/types/ProductCardProps'
+import { Product } from '@/types/Product'
+import { JSX } from 'react'
 import { toast } from 'react-toastify'
 
-export default function Recommendations() {
-   const { data: recommendations, loading, error } = useFetch<ProductCardProps>('/api/recommendations', {}, false, true)
+const Recommendations = (): JSX.Element => {
+   const {
+      data: response,
+      loading,
+      error,
+   } = useFetch<{ success: boolean; data: Product[] }>('/api/recommendations', {}, false, false)
+
+   const recommendations = response && 'data' in response ? response.data : []
 
    if (loading) {
       return (
@@ -21,7 +28,7 @@ export default function Recommendations() {
    if (error) {
       toast.error('Failed to fetch recommendations. Please try again later.')
    }
-   console.log(recommendations)
+
    return (
       <div className='px-10'>
          <div className='flex flex-col gap-y-8'>
@@ -31,8 +38,8 @@ export default function Recommendations() {
 
             <Carousel className='w-full'>
                <CarouselContent className='m-0 flex gap-x-8'>
-                  {Array.isArray(recommendations) ? (
-                     recommendations.map(product => (
+                  {Array.isArray(recommendations) && recommendations.length > 0 ? (
+                     recommendations.map((product: Product) => (
                         <CarouselItem key={product.id} className='basis-[22%] p-0'>
                            <ProductCard product={product} />
                         </CarouselItem>
@@ -50,3 +57,5 @@ export default function Recommendations() {
       </div>
    )
 }
+
+export default Recommendations

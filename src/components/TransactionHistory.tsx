@@ -5,6 +5,7 @@ import BagIcon from '@/components/icons/BagIcon'
 import { useCurrency } from '@/context/CurrencyContext'
 import { Order } from '@/types/Order'
 import { formatDate } from '@/lib/helpers'
+import Image from 'next/image'
 
 const TransactionHistory = ({ orders }: { orders: Order[] }): JSX.Element => {
    const { currency, currencySymbols, convertCurrency } = useCurrency()
@@ -35,7 +36,13 @@ const TransactionHistory = ({ orders }: { orders: Order[] }): JSX.Element => {
                   {order.items.map(item => (
                      <div key={item.productName} className='flex items-center gap-x-6'>
                         <div className='flex h-[80px] w-[100px] items-center justify-center overflow-hidden rounded-md border border-[var(--color-gray-800)] p-[12px]'>
-                           <img src={item.imageUrl} alt={item.productName} className='h-full w-full object-cover' />
+                           <Image
+                              src={item.imageUrl}
+                              width={100}
+                              height={80}
+                              alt={item.productName}
+                              className='h-full w-full object-cover'
+                           />
                         </div>
                         <div className='flex flex-col'>
                            <Text as='p' variant='textMregular' className='font-semibold'>

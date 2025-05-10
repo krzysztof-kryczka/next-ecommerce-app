@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
+import { handleError } from '@/lib/helpers'
+import prisma from '@/lib/prisma'
 
 export async function POST(req: NextRequest) {
    try {
-      console.log('Received request:', req.method, req.url)
-
       const body = await req.json()
       const { email, password, phone, country } = body
 
@@ -18,7 +17,6 @@ export async function POST(req: NextRequest) {
       })
 
       if (existingUser) {
-         console.log(`⚠️ Email already exists: ${email}`)
          return NextResponse.json({ success: false, message: 'Email already exists' }, { status: 400 })
       }
 
@@ -27,11 +25,9 @@ export async function POST(req: NextRequest) {
       })
 
       if (existingPhone) {
-         console.log(`⚠️ Phone number already exists: ${phone}`)
          return NextResponse.json({ success: false, message: 'Phone number already exists' }, { status: 400 })
       }
 
-      console.log('🔵 Hashing password...')
       const hashedPassword = await bcrypt.hash(password, 10)
 
       const newUser = await prisma.user.create({
@@ -43,11 +39,8 @@ export async function POST(req: NextRequest) {
          },
       })
 
-      console.log('✅ User created successfully:', newUser)
-
       return NextResponse.json({ success: true, message: 'User created successfully', data: newUser }, { status: 201 })
    } catch (error) {
-      console.error('❌ Error during registration:', error)
-      return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 })
+      return handleError(error)
    }
 }

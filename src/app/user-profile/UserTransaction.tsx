@@ -12,11 +12,7 @@ const UserTransactions = (): JSX.Element => {
 
    const { data: response, loading } = useFetch<{ success: boolean; data: Order[] }>(
       userId ? '/api/orders' : null,
-      {
-         headers: {
-            Authorization: `Bearer ${session?.accessToken}`,
-         },
-      },
+      {},
       false,
       true,
    )

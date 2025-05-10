@@ -1,3 +1,4 @@
+import { JSX } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import Text from '@/components/ui/text'
@@ -9,12 +10,9 @@ import {
    AlertDialogDescription,
    AlertDialogAction,
 } from '@/components/ui/alert-dialog'
+import { UserAvatarProps } from '@/types/UserAvatarProps'
 
-interface UserAvatarProps {
-   session: any
-}
-
-export default function UserAvatar({ session }: UserAvatarProps) {
+const UserAvatar = ({ session }: UserAvatarProps): JSX.Element => {
    return (
       <div className='flex w-[252px] flex-col items-center gap-y-3'>
          <Image
@@ -44,3 +42,5 @@ export default function UserAvatar({ session }: UserAvatarProps) {
       </div>
    )
 }
+
+export default UserAvatar

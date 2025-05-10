@@ -1,4 +1,4 @@
-import { TabsEnum } from "@/enum/TabsEnum"
+import { TabsEnum } from '@/enum/TabsEnum'
 
 export type UserSidebarProps = {
    activeTab: TabsEnum

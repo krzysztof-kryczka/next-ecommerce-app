@@ -1,8 +1,14 @@
-import { useController } from 'react-hook-form'
+import { JSX } from 'react'
+import { FieldValues, useController } from 'react-hook-form'
 import { countries } from 'countries-list'
 import { CountrySelectProps } from '@/types/CountrySelectProps'
 
-export default function CountrySelect({ name, control, errors, className = '' }: CountrySelectProps) {
+const CountrySelect = <T extends FieldValues>({
+   name,
+   control,
+   errors,
+   className = '',
+}: CountrySelectProps<T>): JSX.Element => {
    const { field } = useController({ name, control })
    const countryNames = Object.values(countries).map(country => country.name)
 
@@ -21,3 +27,6 @@ export default function CountrySelect({ name, control, errors, className = '' }:
       </select>
    )
 }
+
+export default CountrySelect
+

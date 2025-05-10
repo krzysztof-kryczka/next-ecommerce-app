@@ -1,3 +1,4 @@
+import { Address } from '@/types/Address'
 import { NextResponse } from 'next/server'
 
 /**
@@ -21,8 +22,8 @@ export const handleError = (error: unknown): NextResponse => {
  * @param {any} body - Obiekt zawierający dane adresowe.
  * @throws {Error} - Jeśli brakuje wymaganych pól.
  */
-export const validateAddressData = (body: any): void => {
-   const requiredFields = ['country', 'province', 'city', 'postalCode', 'addressLine']
+export const validateAddressData = (body: Partial<Address>): void => {
+   const requiredFields: (keyof Address)[] = ['country', 'province', 'city', 'postalCode', 'addressLine']
    const missingFields = requiredFields.filter(field => !body[field])
 
    if (missingFields.length > 0) {
@@ -39,4 +40,8 @@ export const validateAddressData = (body: any): void => {
 export const formatDate = (isoDate: string): string => {
    const date = new Date(isoDate)
    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+}
+
+export const maskPhoneNumber = (phone: string): string => {
+   return phone.replace(/.(?=.{2})/g, '∗')
 }

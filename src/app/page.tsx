@@ -2,8 +2,9 @@ import HeroSection from './HeroSection'
 import Categories from './Categories'
 import Recommendations from './Recommendations'
 import Brands from './Brands'
+import { JSX } from 'react'
 
-export default function Home() {
+const Home = (): JSX.Element => {
    return (
       <>
          <HeroSection />
@@ -13,3 +14,5 @@ export default function Home() {
       </>
    )
 }
+
+export default Home

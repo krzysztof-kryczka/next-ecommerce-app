@@ -33,7 +33,7 @@ const PaymentSuccessPage = (): JSX.Element => {
    const sessionDetails = Array.isArray(dataSessionDetails) ? dataSessionDetails[0] : dataSessionDetails
 
    useEffect(() => {
-      console.log('Payment - Finalizing order with:', sessionDetails)
+      // console.log('Payment - Finalizing order with:', sessionDetails)
 
       const finalizeOrder = async () => {
          if (!sessionDetails) return
@@ -74,13 +74,7 @@ const PaymentSuccessPage = (): JSX.Element => {
                })),
             })
 
-            await deleteData(
-               '/api/clear-cart',
-               { items: sessionDetails.products },
-               {
-                  Authorization: `Bearer ${session?.accessToken}`,
-               },
-            )
+            await deleteData('/api/clear-cart', { items: sessionDetails.products })
 
             localStorage.removeItem('checkoutItems')
          } catch (error) {

@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, JSX } from 'react'
 import Breadcrumb from '@/components/Breadcrumb'
 import ProductList from '@/components/ProductList'
 import { OrderSummary } from '@/types/OrderSummary'
@@ -11,30 +11,21 @@ import { Address } from '@/types/Address'
 import TotalList from '@/components/TotalList'
 import { loadStripe } from '@stripe/stripe-js'
 import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
 import { toast } from 'react-toastify'
 import { Item } from '@/types/Item'
 import Text from '@/components/ui/text'
 import { useCurrency } from '@/context/CurrencyContext'
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
-const CheckoutPage = () => {
+const CheckoutPage = (): JSX.Element => {
    const [orderSummary, setOrderSummary] = useState<OrderSummary | null>(null)
    const [mainAddress, setMainAddress] = useState<Address | null>(null)
    const [isNoteVisible, setIsNoteVisible] = useState<number | null>(null)
    const [protectedItems, setProtectedItems] = useState<number[]>([])
    const [error, setError] = useState<string | null>(null)
-   const { data: session, status } = useSession()
-   const { currency, currencySymbols } = useCurrency()
+   const { currency } = useCurrency()
    const router = useRouter()
    const protectionCostPerItem = 1
-
-   useEffect(() => {
-      if (status === 'unauthenticated') {
-         toast.error('🚫 Musisz się zalogować, aby dokonać zakupu!')
-         setTimeout(() => router.push('/login'), 2000)
-      }
-   }, [status])
 
    const toggleProtection = (id: number) => {
       setProtectedItems(prevState =>
@@ -48,20 +39,20 @@ const CheckoutPage = () => {
 
          if (!Array.isArray(checkoutItems) || checkoutItems.length === 0) {
             setError('❌ Your cart is empty. Redirecting to cart...')
-            setTimeout(() => router.push('/cart'), 2000)
+            router.push('/cart')
             return
          }
 
          setOrderSummary({
             items: checkoutItems,
-            totalAmount: checkoutItems.reduce((sum: number, item: any) => sum + item.quantity * item.price, 0),
+            totalAmount: checkoutItems.reduce((sum: number, item: Item) => sum + item.quantity * item.price, 0),
          })
       } catch (error) {
          console.error('❌ Error loading checkout items:', error)
          setError('❌ Failed to load checkout items. Redirecting...')
          setTimeout(() => router.push('/cart'), 2000)
       }
-   }, [])
+   }, [router])
 
    // const calculateProtectionCost = () => {
    //    if (!orderSummary || !protectedItems.length) return 0
@@ -76,22 +67,19 @@ const CheckoutPage = () => {
 
       return orderSummary.items
          .filter(item => protectedItems.includes(item.id))
-         .reduce((total, item) => total + protectionCostPerItem, 0) // Stały koszt $1 za każdy produkt
+         .reduce(total => total + protectionCostPerItem, 0) // Stały koszt $1 za każdy produkt
    }
 
    const handleCheckout = async () => {
-      if (status !== 'authenticated') {
-         return toast.error('🚫 You must log in to continue checkout!')
-      }
-      if (!orderSummary || !orderSummary.items.length) {
-         return toast.error('⛔ No items selected for checkout.')
-      }
-
       if (!mainAddress) {
          return toast.error('🚫 Please add a shipping address before proceeding!')
       }
 
       try {
+         if (!orderSummary) {
+            console.error('❌ orderSummary is null, skipping API call.')
+            return
+         }
          const validateResponse = await fetch('/api/validate-checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -100,10 +88,8 @@ const CheckoutPage = () => {
 
          const validateData = await validateResponse.json()
 
-         console.log('API Response:', validateData)
-
          if (!validateResponse.ok) {
-            return toast.error(`🚫 ${validateData.error || 'Invalid checkout items.'}`)
+            return toast.error(`${validateData.error || 'Invalid checkout items.'}`)
          }
 
          const orderDetails = {

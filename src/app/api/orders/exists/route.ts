@@ -1,20 +1,21 @@
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
-import { authenticateRequest } from '@/lib/authenticateRequest'
 import { handleError } from '@/lib/helpers'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import prisma from '@/lib/prisma'
 
 export async function GET(req: Request) {
    try {
-      const userId = await authenticateRequest(req)
-      if (!userId) {
-         return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+      const session = await getServerSession(authOptions)
+      if (!session?.user) {
+         return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
       }
+      const userId = parseInt(session.user.id, 10)
 
       const url = new URL(req.url)
       const paymentIntentId = url.searchParams.get('paymentIntentId')
 
       if (!paymentIntentId) {
-         console.error('❌ Missing paymentIntentId')
          return NextResponse.json({ exists: false, error: 'Missing paymentIntentId' }, { status: 400 })
       }
 

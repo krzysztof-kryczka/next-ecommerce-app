@@ -1,4 +1,4 @@
-import React from 'react'
+import { JSX, useCallback } from 'react'
 import {
    Pagination as PaginationUI,
    PaginationContent,
@@ -11,7 +11,20 @@ import ArrowLeftIcon from './icons/ArrowLeftIcon'
 import ArrowRightIcon from './icons/ArrowRightIcon'
 import { PaginationProps } from '@/types/PaginationProps'
 
-const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, setCurrentPage, getPaginationButtons }) => {
+const Pagination = ({
+   currentPage,
+   totalPages,
+   setCurrentPage,
+   getPaginationButtons,
+}: PaginationProps): JSX.Element => {
+   const handlePrevPage = useCallback(() => {
+      setCurrentPage(prev => Math.max(prev - 1, 1))
+   }, [setCurrentPage])
+
+   const handleNextPage = useCallback(() => {
+      setCurrentPage(prev => Math.min(prev + 1, totalPages))
+   }, [setCurrentPage, totalPages])
+
    return (
       <div className='mt-2 flex items-center justify-between p-10'>
          {/* Lewa strona – numery stron */}
@@ -50,14 +63,14 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, setCur
                   <Button
                      variant='stroke'
                      className='border-[var(--color-neutral-900)] text-[var(--color-neutral-900)] hover:bg-gray-100'
-                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                     onClick={handlePrevPage}
                   >
                      <ArrowLeftIcon /> Previous
                   </Button>
                   <Button
                      variant='stroke'
                      className='border-[var(--color-neutral-900)] text-[var(--color-neutral-900)] hover:bg-gray-100'
-                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                     onClick={handleNextPage}
                   >
                      Next <ArrowRightIcon />
                   </Button>

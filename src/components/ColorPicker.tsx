@@ -1,16 +1,9 @@
-import React from 'react'
+import React, { JSX } from 'react'
 import { Button } from './ui/button'
 import Text from '@/components/ui/text'
+import { ColorPickerProps } from '@/types/ColorPickerProps'
 
-const ColorPicker = ({
-   colors,
-   selectedColor,
-   setSelectedColor,
-}: {
-   colors: { name: string; value: string }[]
-   selectedColor: string
-   setSelectedColor: React.Dispatch<React.SetStateAction<string>>
-}) => {
+const ColorPicker = ({ colors, selectedColor, setSelectedColor }: ColorPickerProps): JSX.Element => {
    return (
       <div>
          <Text as='h4' variant='textLmedium' className='pb-3.5 text-[var(--color-neutral-300)]'>

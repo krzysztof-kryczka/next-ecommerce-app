@@ -16,6 +16,7 @@ import useFetch from '@/hooks/useFetch'
 import { useCategories } from '@/context/CategoriesContext'
 import { useCurrency } from '@/context/CurrencyContext'
 import { Product } from '@/types/Product'
+import Image from 'next/image'
 
 const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
    const [quantity, setQuantity] = useState<number>(1)
@@ -52,14 +53,14 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
    useEffect(() => {
       const unwrapParams = async () => {
          const unwrappedParams = await params
-         console.log('productId form parameters:', unwrappedParams.id)
+         // console.log('productId form parameters:', unwrappedParams.id)
          setProductId(unwrappedParams.id)
       }
       unwrapParams()
    }, [params])
 
    useEffect(() => {
-      console.log('Details product:', product)
+      // console.log('Details product:', product)
       if (product) {
          setStock(product.stock)
          setMainImage(product.imageUrl[0])
@@ -104,7 +105,9 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                   <Card className='h-[341px] w-[422px] rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-3'>
                      <CardContent className='px-0'>
                         {mainImage ? (
-                           <img
+                           <Image
+                              height={317}
+                              width={398}
                               src={mainImage}
                               alt={product.name || 'Product'}
                               className='h-[317px] w-[398px] rounded-md'
@@ -117,10 +120,12 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                   <div className='flex gap-x-2 overflow-x-auto sm:gap-x-4'>
                      {product.imageUrl?.map((url: string, index: number) =>
                         url ? (
-                           <img
+                           <Image
                               key={index}
                               src={url}
                               alt={`Thumbnail ${index}`}
+                              width={90}
+                              height={72}
                               className={`h-[72px] w-[90px] cursor-pointer rounded-md border-2 sm:h-[99px] sm:w-[130px] ${
                                  mainImage === url
                                     ? 'border-[var(--color-primary-400)]'

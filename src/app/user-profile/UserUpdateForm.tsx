@@ -9,10 +9,10 @@ import { toast } from 'react-toastify'
 import { signIn, useSession } from 'next-auth/react'
 
 interface UserFormProps {
-   userData: any
+   userData: UpdateUserFormData
 }
 
-export default function UserUpdateForm({ userData }: UserFormProps) {
+const UserUpdateForm = ({ userData }: UserFormProps) => {
    const [isPhoneEditable, setIsPhoneEditable] = useState(false)
    const [isPasswordEditable, setIsPasswordEditable] = useState(false)
 
@@ -96,3 +96,5 @@ export default function UserUpdateForm({ userData }: UserFormProps) {
       </>
    )
 }
+
+export default UserUpdateForm

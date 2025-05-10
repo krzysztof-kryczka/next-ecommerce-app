@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { handleError } from '@/lib/helpers'
 import prisma from '@/lib/prisma'
 
 export async function GET() {
@@ -6,7 +7,6 @@ export async function GET() {
       const brands = await prisma.brand.findMany()
       return NextResponse.json(brands)
    } catch (error) {
-      console.error('Error fetching brands:', error)
-      return NextResponse.json({ error: 'Failed to fetch brands' }, { status: 500 })
+      return handleError(error)
    }
 }

@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { JSX, useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
@@ -11,7 +11,7 @@ import { headerNavLinks } from '@/data/navigationData'
 import { Separator } from '@/components/ui/separator'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu'
 
-export default function Header() {
+const Header = (): JSX.Element => {
    const { data: session } = useSession()
    const [isDesktop, setIsDesktop] = useState(false)
    const [isTablet, setIsTablet] = useState(false)
@@ -50,7 +50,10 @@ export default function Header() {
                         <DropdownMenuTrigger asChild>
                            <button className='h-10 w-10 overflow-hidden rounded-full'>
                               <Image
-                                 src={session.user?.image || '/avatar.png'}
+                                 src={
+                                    session?.user?.image ||
+                                    'https://i.ibb.co/VpPFKGR4/55335c708ac05d8f469894d08e2671fa.jpg'
+                                 }
                                  alt={session.user?.email || 'Default User Avatar'}
                                  width={40}
                                  height={40}
@@ -100,3 +103,5 @@ export default function Header() {
       </header>
    )
 }
+
+export default Header

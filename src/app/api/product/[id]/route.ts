@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { handleError } from '@/lib/helpers'
 import prisma from '@/lib/prisma'
 
 export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
@@ -55,6 +56,6 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
          { status: 200 },
       )
    } catch (error) {
-      return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 })
+      return handleError(error)
    }
 }

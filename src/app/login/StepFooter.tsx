@@ -1,7 +1,7 @@
 import Text from '@/components/ui/text'
 import { StepFooterProps } from '@/types/Auth'
 
-export const StepFooter: React.FC<StepFooterProps> = ({ step, isSavePasswordChecked, handleSavePasswordChange }) => {
+export const StepFooter = ({ step, isSavePasswordChecked, handleSavePasswordChange }: StepFooterProps) => {
    if (step === 'email') {
       return (
          <Text as='p' variant='textMregular'>

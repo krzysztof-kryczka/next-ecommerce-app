@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { JSX, useCallback } from 'react'
 import PlusIcon from './icons/PlusIcon'
 import MinusIcon from './icons/MinusIcon'
 import Text from '@/components/ui/text'
+import { QuantityPickerProps } from '@/types/QuantityPickerProps'
 
 const QuantityPicker = ({
    quantity,
@@ -10,14 +11,7 @@ const QuantityPicker = ({
    showTitle = true,
    size = 'lg',
    hideStock = false,
-}: {
-   quantity: number
-   setQuantity: React.Dispatch<React.SetStateAction<number>>
-   stock: number
-   showTitle?: boolean
-   size?: 'md' | 'lg'
-   hideStock?: boolean
-}) => {
+}: QuantityPickerProps): JSX.Element => {
    const sizes = {
       md: {
          button: 'h-5 w-5',
@@ -30,13 +24,14 @@ const QuantityPicker = ({
          text: 'text-lg',
       },
    }
-   const decreaseQuantity = () => {
-      if (quantity > 1) setQuantity(quantity - 1)
-   }
 
-   const increaseQuantity = () => {
+   const decreaseQuantity = useCallback(() => {
+      if (quantity > 1) setQuantity(quantity - 1)
+   }, [quantity, setQuantity])
+
+   const increaseQuantity = useCallback(() => {
       if (quantity < stock) setQuantity(quantity + 1)
-   }
+   }, [quantity, stock, setQuantity])
 
    return (
       <div className='flex flex-col'>
@@ -50,7 +45,7 @@ const QuantityPicker = ({
                }`}
             >
                <div
-                  onClick={quantity <= 1 ? undefined : decreaseQuantity}
+                  onClick={quantity > 1 ? decreaseQuantity : undefined}
                   className={`flex items-center justify-center ${sizes[size].button} ${
                      quantity <= 1 ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
                   }`}
@@ -60,7 +55,7 @@ const QuantityPicker = ({
                </div>
                <span className={`${sizes[size].text} font-medium text-[var(--color-neutral-900)]`}>{quantity}</span>
                <div
-                  onClick={quantity >= stock ? undefined : increaseQuantity}
+                  onClick={quantity < stock ? increaseQuantity : undefined}
                   className={`flex items-center justify-center ${sizes[size].button} ${
                      quantity >= stock ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
                   }`}

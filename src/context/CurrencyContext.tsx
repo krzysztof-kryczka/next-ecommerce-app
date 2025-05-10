@@ -20,14 +20,22 @@ export const convertCurrency = (amount: string, fromCurrency: string, toCurrency
 type CurrencyContextType = {
    currency: string
    setCurrency: (newCurrency: string) => void
-   convertCurrency: (amount: string, fromCurrency: string, toCurrency: string) => string
+   convertCurrency: (amount: string, fromCurrency: string, toCurrency: string) => number
    currencySymbols: Record<string, string>
 }
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined)
 
 export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
-   const [currency, setCurrency] = useState<string>(localStorage.getItem('currency') || 'USD')
+   // const [currency, setCurrency] = useState<string>(localStorage.getItem('currency') || 'USD')
+
+   // localStorage nie jest dostępne na serwerze
+   const [currency, setCurrency] = useState<string>(() => {
+      if (typeof window !== 'undefined') {
+         return localStorage.getItem('currency') || 'USD'
+      }
+      return 'USD' // wartość domyślna na serwerze
+   })
 
    useEffect(() => {
       localStorage.setItem('currency', currency)

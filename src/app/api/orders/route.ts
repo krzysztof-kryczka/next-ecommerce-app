@@ -1,15 +1,17 @@
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
-import { authenticateRequest } from '@/lib/authenticateRequest'
 import { handleError } from '@/lib/helpers'
 import { OrderItemInput } from '@/types/OrderItemInput'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import prisma from '@/lib/prisma'
 
 export async function POST(req: Request) {
    try {
-      const userId = await authenticateRequest(req)
-      if (!userId) {
-         return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+      const session = await getServerSession(authOptions)
+      if (!session?.user) {
+         return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
       }
+      const userId = parseInt(session.user.id, 10)
 
       const body = await req.json()
 
@@ -40,17 +42,20 @@ export async function POST(req: Request) {
    }
 }
 
-export async function GET(req: Request) {
+export async function GET() {
    try {
-      const userId = await authenticateRequest(req)
-      if (!userId) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+      const session = await getServerSession(authOptions)
+      if (!session?.user) {
+         return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
+      }
+      const userId = parseInt(session.user.id, 10)
 
       const orders = await prisma.order.findMany({
          where: { userId },
          include: { items: { include: { product: true } } },
       })
 
-      if (!orders.length) return NextResponse.json({ success: false, error: 'Brak zamówień' }, { status: 404 })
+      if (!orders.length) return NextResponse.json({ success: false, error: 'No orders' }, { status: 404 })
 
       const formattedOrders = orders.map(order => ({
          id: order.id,

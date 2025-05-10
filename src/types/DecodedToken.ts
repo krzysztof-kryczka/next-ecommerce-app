@@ -3,5 +3,6 @@ export type DecodedToken = {
    email: string
    name?: string
    picture?: string
-   [key: string]: any
+   // [key: string]: any
+   additionalClaims?: Record<string, unknown>
 }

@@ -1,13 +1,17 @@
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
 import { handleError } from '@/lib/helpers'
-import { authenticateRequest } from '@/lib/authenticateRequest'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { CartClearItem } from '@/types/CartClearItem'
+import prisma from '@/lib/prisma'
 
 export async function DELETE(req: Request) {
    try {
-      const userId = await authenticateRequest(req)
-      if (!userId) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+      const session = await getServerSession(authOptions)
+      if (!session?.user) {
+         return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
+      }
+      const userId = parseInt(session.user.id, 10)
 
       const { items } = await req.json()
 

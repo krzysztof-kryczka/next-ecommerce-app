@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
 import { Item } from '@/types/Item'
+import { handleError } from '@/lib/helpers'
+import prisma from '@/lib/prisma'
 
 export async function POST(req: Request) {
    try {
       const { userId, items } = await req.json()
-
-      console.log('User ID:', userId)
-      console.log('Selected items from frontend:', items)
 
       const cart = await prisma.cart.findFirst({
          where: { userId },
@@ -30,7 +28,6 @@ export async function POST(req: Request) {
       })
 
       if (!cart) {
-         console.error('❌ No cart found for user')
          return NextResponse.json({ error: '🚫 Cart not found' }, { status: 400 })
       }
 
@@ -49,10 +46,6 @@ export async function POST(req: Request) {
             throw new Error(`⚠️ Insufficient stock for product ID ${item.id}`)
          }
 
-         if (item.quantity > cartItem.quantity) {
-            throw new Error(`⛔ Requested quantity exceeds cart quantity for product ID ${item.id}`)
-         }
-
          return {
             id: cartItem.product.id,
             name: cartItem.product.name,
@@ -65,13 +58,7 @@ export async function POST(req: Request) {
       })
 
       return NextResponse.json({ success: true, validatedItems }, { status: 200 })
-   } catch (err) {
-      if (err instanceof Error) {
-         console.error('❌ Error during validation:', err.message)
-         return NextResponse.json({ error: `🚨 Error during validation: ${err.message}` }, { status: 400 })
-      } else {
-         console.error('🚨 Unknown error occurred:', err)
-         return NextResponse.json({ error: '🚨 Unknown error occurred' }, { status: 400 })
-      }
+   } catch (error) {
+      return handleError(error)
    }
 }

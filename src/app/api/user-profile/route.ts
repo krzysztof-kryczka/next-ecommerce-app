@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '../../../pages/api/auth/[...nextauth]'
+import { getServerSession } from 'next-auth/next'
 import bcrypt from 'bcryptjs'
 import { User } from '@/types/User'
+import { handleError } from '@/lib/helpers'
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import prisma from '@/lib/prisma'
 
-export async function GET(req: Request) {
+export async function GET() {
    try {
       const session = await getServerSession(authOptions)
       if (!session?.user?.email) {
@@ -22,13 +23,14 @@ export async function GET(req: Request) {
 
       return NextResponse.json(user, { status: 200 })
    } catch (error) {
-      return NextResponse.json({ message: 'Error fetching user data' }, { status: 500 })
+      return handleError(error)
    }
 }
 
 export async function PUT(req: Request) {
    try {
       const session = await getServerSession(authOptions)
+
       if (!session?.user?.email) {
          return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
       }
@@ -50,7 +52,6 @@ export async function PUT(req: Request) {
 
       // Szyfrowanie hasła tylko gdy użytkownik przesłał nowe
       if (body.password && !body.password.startsWith('$2b$')) {
-         console.log('🔵 Hashing new password...')
          updatedData.password = await bcrypt.hash(body.password, 10)
       }
 
@@ -63,10 +64,8 @@ export async function PUT(req: Request) {
          data: updatedData,
       })
 
-      console.log('✅ User updated successfully:', updatedUser)
       return NextResponse.json({ message: 'User updated successfully', user: updatedUser }, { status: 200 })
    } catch (error) {
-      console.error('❌ Error updating user:', error)
-      return NextResponse.json({ message: 'Error updating user' }, { status: 500 })
+      return handleError(error)
    }
 }

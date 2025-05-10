@@ -7,19 +7,19 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription }
 import { Separator } from '@/components/ui/separator'
 import { RegisterFormData } from '@/schema/registerSchema'
 import useFetch from '@/hooks/useFetch'
+import { JSX } from 'react'
 
 type RegisterResponse = {
    success: boolean
    message?: string
 }
 
-const RegisterPage: React.FC = () => {
+const RegisterPage = (): JSX.Element => {
    const { postData, error } = useFetch<RegisterResponse>(null)
    const router = useRouter()
 
    const onSubmit = async (data: RegisterFormData) => {
       try {
-         console.log('Registering user with data:', data)
          const response = await postData('/api/register', data)
 
          if (error) {

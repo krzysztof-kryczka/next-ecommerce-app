@@ -2,6 +2,7 @@ import Stripe from 'stripe'
 import { NextResponse } from 'next/server'
 import { Item } from '@/types/Item'
 import { exchangeRates } from '@/utils/exchangeRates'
+import { handleError } from '@/lib/helpers'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-03-31.basil' })
 
@@ -14,7 +15,6 @@ const convertCurrency = (amount: number, fromCurrency: string, toCurrency: strin
 export async function POST(req: Request) {
    try {
       const body = await req.json()
-      console.log('🔍 Dane przesłane do Stripe:', body)
 
       const {
          items,
@@ -89,13 +89,7 @@ export async function POST(req: Request) {
       })
 
       return NextResponse.json({ id: session.id })
-   } catch (err) {
-      if (err instanceof Error) {
-         console.error('❌ Error creating Stripe session:', err.message)
-         return NextResponse.json({ error: '🚨 Error creating Stripe session:', details: err.message }, { status: 500 })
-      } else {
-         console.error('🚨 Unknown error occurred:', err)
-         return NextResponse.json({ error: '🚨 Unknown error occurred' }, { status: 400 })
-      }
+   } catch (error) {
+      return handleError(error)
    }
 }

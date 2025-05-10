@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, JSX } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loginStepOneSchema, loginStepTwoSchema } from '@/schema/loginSchema'
@@ -15,11 +15,11 @@ import { StepPassword } from './StepPassword'
 import { StepFooter } from './StepFooter'
 import useFetch from '@/hooks/useFetch'
 
-const LoginPage: React.FC = () => {
+const LoginPage = (): JSX.Element => {
    const [step, setStep] = useState<'email' | 'password'>('email')
    const [emailOrPhone, setEmailOrPhone] = useState('')
    const [isSavePasswordChecked, setIsSavePasswordChecked] = useState(false)
-   const { data: session, status } = useSession()
+   const { status } = useSession()
    const router = useRouter()
    const { postData, error, loading } = useFetch<{ success: boolean; message: string }>('/api/check-user', {}, true)
 
@@ -46,7 +46,6 @@ const LoginPage: React.FC = () => {
             toast.error('Unexpected error: No response from server.')
             return
          }
-         console.log('API response:', responseData)
          if (responseData?.success) {
             setEmailOrPhone(data.emailOrPhone)
             setStep('password')
@@ -62,7 +61,6 @@ const LoginPage: React.FC = () => {
    const handleVerifyPassword = async (data: { password: string }) => {
       try {
          const responseData = await postData('/api/login', { emailOrPhone, password: data.password })
-         console.log('responseData', responseData)
          if (error) {
             toast.error('Unexpected error: No response from server.')
             return
@@ -74,8 +72,6 @@ const LoginPage: React.FC = () => {
                password: data.password,
                savePassword: isSavePasswordChecked,
             })
-
-            console.log('NextAuth sign-in response:', signInResponse)
 
             if (signInResponse?.error) {
                toast.error('Login failed. Please try again.')
@@ -115,10 +111,6 @@ const LoginPage: React.FC = () => {
    if (status === 'authenticated') {
       return <p>Redirecting...</p>
    }
-
-   console.log('Current step:', step)
-   console.log('Is Save Password checked:', isSavePasswordChecked)
-   console.log('Session data from useSession:', session)
 
    return (
       <div className='my-20 flex flex-col items-center justify-center gap-y-8'>

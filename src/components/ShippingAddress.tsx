@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { JSX, useEffect, useState } from 'react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Card, CardContent } from '@/components/ui/card'
 import { useSession } from 'next-auth/react'
@@ -9,71 +9,40 @@ import { AddressFormData } from '@/schema/addressSchema'
 import AddressForm from './AddressForm'
 import MainAddressDisplay from './MainAddressDisplay'
 
-const ShippingAddress = ({ onMainAddressSelect }: { onMainAddressSelect: (address: Address) => void }) => {
+const ShippingAddress = ({ onMainAddressSelect }: { onMainAddressSelect: (address: Address) => void }): JSX.Element => {
    const [addresses, setAddresses] = useState<Address[]>([])
    const { data: session } = useSession()
    const userId = session?.user?.id
 
    const { error, loading, fetchData, postData } = useFetch<{ success: boolean; addresses: Address[] }>(
       `/api/addresses?userId=${userId}`,
-      {
-         headers: {
-            Authorization: `Bearer ${session?.accessToken}`,
-         },
-      },
-      false,
-      true,
    )
-
-   useEffect(() => {
-      if (!userId) {
-         console.warn('🚨 userId is undefined, skipping fetch')
-         return
-      }
-
-      fetchData(`/api/addresses?userId=${userId}`).then(result => {
-         console.log('API returned:', result)
-         if (result?.addresses) {
-            setAddresses(result.addresses)
-         }
-      })
-   }, [userId])
 
    useEffect(() => {
       if (addresses.length === 0) return
       const defaultMainAddress = addresses.find(address => address.isMain)
       if (defaultMainAddress) {
-         console.log('🟢 Setting default main address:', defaultMainAddress)
          onMainAddressSelect(defaultMainAddress)
       }
    }, [addresses])
 
    useEffect(() => {
-      if (session?.user?.id) {
-         console.log('Reloading addresses after session update')
-         fetchData(`/api/addresses?userId=${session.user.id}`).then(result => {
-            if (result?.addresses) {
-               setAddresses(result.addresses)
-            }
-         })
+      const getAddresses = async () => {
+         if (!userId) return
+         const result = await fetchData()
+         if (Array.isArray(result)) {
+            console.error('❌ Unexpected array format:', result)
+         } else if (result?.success && result?.addresses) {
+            setAddresses(result.addresses)
+         }
       }
-   }, [session])
+      getAddresses()
+   }, [userId])
 
    const handleAddAddress = async (data: AddressFormData) => {
-      console.log('Sending address data:', { ...data, userId })
-
-      const response = await postData(
-         '/api/addresses',
-         { ...data, userId },
-         {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session?.accessToken}`,
-         },
-      )
+      const response = await postData('/api/addresses', { ...data, userId })
 
       if (response?.success) {
-         console.log('✅ Address added successfully')
-
          const newAddress: Address = {
             ...data,
             id: response.addresses?.[response.addresses.length - 1]?.id || Date.now(),
@@ -82,20 +51,24 @@ const ShippingAddress = ({ onMainAddressSelect }: { onMainAddressSelect: (addres
 
          setAddresses(prevAddresses => {
             if (newAddress.isMain) {
-               return prevAddresses.map(addr => ({ ...addr, isMain: false })).concat(newAddress)
+               return prevAddresses
+                  .map(addr => ({ ...addr, isMain: addr.isMain ?? false }))
+                  .concat({
+                     ...newAddress,
+                     isMain: newAddress.isMain ?? false,
+                  })
             } else {
                return [...prevAddresses, newAddress]
             }
          })
 
-         toast.success('🏠 Address added successfully!')
+         toast.success('Address added successfully!')
       } else {
          toast.error('❌ Failed to add address. Please try again.')
       }
    }
 
    const handleSelectAddress = (address: Address) => {
-      console.log('📦 Selected address:', address)
       onMainAddressSelect(address) // Przekazanie adresu do CheckoutPage
    }
 

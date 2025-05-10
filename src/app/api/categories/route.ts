@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
+import { NextResponse } from 'next/server'
 import { Category } from '@/types/Category'
+import { handleError } from '@/lib/helpers'
+import prisma from '@/lib/prisma'
 
-export async function GET(req: NextRequest) {
+export async function GET() {
    try {
       const categories: Category[] = await prisma.category.findMany({
          select: {
@@ -16,7 +17,6 @@ export async function GET(req: NextRequest) {
 
       return NextResponse.json(categories, { status: 200 })
    } catch (error) {
-      console.error('Error fetching categories:', error)
-      return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 })
+      return handleError(error)
    }
 }

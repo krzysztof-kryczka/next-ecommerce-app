@@ -1,31 +1,24 @@
 'use client'
-import React, { JSX, useEffect, useState } from 'react'
+import React, { JSX, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Card } from '@/components/ui/card'
 import UserSidebar from './UserSidebar'
 import UserAvatar from './UserAvatar'
-import { useRouter } from 'next/navigation'
 import useFetch from '@/hooks/useFetch'
 import UserUpdateForm from './UserUpdateForm'
 import { TabsEnum } from '@/enum/TabsEnum'
 import UserAddress from './UserAddress'
 import UserTransaction from './UserTransaction'
 import TabHeader from './UserTabHeader'
+import { User } from '@/types/User'
 
-export default function UserProfilePage(): JSX.Element {
-   const router = useRouter()
+const UserProfilePage = (): JSX.Element => {
    const { data: session, status } = useSession()
    const [activeTab, setActiveTab] = useState<TabsEnum>(TabsEnum.Profile)
+   const { data: userData, loading, error } = useFetch<User>('/api/user-profile')
 
-   useEffect(() => {
-      if (status === 'unauthenticated') {
-         router.push('/login')
-      }
-   }, [status])
-
-   const { data: userData, loading, error } = useFetch('/api/user-profile')
-
+   const user = Array.isArray(userData) ? userData[0] : userData
    if (status === 'loading' || loading) return <p>Loading...</p>
    if (error) return <p className='text-red-500'>Error: {error}</p>
 
@@ -51,7 +44,7 @@ export default function UserProfilePage(): JSX.Element {
                      />
                      <div className='flex gap-x-12'>
                         {session?.user && <UserAvatar session={session} />}
-                        <UserUpdateForm userData={userData} />
+                        <UserUpdateForm userData={user} />
                      </div>
                   </div>
                </TabsContent>
@@ -78,3 +71,5 @@ export default function UserProfilePage(): JSX.Element {
       </div>
    )
 }
+
+export default UserProfilePage

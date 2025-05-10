@@ -7,10 +7,11 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import { CategoriesProvider } from '@/context/CategoriesContext'
 import { CurrencyProvider } from '@/context/CurrencyContext'
+import { JSX } from 'react'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>): JSX.Element => {
    return (
       <html lang='en'>
          <body className={`${inter.className} antialiased`}>
@@ -38,3 +39,5 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </html>
    )
 }
+
+export default RootLayout

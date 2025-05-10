@@ -1,15 +1,35 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
+import { handleError } from '@/lib/helpers'
 import prisma from '@/lib/prisma'
-import { ProductCardProps } from '@/types/ProductCardProps'
 
-export async function GET(req: NextRequest) {
+export async function GET() {
    try {
-      const products = await prisma.$queryRaw<
-         ProductCardProps[]
-      >`SELECT id, name, price, "imageUrl", "categoryId" FROM "Product" ORDER BY RANDOM() LIMIT 6`
-      return NextResponse.json(products, { status: 200 })
+      const totalProducts = await prisma.product.count()
+
+      if (totalProducts === 0) {
+         return NextResponse.json({ success: true, data: [] }, { status: 200 })
+      }
+
+      const randomIds = Array.from(
+         { length: Math.min(7, totalProducts) },
+         () => Math.floor(Math.random() * totalProducts) + 1,
+      )
+
+      const recommendations = await prisma.product.findMany({
+         where: { id: { in: randomIds } },
+         select: {
+            id: true,
+            name: true,
+            price: true,
+            categoryId: true,
+            imageUrl: true,
+            createdAt: true,
+            brandId: true,
+         },
+      })
+
+      return NextResponse.json({ success: true, data: recommendations }, { status: 200 })
    } catch (error) {
-      console.error('Failed to fetch recommendations:', error)
-      return NextResponse.json({ message: 'Failed to fetch recommendations' }, { status: 500 })
+      return handleError(error)
    }
 }

@@ -1,8 +1,8 @@
-import React, { memo } from 'react'
+import React, { JSX, memo } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
 import { SortBySelectProps } from '@/types/SortBySelectProps'
 
-const SortBySelect: React.FC<SortBySelectProps> = memo(({ sortBy, setSortBy }) => {
+const SortBySelect = ({ sortBy, setSortBy }: SortBySelectProps): JSX.Element => {
    return (
       <Select value={sortBy} onValueChange={setSortBy}>
          <SelectTrigger className='px-4 py-2 text-sm font-medium' aria-label='Sort products'>
@@ -15,6 +15,6 @@ const SortBySelect: React.FC<SortBySelectProps> = memo(({ sortBy, setSortBy }) =
          </SelectContent>
       </Select>
    )
-})
+}
 
-export default SortBySelect
+export default memo(SortBySelect)

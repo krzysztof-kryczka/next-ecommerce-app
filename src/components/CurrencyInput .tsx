@@ -1,17 +1,10 @@
-import React, { useState } from 'react'
+import React, { JSX, useState } from 'react'
 import { Input } from './ui/input'
 import { Select, SelectTrigger, SelectContent, SelectItem } from './ui/select'
+import { CurrencyInputProps } from '@/types/CurrencyInputProps'
 
-type CurrencyInputProps = {
-   value: string
-   onChange: (newValue: string) => void
-   placeholder?: string
-   currency: string
-   setCurrency: (newCurrency: string) => void
-}
-
-const CurrencyInput: React.FC<CurrencyInputProps> = ({ value, onChange, placeholder, currency, setCurrency }) => {
-   const [inputValue, setInputValue] = useState<string>(value || '')
+const CurrencyInput = ({ value, onChange, placeholder, currency, setCurrency }: CurrencyInputProps): JSX.Element => {
+   const [inputValue, setInputValue] = useState<string>(value)
    const currencies = ['USD', 'EUR', 'GBP', 'PLN']
 
    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -9,6 +9,8 @@ const buttonVariants = cva(
       variants: {
          variant: {
             fill: 'bg-[var(--color-primary-500)] text-[var(--color-base-white)] hover:bg-[var(--color-primary-600)] cursor-pointer',
+            outline:
+               'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
             stroke:
                'color-base-white border border-primary-500 text-primary-500 disabled:border-primary-300 disabled:text-primary-300 cursor-pointer',
             text: 'text-[var(--color-primary-500)] cursor-pointer',
@@ -21,6 +23,10 @@ const buttonVariants = cva(
             M: 'w-[153px] h-11 px-5 py-2.5 rounded-md text-sm',
             S: 'w-[153px] h-10 px-5 py-2 rounded-md text-xs',
             XS: 'w-[139px] h-10 px-5 py-1.5 rounded-md text-xs',
+            icon: 'size-9',
+            default: 'h-9 px-4 py-2 has-[>svg]:px-3',
+            sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
+            lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
          },
       },
       defaultVariants: {

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
 import { handleError } from '@/lib/helpers'
+import prisma from '@/lib/prisma'
 
 export async function PATCH(req: Request) {
    try {

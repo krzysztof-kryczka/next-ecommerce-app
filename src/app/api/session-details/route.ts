@@ -1,5 +1,6 @@
 import Stripe from 'stripe'
 import { NextResponse } from 'next/server'
+import { handleError } from '@/lib/helpers'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-03-31.basil' })
 
@@ -34,16 +35,7 @@ export async function GET(req: Request) {
          serviceFees: additionalCharges.serviceFees || 0,
          products,
       })
-   } catch (err) {
-      if (err instanceof Error) {
-         console.error('❌ Error retrieving session details:', err.message)
-         return NextResponse.json(
-            { error: '🚨 Failed to retrieve session details:', details: err.message },
-            { status: 500 },
-         )
-      } else {
-         console.error('🚨 Unknown error occurred:', err)
-         return NextResponse.json({ error: '🚨 Unknown error occurred' }, { status: 400 })
-      }
+   } catch (error) {
+      return handleError(error)
    }
 }

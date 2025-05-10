@@ -16,6 +16,7 @@ import Text from '@/components/ui/text'
 import useFetch from '@/hooks/useFetch'
 import { Category } from '@/types/Category'
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon'
+import Image from 'next/image'
 
 export default function CategoriesCarousel() {
    const [carouselApi, setCarouselApi] = useState<CarouselApi>()
@@ -57,38 +58,63 @@ export default function CategoriesCarousel() {
                <CardContent className='relative overflow-hidden p-0'>
                   <Carousel setApi={setCarouselApi} className='relative'>
                      <CarouselContent>
-                        {categories.map(category => (
-                           <CarouselItem key={category.id} className='flex items-center justify-between gap-8 p-0'>
-                              {/* Lewa strona: Tekst */}
-                              <div className='flex w-1/2 flex-col gap-y-10 pt-[132px] pb-20 pl-[120px]'>
-                                 <div className='flex flex-col gap-y-6'>
-                                    <Text as='h4' variant='h4medium' className='text-[var(--color-neutral-900)]'>
-                                       {category.name}
-                                    </Text>
-                                    <Text as='p' variant='textMregular' className='text-[var(--color-neutral-100)]'>
-                                       {category.description}
-                                    </Text>
-                                 </div>
-                                 <Button
-                                    variant='stroke'
-                                    size='XL'
-                                    onClick={() => handleExploreCategory(category.id)}
-                                    className='w-[211px] gap-x-3.5 pr-[15px]'
-                                 >
-                                    <Text variant='textMmedium'>Explore Category</Text>
-                                    <ArrowRightIcon className='!h-6 !w-6 stroke-[var(--color-primary-400)]' />
-                                 </Button>
-                              </div>
-                              {/* Prawa strona: Obraz */}
-                              <div className='w-1/2'>
-                                 <img
-                                    src={category.image}
-                                    alt={category.name}
-                                    className='mx-auto h-96 w-auto scale-[180%] transform border-none'
-                                 />
-                              </div>
-                           </CarouselItem>
-                        ))}
+                        {Array.isArray(categories)
+                           ? categories.map(category => {
+                                return (
+                                   <CarouselItem
+                                      key={category.id}
+                                      className='flex items-center justify-between gap-8 p-0'
+                                   >
+                                      {/* Lewa strona: Tekst */}
+                                      <div className='flex w-1/2 flex-col gap-y-10 pt-[132px] pb-20 pl-[120px]'>
+                                         <div className='flex flex-col gap-y-6'>
+                                            <Text
+                                               as='h4'
+                                               variant='h4medium'
+                                               className='text-[var(--color-neutral-900)]'
+                                            >
+                                               {category.name}
+                                            </Text>
+                                            <Text
+                                               as='p'
+                                               variant='textMregular'
+                                               className='text-[var(--color-neutral-100)]'
+                                            >
+                                               {category.description}
+                                            </Text>
+                                         </div>
+                                         <Button
+                                            variant='stroke'
+                                            size='XL'
+                                            onClick={() => handleExploreCategory(category.id)}
+                                            className='w-[211px] gap-x-3.5 pr-[15px]'
+                                         >
+                                            <Text variant='textMmedium'>Explore Category</Text>
+                                            <ArrowRightIcon className='!h-6 !w-6 stroke-[var(--color-primary-400)]' />
+                                         </Button>
+                                      </div>
+                                      {/* Prawa strona: Obraz */}
+                                      <div className='w-1/2'>
+                                         {category.image ? (
+                                            <Image
+                                               src={category.image}
+                                               alt={category.name}
+                                               height={384}
+                                               width={384}
+                                               className='mx-auto h-96 w-auto scale-[180%] transform border-none'
+                                            />
+                                         ) : (
+                                            <div className='flex h-96 w-96 items-center justify-center bg-[var(--color-danger-50)]'>
+                                               <Text as='span' variant='textMmedium'>
+                                                  No Image
+                                               </Text>
+                                            </div>
+                                         )}
+                                      </div>
+                                   </CarouselItem>
+                                )
+                             })
+                           : null}
                      </CarouselContent>
                      {/* Nawigacja */}
                      <CarouselPrevious
@@ -104,12 +130,14 @@ export default function CategoriesCarousel() {
             </Card>
             {/* Indykatory */}
             <div className='mt-6 flex justify-center gap-x-4'>
-               {categories.map((_, index) => (
-                  <div
-                     key={index}
-                     className={`h-3 w-3 rounded-full ${index === currentIndex ? 'bg-[var(--color-primary-400)]' : 'bg-gray-600'}`}
-                  />
-               ))}
+               {Array.isArray(categories)
+                  ? categories.map((_, index) => (
+                       <div
+                          key={index}
+                          className={`h-3 w-3 rounded-full ${index === currentIndex ? 'bg-[var(--color-primary-400)]' : 'bg-gray-600'}`}
+                       />
+                    ))
+                  : null}
             </div>
          </div>
       </div>

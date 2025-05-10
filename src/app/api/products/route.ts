@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
+import { handleError } from '@/lib/helpers'
 import prisma from '@/lib/prisma'
 
-export async function GET(req: NextRequest) {
+export async function GET() {
    try {
       const products = await prisma.product.findMany({
          select: {
@@ -17,7 +18,6 @@ export async function GET(req: NextRequest) {
 
       return NextResponse.json({ success: true, data: products }, { status: 200 })
    } catch (error) {
-      console.error('❌ Error fetching products:', error)
-      return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 })
+      return handleError(error)
    }
 }

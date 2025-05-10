@@ -7,9 +7,9 @@ export const verifyToken = (token: string): DecodedToken | null => {
       if (!secretKey) {
          throw new Error('Missing JWT_SECRET environment variable.')
       }
-      console.log('Token to Verify:', token)
+      // console.log('Token to Verify:', token)
       const decoded = jwt.verify(token, secretKey) as DecodedToken
-      console.log('Decoded Token:', decoded)
+      // console.log('Decoded Token:', decoded)
       return decoded
    } catch (err: unknown) {
       if (err instanceof Error) {

@@ -1,5 +1,6 @@
 'use client'
 
+import { JSX, useCallback } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import CartIcon from '@/components/icons/CartIcon'
@@ -8,14 +9,16 @@ import { useCategories } from '@/context/CategoriesContext'
 import Text from '@/components/ui/text'
 import { useAddToCart } from '@/hooks/useAddToCart'
 import { useCurrency } from '@/context/CurrencyContext'
+import Image from 'next/image'
 
-export default function ProductCard({ product }: ProductCardProps) {
+const ProductCard = ({ product }: ProductCardProps): JSX.Element => {
    const { categoriesMap } = useCategories()
    const { addToCart } = useAddToCart()
    const { currency, convertCurrency, currencySymbols } = useCurrency()
-   const handleAddToCart = () => {
+
+   const handleAddToCart = useCallback(() => {
       addToCart(product.id, 1)
-   }
+   }, [product?.id, addToCart])
 
    return (
       <div className='relative z-10 h-[386px] w-[300px] cursor-pointer overflow-hidden rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)]'>
@@ -25,25 +28,28 @@ export default function ProductCard({ product }: ProductCardProps) {
          >
             <CartIcon />
          </div>
-         <Link key={product.id} href={`/product/${product.id}`}>
+         <Link href={`/product/${product?.id}`}>
             <div className='px-4 pt-4'>
-               <img
-                  src={product.imageUrl?.[0] || 'https://i.ibb.co/xtWHYY7v/brak-zdjecia.png'}
-                  alt={product.name}
+               <Image
+                  src={product?.imageUrl?.[0] || 'https://i.ibb.co/xtWHYY7v/brak-zdjecia.png'}
+                  alt={product?.name}
+                  height={204}
+                  width={268}
+                  priority
                   className='h-[204px] w-[268px] rounded-md border border-[var(--color-neutral-900)] object-cover'
                />
             </div>
             <div className='flex flex-col gap-y-4 px-4 pt-[18px] pb-5'>
                <Button
-                  variant={'fill'}
-                  size={'XS'}
+                  variant='fill'
+                  size='XS'
                   className='h-auto w-max bg-[var(--color-blazeOrange-600)] px-2.5 py-1.5 text-[var(--color-primary-100)]'
                >
-                  <Text variant='textSmedium'>{categoriesMap[product.categoryId]}</Text>
+                  <Text variant='textSmedium'>{categoriesMap[product?.categoryId]}</Text>
                </Button>
                <div className='flex flex-col gap-y-2'>
                   <Text as='h2' variant='textLregular' className='text-[var(--color-neutral-900)]'>
-                     {product.name}
+                     {product?.name}
                   </Text>
                   <Text
                      as='h5'
@@ -51,7 +57,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                      className='flex items-center gap-2 text-[var(--color-neutral-900)]'
                   >
                      {currencySymbols[currency] || currency}{' '}
-                     {convertCurrency(product.price.toString(), 'USD', currency)}
+                     {convertCurrency(product?.price.toString(), 'USD', currency)}
                   </Text>
                </div>
             </div>
@@ -59,3 +65,5 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
    )
 }
+
+export default ProductCard

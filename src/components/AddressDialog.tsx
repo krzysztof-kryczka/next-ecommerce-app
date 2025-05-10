@@ -1,20 +1,15 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { JSX, useMemo, useState } from 'react'
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Separator } from '@radix-ui/react-separator'
 import { Button } from '@/components/ui/button'
 import { Address } from '@/types/Address'
 import { toast } from 'react-toastify'
 import AddressList from './AddressList'
+import { AddressDialogProps } from '@/types/AddressDialogProps'
 
-const AddressDialog = ({
-   addresses,
-   onSelectAddress,
-}: {
-   addresses: Address[]
-   onSelectAddress: (address: Address) => void
-}) => {
+const AddressDialog = ({ addresses, onSelectAddress }: AddressDialogProps): JSX.Element => {
    const [selectedAddress, setSelectedAddress] = useState<Address | null>(null)
    const [open, setOpen] = useState(false)
 

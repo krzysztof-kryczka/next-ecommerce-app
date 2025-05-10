@@ -29,6 +29,8 @@ const inputVariants = cva(
 interface InputProps extends React.ComponentProps<'input'>, VariantProps<typeof inputVariants> {
    isPassword?: boolean
    error?: string
+   actionText?: string
+   onActionClick?: () => void
 }
 
 const Input: React.FC<InputProps> = ({
@@ -73,7 +75,7 @@ const Input: React.FC<InputProps> = ({
             </Text>
          )}
          {error && (
-            <Text as='p' variant='textSregular' className='text-[var(--color-danger-500)]'>
+            <Text as='p' variant='textSmedium' className='text-[var(--color-danger-500)]'>
                {error}
             </Text>
          )}

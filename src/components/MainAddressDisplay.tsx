@@ -1,19 +1,10 @@
 import { Button } from './ui/button'
 import Text from '@/components/ui/text'
 import AddressDialog from './AddressDialog'
-import { Address } from '@/types/Address'
+import { MainAddressDisplayProps } from '@/types/MainAddressDisplayProps'
+import { JSX } from 'react'
 
-const MainAddressDisplay = ({
-   loading,
-   error,
-   addresses,
-   onSelectAddress,
-}: {
-   loading: boolean
-   error: string | null
-   addresses: Address[]
-   onSelectAddress: (address: Address) => void
-}) => {
+const MainAddressDisplay = ({ loading, error, addresses, onSelectAddress }: MainAddressDisplayProps): JSX.Element => {
    if (loading) return <p>Loading addresses...</p>
    if (error) return <p className='text-red-500'>{error}</p>
    if (addresses.length === 0) return <p>No addresses found.</p>

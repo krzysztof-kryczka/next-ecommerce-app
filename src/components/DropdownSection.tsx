@@ -1,12 +1,10 @@
+import { JSX } from 'react'
+import { DropdownSectionProps } from '@/types/DropdownSectionProps'
 import ChevronDownIcon from './icons/ChevronDownIcon'
 import ChevronUpIcon from './icons/ChevronUpIcon'
 import Text from '@/components/ui/text'
 
-const DropdownSection: React.FC<{
-   title: string
-   isOpen: boolean
-   onToggle: () => void
-}> = ({ title, isOpen, onToggle }) => (
+const DropdownSection = ({ title, isOpen, onToggle }: DropdownSectionProps): JSX.Element => (
    <Text
       as='p'
       variant='h7semiBold'

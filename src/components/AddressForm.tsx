@@ -4,16 +4,10 @@ import Text from '@/components/ui/text'
 import CustomFormField from './CustomFormField'
 import { AddressFormData, AddressSchema } from '@/schema/addressSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { AddressFormProps } from '@/types/AddressFormProps'
+import { JSX } from 'react'
 
-const AddressForm = ({
-   onSubmit,
-   initialData,
-   onCancel,
-}: {
-   onSubmit: (data: AddressFormData) => void
-   initialData?: AddressFormData
-   onCancel: () => void
-}) => {
+const AddressForm = ({ onSubmit, initialData, onCancel }: AddressFormProps): JSX.Element => {
    const methods = useForm<AddressFormData>({
       resolver: zodResolver(AddressSchema),
       defaultValues: initialData ?? {
@@ -24,17 +18,17 @@ const AddressForm = ({
          addressLine: '',
          isMain: false,
       },
+      mode: 'onBlur',
    })
 
    const handleSubmit = methods.handleSubmit(data => {
       const finalData = initialData ? { ...data, id: initialData.id } : data
-      console.log('🔄 Debug:', initialData ? 'Editing existing address' : 'Adding new address', finalData)
+      // console.log('🔄 Debug:', initialData ? 'Editing existing address' : 'Adding new address', finalData)
       onSubmit(finalData)
    })
 
    return (
       <FormProvider {...methods}>
-         {/* <form onSubmit={methods.handleSubmit(onSubmit)} className='flex flex-col gap-y-8'> */}
          <form onSubmit={handleSubmit} className='flex flex-col gap-y-8'>
             {/* Pierwszy rząd: Kraj + Prowincja */}
             <div className='flex gap-x-[41px]'>
