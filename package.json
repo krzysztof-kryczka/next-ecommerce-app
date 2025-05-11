@@ -12,8 +12,8 @@
       "seed": "tsx prisma/seed.ts",
       "start:db": "docker-compose up -d",
       "stop:db": "docker-compose down",
-      "start:app": "next start",
-      "start": "npm run start:db && npm run build && npm run start:app",
+      "start:app": "npm run start:db && npm run build && npm run start",
+      "start": "next start",
       "postinstall": "prisma generate"
    },
    "dependencies": {
@@ -29,6 +29,7 @@
       "@radix-ui/react-tabs": "^1.1.8",
       "@stripe/stripe-js": "^7.2.0",
       "@vercel/analytics": "^1.5.0",
+      "@vercel/speed-insights": "^1.2.0",
       "bcryptjs": "^3.0.2",
       "class-variance-authority": "^0.7.1",
       "clsx": "^2.1.1",
