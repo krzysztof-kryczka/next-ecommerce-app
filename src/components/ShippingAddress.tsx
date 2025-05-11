@@ -1,4 +1,4 @@
-import { JSX, useEffect, useState } from 'react'
+import { JSX, useCallback, useEffect, useState } from 'react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Card, CardContent } from '@/components/ui/card'
 import { useSession } from 'next-auth/react'
@@ -15,7 +15,7 @@ const ShippingAddress = ({ onMainAddressSelect }: { onMainAddressSelect: (addres
    const userId = session?.user?.id
 
    const { error, loading, fetchData, postData } = useFetch<{ success: boolean; addresses: Address[] }>(
-      `/api/addresses?userId=${userId}`,
+      userId ? `/api/addresses?userId=${userId}` : null,
    )
 
    useEffect(() => {
@@ -24,20 +24,21 @@ const ShippingAddress = ({ onMainAddressSelect }: { onMainAddressSelect: (addres
       if (defaultMainAddress) {
          onMainAddressSelect(defaultMainAddress)
       }
-   }, [addresses])
+   }, [addresses, onMainAddressSelect])
+
+   const getAddresses = useCallback(async () => {
+      if (!userId) return
+      const result = await fetchData()
+      if (Array.isArray(result)) {
+         console.error('❌ Unexpected array format:', result)
+      } else if (result?.success && result?.addresses) {
+         setAddresses(result.addresses)
+      }
+   }, [userId, fetchData])
 
    useEffect(() => {
-      const getAddresses = async () => {
-         if (!userId) return
-         const result = await fetchData()
-         if (Array.isArray(result)) {
-            console.error('❌ Unexpected array format:', result)
-         } else if (result?.success && result?.addresses) {
-            setAddresses(result.addresses)
-         }
-      }
       getAddresses()
-   }, [userId])
+   }, [getAddresses])
 
    const handleAddAddress = async (data: AddressFormData) => {
       const response = await postData('/api/addresses', { ...data, userId })

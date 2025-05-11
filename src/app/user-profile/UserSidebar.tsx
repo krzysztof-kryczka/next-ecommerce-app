@@ -64,7 +64,7 @@ const UserSidebar = ({ activeTab, setActiveTab }: UserSidebarProps): JSX.Element
          </CardContent>
          <Separator className='bg-[var(--color-gray-800)]' />
          <CardFooter>
-            <Button variant='text' onClick={() => signOut()} className='w-full'>
+            <Button variant='text' onClick={() => signOut({ callbackUrl: '/' })} className='w-full'>
                Logout
             </Button>
          </CardFooter>

@@ -28,11 +28,11 @@ const useFetch = <T>(url: string | null, options?: RequestInit, disableFetch = f
       } finally {
          setLoading(false)
       }
-   }, [url, options, disableFetch]) // ✅ Teraz `fetchData` zmienia się tylko przy zmianie `url`, `options`, `disableFetch`.
+   }, [url, disableFetch])
 
    useEffect(() => {
       fetchData()
-   }, [url, disableFetch]) // ✅ Nie dodajemy `fetchData`, aby uniknąć nieskończonych zapytań!
+   }, [url, disableFetch, fetchData])
 
    const sendRequest = useCallback(
       async <R>(

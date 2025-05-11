@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { Address } from '@/types/Address'
 import useFetch from '@/hooks/useFetch'
@@ -20,18 +20,20 @@ export default function UserAddresses() {
       addresses: Address[]
    }>(`api/addresses?userId=${userId}`)
 
-   useEffect(() => {
-      const getAddresses = async () => {
-         if (!userId) return
-         const result = await fetchData()
-         if (Array.isArray(result)) {
-            console.error('❌ Unexpected array format:', result)
-         } else if (result?.success && result?.addresses) {
-            setAddresses(result.addresses)
-         }
+   // Zapamiętanie fetchData w callbacvku i nie ma nieskonczonej ilosci zapytan
+   const getAddresses = useCallback(async () => {
+      if (!userId) return
+      const result = await fetchData()
+      if (Array.isArray(result)) {
+         console.error('❌ Unexpected array format:', result)
+      } else if (result?.success && result?.addresses) {
+         setAddresses(result.addresses)
       }
+   }, [userId, fetchData])
+
+   useEffect(() => {
       getAddresses()
-   }, [userId])
+   }, [getAddresses])
 
    const handleEditAddress = (address: Address) => {
       setEditingAddress(address)
