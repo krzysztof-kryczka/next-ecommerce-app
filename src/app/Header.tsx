@@ -31,24 +31,29 @@ const Header = (): JSX.Element => {
    const buttonSize = isDesktop ? 'XXL' : isTablet ? 'M' : 'XS'
 
    return (
-      <header className='mx-auto flex max-w-[1440px] flex-col px-10 py-8'>
-         <div className='flex flex-col gap-y-10'>
-            <div className='flex items-center justify-between'>
-               <div className='logo'>
+      <header className='mx-auto max-w-[1440px] px-6 py-4 sm:px-10 sm:py-8'>
+         <div className='flex flex-col gap-y-6 sm:gap-y-10'>
+            <div className='flex flex-wrap items-center justify-between'>
+               {/* Logo */}
+               <div className='logo flex-shrink-0'>
                   <Text as='a' variant='h3semiBold' href='/'>
                      <span className='text-[var(--color-primary-400)]'>Devstock</span>
                      <span className='text-[var(--color-neutral-900)]'>Hub</span>
                   </Text>
                </div>
 
+               {/* Akcje użytkownika */}
                {session ? (
-                  <div className='flex items-center gap-x-7'>
+                  <div className='flex items-center gap-x-5 sm:gap-x-7'>
+                     {/* Ikona koszyka */}
                      <Link href='/cart'>
                         <CartIcon />
                      </Link>
+
+                     {/* Menu użytkownika */}
                      <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                           <button className='h-10 w-10 overflow-hidden rounded-full'>
+                           <button className='h-8 w-8 cursor-pointer overflow-hidden rounded-full sm:h-10 sm:w-10'>
                               <Image
                                  src={
                                     session?.user?.image ||
@@ -61,11 +66,50 @@ const Header = (): JSX.Element => {
                               />
                            </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align='end'>
+
+                        <DropdownMenuContent
+                           align='end'
+                           className='w-48 rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-2 shadow-xl sm:w-56 lg:w-64'
+                        >
+                           {/* Profil */}
                            <DropdownMenuItem asChild>
-                              <Link href='/user-profile'>Profile</Link>
+                              <Link
+                                 href='/user-profile'
+                                 className='flex w-full cursor-pointer items-center gap-x-2 rounded-md px-3 py-2 text-[var(--color-neutral-100)] hover:bg-[var(--color-gray-700)]'
+                              >
+                                 👤 Profile
+                              </Link>
                            </DropdownMenuItem>
-                           <DropdownMenuItem onClick={() => signOut()}>Log Out</DropdownMenuItem>
+
+                           {/* Ustawienia */}
+                           <DropdownMenuItem asChild>
+                              <Link
+                                 href='#'
+                                 className='flex w-full cursor-pointer items-center gap-x-2 rounded-md px-3 py-2 text-[var(--color-neutral-100)] hover:bg-[var(--color-gray-700)]'
+                              >
+                                 ⚙️ Settings
+                              </Link>
+                           </DropdownMenuItem>
+
+                           {/* Pomoc */}
+                           <DropdownMenuItem asChild>
+                              <Link
+                                 href='#'
+                                 className='flex w-full cursor-pointer items-center gap-x-2 rounded-md px-3 py-2 text-[var(--color-neutral-100)] hover:bg-[var(--color-gray-700)]'
+                              >
+                                 ❓ Help Center
+                              </Link>
+                           </DropdownMenuItem>
+
+                           <Separator className='my-5 bg-[var(--color-gray-800)]' />
+
+                           {/* Wylogowanie */}
+                           <DropdownMenuItem
+                              className='flex items-center gap-x-2 rounded-md px-3 py-2 text-[var(--color-danger-400)] hover:bg-red-600 hover:text-white'
+                              onClick={() => signOut()}
+                           >
+                              🚪 Log Out
+                           </DropdownMenuItem>
                         </DropdownMenuContent>
                      </DropdownMenu>
                   </div>
@@ -78,8 +122,9 @@ const Header = (): JSX.Element => {
                )}
             </div>
 
-            <nav>
-               <ul className='flex justify-center space-x-4 sm:justify-start'>
+            {/* Nawigacja */}
+            <nav className='flex'>
+               <ul className='flex justify-center gap-3 sm:gap-4 lg:justify-start lg:gap-12'>
                   {headerNavLinks.map(link => (
                      <li key={link.href}>
                         <Text
@@ -89,7 +134,7 @@ const Header = (): JSX.Element => {
                            className={
                               pathname === link.href
                                  ? 'text-[var(--color-primary-400)]'
-                                 : 'text-[var(--color-neutral-300)]'
+                                 : 'text-[var(--color-neutral-300)] hover:text-[var(--color-primary-400)]'
                            }
                         >
                            {link.label}
@@ -98,6 +143,7 @@ const Header = (): JSX.Element => {
                   ))}
                </ul>
             </nav>
+
             <Separator className='bg-[var(--color-gray-800)]' />
          </div>
       </header>
