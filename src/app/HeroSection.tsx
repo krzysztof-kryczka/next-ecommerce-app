@@ -53,7 +53,7 @@ export default function CategoriesCarousel() {
 
    return (
       <div className='px-10'>
-         <div>
+         <div >
             <Card className='gap-0 border-[var(--color-gray-800)] p-0'>
                <CardContent className='relative overflow-hidden p-0'>
                   <Carousel setApi={setCarouselApi} className='relative'>
@@ -63,10 +63,10 @@ export default function CategoriesCarousel() {
                                 return (
                                    <CarouselItem
                                       key={category.id}
-                                      className='flex items-center justify-between gap-8 p-0'
+                                      className='flex flex-col-reverse items-center justify-between gap-6 p-0 sm:flex-row sm:gap-8'
                                    >
                                       {/* Lewa strona: Tekst */}
-                                      <div className='flex w-1/2 flex-col gap-y-10 pt-[132px] pb-20 pl-[120px]'>
+                                      <div className='flex w-full flex-col gap-y-6 px-6 pt-10 pb-10 text-center sm:w-1/2 sm:gap-y-10 sm:pt-[132px] sm:pb-20 sm:pl-[120px] sm:text-left'>
                                          <div className='flex flex-col gap-y-6'>
                                             <Text
                                                as='h4'
@@ -87,24 +87,25 @@ export default function CategoriesCarousel() {
                                             variant='stroke'
                                             size='XL'
                                             onClick={() => handleExploreCategory(category.id)}
-                                            className='w-[211px] gap-x-3.5 pr-[15px]'
+                                            className='mx-auto w-full gap-x-3.5 pr-[15px] sm:mx-0 sm:w-[211px]'
                                          >
                                             <Text variant='textMmedium'>Explore Category</Text>
                                             <ArrowRightIcon className='!h-6 !w-6 stroke-[var(--color-primary-400)]' />
                                          </Button>
                                       </div>
+
                                       {/* Prawa strona: Obraz */}
-                                      <div className='w-1/2'>
+                                      <div className='flex w-full justify-center sm:w-1/2'>
                                          {category.image ? (
                                             <Image
                                                src={category.image}
                                                alt={category.name}
-                                               height={384}
                                                width={384}
-                                               className='mx-auto h-96 w-auto scale-[180%] transform border-none'
+                                               height={384}
+                                               className='mx-auto h-96 w-auto transform border-none sm:max-w-[200px] sm:scale-100 md:max-w-[250px] md:scale-125 lg:max-w-[384px] lg:scale-150'
                                             />
                                          ) : (
-                                            <div className='flex h-96 w-96 items-center justify-center bg-[var(--color-danger-50)]'>
+                                            <div className='flex h-40 w-full items-center justify-center bg-[var(--color-danger-50)] sm:h-96 sm:w-96'>
                                                <Text as='span' variant='textMmedium'>
                                                   No Image
                                                </Text>

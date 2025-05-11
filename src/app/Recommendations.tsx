@@ -37,10 +37,13 @@ const Recommendations = (): JSX.Element => {
             </Text>
 
             <Carousel className='w-full'>
-               <CarouselContent className='m-0 flex gap-x-8'>
-                  {Array.isArray(recommendations) && recommendations.length > 0 ? (
-                     recommendations.map((product: Product) => (
-                        <CarouselItem key={product.id} className='basis-[22%] p-0'>
+               <CarouselContent className='flex gap-x-10'>
+                  {Array.isArray(recommendations) ? (
+                     recommendations.map(product => (
+                        <CarouselItem
+                           key={product.id}
+                           className='xs:basis-[50%] flex-shrink-0 sm:basis-[42%] md:basis-[34%] lg:basis-[26%] xl:basis-[20%]'
+                        >
                            <ProductCard product={product} />
                         </CarouselItem>
                      ))

@@ -25,13 +25,13 @@ const Categories = (): JSX.Element => {
    if (loading) return <p>Loading categories...</p>
    if (error) return <p>{error}</p>
    return (
-      <div className='px-10'>
+      <div className='px-6 sm:px-8 md:px-10'>
          <div>
-            <div className='flex flex-col gap-y-8'>
+            <div className='flex flex-col gap-y-6 sm:gap-y-8'>
                <Text as='h4' variant='h4mobileMedium' className='text-[var(--color-neutral-900)]'>
                   Category
                </Text>
-               <div className='grid grid-cols-1 gap-x-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5'>
+               <div className='grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5'>
                   {Array.isArray(categories) ? (
                      categories.map(category => (
                         <Link
@@ -41,12 +41,11 @@ const Categories = (): JSX.Element => {
                               query: { 'selected[]': [category.id] },
                            }}
                         >
-                           <Card className='w-full cursor-pointer gap-0 rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] px-[70px] py-7 text-[var(--color-base-white)] hover:shadow-lg sm:max-w-[422px]'>
-                              <CardHeader className='flex flex-col items-center gap-y-6 p-0'>
-                                 {/* Ikona na podstawie nazwy kategorii */}
+                           <Card className='w-full cursor-pointer gap-0 border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] px-6 py-6 text-[var(--color-base-white)] transition-transform duration-300 ease-in-out hover:scale-115 hover:shadow-lg sm:max-w-[422px] sm:px-8 sm:py-7 md:px-10 md:py-8 lg:px-[70px] lg:py-7'>
+                              <CardHeader className='flex flex-col items-center gap-y-4 p-0 sm:gap-y-5 md:gap-y-6'>
                                  {categoryIcons[category.name] || <span className='text-gray-500'>No Icon</span>}
                                  <CardTitle>
-                                    <Text variant='h6mobileMedium' className='text-[var(--color-neutral-900)'>
+                                    <Text variant='h6mobileMedium' className='text-[var(--color-neutral-900)]'>
                                        {category.name}
                                     </Text>
                                  </CardTitle>

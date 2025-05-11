@@ -7,7 +7,7 @@
    "type": "module",
    "scripts": {
       "dev": "next dev --turbopack",
-      "build": "next build",
+      "build": "prisma generate && prisma migrate deploy && next build",
       "lint": "next lint",
       "seed": "tsx prisma/seed.ts",
       "start:db": "docker-compose up -d",

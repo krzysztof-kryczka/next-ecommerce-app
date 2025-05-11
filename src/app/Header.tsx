@@ -13,30 +13,15 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 
 const Header = (): JSX.Element => {
    const { data: session } = useSession()
-   const [isDesktop, setIsDesktop] = useState(false)
-   const [isTablet, setIsTablet] = useState(false)
    const pathname = usePathname()
-
-   useEffect(() => {
-      const handleResize = () => {
-         const width = window.innerWidth
-         setIsDesktop(width >= 1024)
-         setIsTablet(width >= 640 && width < 1024)
-      }
-      handleResize()
-      window.addEventListener('resize', handleResize)
-      return () => window.removeEventListener('resize', handleResize)
-   }, [])
-
-   const buttonSize = isDesktop ? 'XXL' : isTablet ? 'M' : 'XS'
 
    return (
       <header className='mx-auto max-w-[1440px] px-6 py-4 sm:px-10 sm:py-8'>
-         <div className='flex flex-col gap-y-6 sm:gap-y-10'>
+         <div className='flex flex-col gap-y-6 sm:gap-y-8'>
             <div className='flex flex-wrap items-center justify-between'>
                {/* Logo */}
                <div className='logo flex-shrink-0'>
-                  <Text as='a' variant='h3semiBold' href='/'>
+                  <Text as='a' variant='h4semiBold' href='/'>
                      <span className='text-[var(--color-primary-400)]'>Devstock</span>
                      <span className='text-[var(--color-neutral-900)]'>Hub</span>
                   </Text>
@@ -115,7 +100,7 @@ const Header = (): JSX.Element => {
                   </div>
                ) : (
                   <Link href='/login'>
-                     <Button variant='text' size={buttonSize} asChild>
+                     <Button variant='fill' className="h-[54px]" asChild>
                         <button>Sign In</button>
                      </Button>
                   </Link>
