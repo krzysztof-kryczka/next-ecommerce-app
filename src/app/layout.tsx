@@ -23,8 +23,8 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>): JSX.
                   <CategoriesProvider>
                      <Suspense fallback={<p>Loading...</p>}>
                         <main className='mx-auto flex max-w-[1440px] flex-col gap-y-[100px] pb-20'>{children}</main>
-                        <SpeedInsights />
                         <Analytics />
+                        <SpeedInsights />
                      </Suspense>
                   </CategoriesProvider>
                </CurrencyProvider>

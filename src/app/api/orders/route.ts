@@ -1,17 +1,12 @@
 import { NextResponse } from 'next/server'
-import { handleError } from '@/lib/helpers'
+import { getUserId, handleError } from '@/lib/helpers'
 import { OrderItemInput } from '@/types/OrderItemInput'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/utils/authOptions'
 import prisma from '@/lib/prisma'
 
 export async function POST(req: Request) {
    try {
-      const session = await getServerSession(authOptions)
-      if (!session?.user) {
-         return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
-      }
-      const userId = parseInt(session.user.id, 10)
+      const userId = await getUserId()
+      if (!userId) return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
 
       const body = await req.json()
 
@@ -44,11 +39,8 @@ export async function POST(req: Request) {
 
 export async function GET() {
    try {
-      const session = await getServerSession(authOptions)
-      if (!session?.user) {
-         return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
-      }
-      const userId = parseInt(session.user.id, 10)
+      const userId = await getUserId()
+      if (!userId) return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
 
       const orders = await prisma.order.findMany({
          where: { userId },

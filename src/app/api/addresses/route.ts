@@ -1,18 +1,12 @@
 import { NextResponse } from 'next/server'
-import { handleError, validateAddressData } from '@/lib/helpers'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/utils/authOptions'
+import { getUserId, handleError, validateAddressData } from '@/lib/helpers'
 import prisma from '@/lib/prisma'
 
 export async function GET(req: Request) {
    try {
-      const session = await getServerSession(authOptions)
-      if (!session?.user) {
-         return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
-      }
-      const userId = parseInt(session.user.id, 10)
+      const userId = await getUserId()
+      if (!userId) return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
 
-      if (!userId) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
       const { searchParams } = new URL(req.url)
       const userIdParam = parseInt(searchParams.get('userId') || '', 10)
 
@@ -23,20 +17,17 @@ export async function GET(req: Request) {
       const addresses = await prisma.address.findMany({ where: { userId } })
       return NextResponse.json({ success: true, addresses }, { status: 200 })
    } catch (error) {
+      console.error('❌ Błąd w GET /api/addresses:', error)
       return handleError(error)
    }
 }
 
 export async function POST(req: Request) {
    try {
-      const session = await getServerSession(authOptions)
-      if (!session?.user) {
-         return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
-      }
-      const userId = parseInt(session.user.id, 10)
+      const userId = await getUserId()
+      if (!userId) return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
 
       const body = await req.json()
-
       validateAddressData(body)
 
       if (body.isMain) {
@@ -45,7 +36,7 @@ export async function POST(req: Request) {
 
       const newAddress = await prisma.address.create({
          data: {
-            userId: userId,
+            userId,
             country: body.country,
             province: body.province,
             city: body.city,
@@ -57,17 +48,15 @@ export async function POST(req: Request) {
 
       return NextResponse.json({ success: true, address: newAddress }, { status: 201 })
    } catch (error) {
+      console.error('❌ Błąd w POST /api/addresses:', error)
       return handleError(error)
    }
 }
 
 export async function PUT(req: Request) {
    try {
-      const session = await getServerSession(authOptions)
-      if (!session?.user) {
-         return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
-      }
-      const userId = parseInt(session.user.id, 10)
+      const userId = await getUserId()
+      if (!userId) return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
 
       const { searchParams } = new URL(req.url)
       const addressId = parseInt(searchParams.get('id') || '', 10)
@@ -91,24 +80,18 @@ export async function PUT(req: Request) {
          })
       }
 
-      const updatedAddress = await prisma.address.update({
-         where: { id: addressId },
-         data: { ...body },
-      })
-
+      const updatedAddress = await prisma.address.update({ where: { id: addressId }, data: body })
       return NextResponse.json({ success: true, address: updatedAddress }, { status: 200 })
    } catch (error) {
+      console.error('❌ Błąd w PUT /api/addresses:', error)
       return handleError(error)
    }
 }
 
 export async function DELETE(req: Request) {
    try {
-      const session = await getServerSession(authOptions)
-      if (!session?.user) {
-         return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
-      }
-      const userId = parseInt(session.user.id, 10)
+      const userId = await getUserId()
+      if (!userId) return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
 
       const { searchParams } = new URL(req.url)
       const addressId = parseInt(searchParams.get('id') || '', 10)
@@ -125,6 +108,7 @@ export async function DELETE(req: Request) {
       await prisma.address.delete({ where: { id: addressId } })
       return NextResponse.json({ success: true, message: 'Address deleted successfully' }, { status: 200 })
    } catch (error) {
+      console.error('❌ Błąd w DELETE /api/addresses:', error)
       return handleError(error)
    }
 }

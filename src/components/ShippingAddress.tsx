@@ -46,22 +46,15 @@ const ShippingAddress = ({ onMainAddressSelect }: { onMainAddressSelect: (addres
       if (response?.success) {
          const newAddress: Address = {
             ...data,
-            id: response.addresses?.[response.addresses.length - 1]?.id || Date.now(),
-            isMain: !!data.isMain,
+            id: Date.now(),
+            isMain: data.isMain !== undefined ? data.isMain : false,
          }
 
-         setAddresses(prevAddresses => {
-            if (newAddress.isMain) {
-               return prevAddresses
-                  .map(addr => ({ ...addr, isMain: addr.isMain ?? false }))
-                  .concat({
-                     ...newAddress,
-                     isMain: newAddress.isMain ?? false,
-                  })
-            } else {
-               return [...prevAddresses, newAddress]
-            }
-         })
+         setAddresses(prevAddresses =>
+            newAddress.isMain
+               ? [...prevAddresses.map(addr => ({ ...addr, isMain: false })), newAddress]
+               : [...prevAddresses, newAddress],
+         )
 
          toast.success('Address added successfully!')
       } else {
@@ -79,13 +72,13 @@ const ShippingAddress = ({ onMainAddressSelect }: { onMainAddressSelect: (addres
             <TabsList className='flex w-full'>
                <TabsTrigger
                   value='existing'
-                  className='flex-1 rounded-none border-b-[var(--color-gray-800))] py-2 text-center text-base font-medium text-[var(--color-neutral-300)] hover:text-[var(--color-primary)] data-[state=active]:border-b-[var(--color-blazeOrange-600))] data-[state=active]:bg-transparent data-[state=active]:text-[var(--color-blazeOrange-600)]'
+                  className='flex-1 rounded-none border-b-[var(--color-gray-800)] py-2 text-center text-base font-medium text-[var(--color-neutral-300)] hover:text-[var(--color-primary)] data-[state=active]:border-b-[var(--color-blazeOrange-600)] data-[state=active]:bg-transparent data-[state=active]:text-[var(--color-blazeOrange-600)]'
                >
                   Existing Address
                </TabsTrigger>
                <TabsTrigger
                   value='new'
-                  className='flex-1 rounded-none border-b-[var(--color-gray-800))] py-2 text-center text-base font-medium text-[var(--color-neutral-300)] hover:text-[var(--color-primary)] data-[state=active]:border-b-[var(--color-blazeOrange-600))] data-[state=active]:bg-transparent data-[state=active]:text-[var(--color-blazeOrange-600)]'
+                  className='flex-1 rounded-none border-b-[var(--color-gray-800)] py-2 text-center text-base font-medium text-[var(--color-neutral-300)] hover:text-[var(--color-primary)] data-[state=active]:border-b-[var(--color-blazeOrange-600)] data-[state=active]:bg-transparent data-[state=active]:text-[var(--color-blazeOrange-600)]'
                >
                   New Address
                </TabsTrigger>

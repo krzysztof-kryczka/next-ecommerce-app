@@ -1,5 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
-
+type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
+type ApiResponse = {
+   success: boolean
+   message: string
+}
 const useFetch = <T>(url: string | null, options?: RequestInit, disableFetch = false, defaultToArray = false) => {
    // const [data, setData] = useState<T | T[]>(defaultToArray ? ([] as T[]) : null)
    const [data, setData] = useState<T | T[]>(defaultToArray ? ([] as T[]) : (null as T))
@@ -35,32 +39,37 @@ const useFetch = <T>(url: string | null, options?: RequestInit, disableFetch = f
    }, [url, disableFetch, fetchData])
 
    const sendRequest = useCallback(
-      async <R>(
-         method: string,
+      async <R extends ApiResponse>(
+         method: HTTPMethod,
          requestUrl: string,
          body?: object,
          headers: Record<string, string> = {},
-      ): Promise<R | null> => {
-         try {
-            setLoading(true)
-            setError(null)
+      ): Promise<R> => {
+         setLoading(true)
+         setError(null)
 
+         try {
             const response = await fetch(requestUrl, {
                method,
-               headers: {
-                  'Content-Type': 'application/json',
-                  ...headers,
-               },
+               headers: { 'Content-Type': 'application/json', ...headers },
                body: body ? JSON.stringify(body) : undefined,
             })
 
-            if (!response.ok) throw new Error(`Failed to ${method} data to ${requestUrl}`)
+            const result = await response.json()
+            // eslint-disable-next-line no-console
+            console.log(`📩 Status API: ${response.status}`, result)
 
-            return await response.json()
+            if (!response.ok) {
+               setError(result.message || `Error ${response.status}`)
+               return result
+            }
+
+            return result
          } catch (error) {
-            setError(error instanceof Error ? error.message : 'Unknown error')
-            console.error(`Error during ${method} request:`, error)
-            return null
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+            console.error('❌ Błąd:', errorMessage)
+            setError(errorMessage)
+            return { success: false, message: errorMessage } as R
          } finally {
             setLoading(false)
          }
@@ -72,15 +81,17 @@ const useFetch = <T>(url: string | null, options?: RequestInit, disableFetch = f
       data,
       loading,
       error,
+      setError,
       fetchData,
       postData: (url: string, body: object, headers: Record<string, string> = {}) =>
-         sendRequest<T>('POST', url, body, headers),
+         sendRequest<ApiResponse>('POST', url, body, headers),
+
       deleteData: (url: string, body?: object, headers: Record<string, string> = {}) =>
-         sendRequest<T>('DELETE', url, body, headers),
+         sendRequest('DELETE', url, body, headers),
       patchData: (url: string, body: object, headers: Record<string, string> = {}) =>
-         sendRequest<T>('PATCH', url, body, headers),
+         sendRequest('PATCH', url, body, headers),
       putData: (url: string, body: object, headers: Record<string, string> = {}) =>
-         sendRequest<T>('PUT', url, body, headers),
+         sendRequest('PUT', url, body, headers),
    }
 }
 

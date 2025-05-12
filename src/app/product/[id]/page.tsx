@@ -18,6 +18,7 @@ import { useCurrency } from '@/context/CurrencyContext'
 import { Product } from '@/types/Product'
 import Image from 'next/image'
 import ErrorMessage from '@/components/ui/ErrorMessage'
+import LoadingIndicator from '@/components/ui/LoadingIndicator'
 
 const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
    const [quantity, setQuantity] = useState<number>(1)
@@ -74,9 +75,7 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
       }
    }
 
-   if (productLoading) {
-      return <div className='flex h-screen items-center justify-center'>Loading...</div>
-   }
+   if (productLoading) return <LoadingIndicator />
 
    if (!product || error) {
       return <ErrorMessage sectionName='product.' errorDetails={error} />

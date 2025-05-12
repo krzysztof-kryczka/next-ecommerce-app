@@ -80,6 +80,7 @@ const CheckoutPage = (): JSX.Element => {
             console.error('❌ orderSummary is null, skipping API call.')
             return
          }
+
          const validateResponse = await fetch('/api/validate-checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -118,17 +119,25 @@ const CheckoutPage = (): JSX.Element => {
             body: JSON.stringify(orderDetails),
          })
 
+         const responseData = await response.json()
+
          if (!response.ok) {
-            throw new Error('⚠️ Failed to create Stripe session.')
+            toast.error(`Stripe error: ${responseData.error || 'Failed to create session.'}`, {
+               autoClose: 20000,
+               closeOnClick: true,
+               style: { width: '700px' },
+            })
          }
 
-         const { id } = await response.json()
+         const { id } = responseData
          const stripeResponse = await stripe?.redirectToCheckout({ sessionId: id })
-         console.error('❌ Stripe checkout error:', stripeResponse?.error?.message)
-         toast.error('⚠️ Failed to redirect to payment.')
+
+         if (stripeResponse?.error) {
+            console.error('❌ Stripe checkout error:', stripeResponse.error.message)
+            return toast.error(`⚠️ Stripe checkout failed: ${stripeResponse.error.message}`)
+         }
       } catch (error) {
          console.error('❌ Checkout process failed:', error)
-         toast.error('❌ Something went wrong during checkout.')
       }
    }
 

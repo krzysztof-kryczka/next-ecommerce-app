@@ -1,15 +1,10 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-
+import { getUserId } from '@/lib/helpers'
 import prisma from '@/lib/prisma'
-import { authOptions } from '@/utils/authOptions'
 
 export async function GET() {
-   const session = await getServerSession(authOptions)
-   if (!session?.user) {
-      return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
-   }
-   const userId = parseInt(session.user.id, 10)
+   const userId = await getUserId()
+   if (!userId) return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
 
    const cart = await prisma.cart.findFirst({
       where: { userId },
@@ -45,11 +40,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-   const session = await getServerSession(authOptions)
-   if (!session?.user) {
-      return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
-   }
-   const userId = parseInt(session.user.id, 10)
+   const userId = await getUserId()
+   if (!userId) return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
 
    const { productId, quantity } = await req.json()
 
@@ -77,11 +69,8 @@ export async function POST(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-   const session = await getServerSession(authOptions)
-   if (!session?.user) {
-      return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
-   }
-   const userId = parseInt(session.user.id, 10)
+   const userId = await getUserId()
+   if (!userId) return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
 
    const { productId, quantity } = await req.json()
 
@@ -106,11 +95,8 @@ export async function PATCH(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-   const session = await getServerSession(authOptions)
-   if (!session?.user) {
-      return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
-   }
-   const userId = parseInt(session.user.id, 10)
+   const userId = await getUserId()
+   if (!userId) return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
 
    const { productId } = await req.json()
 

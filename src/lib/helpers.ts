@@ -1,4 +1,6 @@
 import { Address } from '@/types/Address'
+import { authOptions } from '@/utils/authOptions'
+import { getServerSession } from 'next-auth'
 import { NextResponse } from 'next/server'
 
 /**
@@ -42,6 +44,23 @@ export const formatDate = (isoDate: string): string => {
    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
 }
 
+/**
+ * Maskuje numer telefonu, zastępując wszystkie znaki oprócz ostatnich dwóch gwiazdkami.
+ *
+ * @param {string} phone - Numer telefonu do zamaskowania.
+ * @returns {string} - Zamaskowany numer w postaci "****56".
+ */
 export const maskPhoneNumber = (phone: string): string => {
    return phone.replace(/.(?=.{2})/g, '∗')
+}
+
+/**
+ * Pobiera ID użytkownika z sesji NextAuth.
+ *
+ * @returns {number | null} - ID użytkownika jako liczba lub null, jeśli sesja nie istnieje.
+ */
+export const getUserId = async () => {
+   const session = await getServerSession(authOptions)
+   if (!session?.user) return null
+   return parseInt(session.user.id, 10) || null
 }

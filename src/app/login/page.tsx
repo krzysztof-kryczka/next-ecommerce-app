@@ -21,7 +21,11 @@ const LoginPage = (): JSX.Element => {
    const [isSavePasswordChecked, setIsSavePasswordChecked] = useState(false)
    const { status } = useSession()
    const router = useRouter()
-   const { postData, error, loading } = useFetch<{ success: boolean; message: string }>('/api/check-user', {}, true)
+   const { postData, error, setError, loading } = useFetch<{ success: boolean; message: string }>(
+      '/api/check-user',
+      {},
+      true,
+   )
 
    useEffect(() => {
       if (status === 'authenticated') {
@@ -42,6 +46,7 @@ const LoginPage = (): JSX.Element => {
    const handleCheckUser = async (data: { emailOrPhone: string }) => {
       try {
          const responseData = await postData('/api/check-user', { emailOrPhone: data.emailOrPhone })
+         setError(null)
          if (error) {
             toast.error('Unexpected error: No response from server.')
             return
@@ -61,6 +66,7 @@ const LoginPage = (): JSX.Element => {
    const handleVerifyPassword = async (data: { password: string }) => {
       try {
          const responseData = await postData('/api/login', { emailOrPhone, password: data.password })
+         setError(null)
          if (error) {
             toast.error('Unexpected error: No response from server.')
             return

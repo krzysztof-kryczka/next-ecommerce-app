@@ -1,16 +1,11 @@
 import { NextResponse } from 'next/server'
-import { handleError } from '@/lib/helpers'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/utils/authOptions'
+import { getUserId, handleError } from '@/lib/helpers'
 import prisma from '@/lib/prisma'
 
 export async function GET(req: Request) {
    try {
-      const session = await getServerSession(authOptions)
-      if (!session?.user) {
-         return NextResponse.json({ success: false, message: 'Unauthorized: No session found' }, { status: 401 })
-      }
-      const userId = parseInt(session.user.id, 10)
+      const userId = await getUserId()
+      if (!userId) return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
 
       const url = new URL(req.url)
       const paymentIntentId = url.searchParams.get('paymentIntentId')

@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server'
 import { Item } from '@/types/Item'
-import { handleError } from '@/lib/helpers'
+import { getUserId, handleError } from '@/lib/helpers'
 import prisma from '@/lib/prisma'
 
 export async function POST(req: Request) {
    try {
-      const { userId, items } = await req.json()
+      const userId = await getUserId()
+      if (!userId) return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+
+      const { items } = await req.json()
 
       const cart = await prisma.cart.findFirst({
          where: { userId },

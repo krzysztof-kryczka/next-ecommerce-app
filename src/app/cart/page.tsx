@@ -11,14 +11,13 @@ import { useRouter } from 'next/navigation'
 import useFetch from '@/hooks/useFetch'
 import Text from '@/components/ui/text'
 import ErrorMessage from '@/components/ui/ErrorMessage'
-import LoadingIndicator from '@/components/ui/LoadingIndicator'
 
 const CartPage = (): JSX.Element => {
    const [cartItems, setCartItems] = useState<Product[]>([])
    const [selectedItems, setSelectedItems] = useState<number[]>([])
    const [isSelectAllChecked, setIsSelectAllChecked] = useState(false)
    const [isNoteVisible, setIsNoteVisible] = useState<number | null>(null)
-   const { data, error, loading, deleteData, patchData } = useFetch<Product[]>('/api/cart')
+   const { data, error, deleteData, patchData } = useFetch<Product[]>('/api/cart')
    const router = useRouter()
 
    useEffect(() => {
@@ -88,7 +87,6 @@ const CartPage = (): JSX.Element => {
       router.push('/checkout')
    }
 
-   if (loading) return <LoadingIndicator />
    if (error) {
       return <ErrorMessage sectionName='cart.' errorDetails={error} />
    }

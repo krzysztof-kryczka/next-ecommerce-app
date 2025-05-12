@@ -1,6 +1,6 @@
 {
    "name": "next-ecommerce-app",
-   "version": "1.0.0",
+   "version": "1.0.1",
    "private": true,
    "description": "Next.js e-commerce app with Prisma and Tailwind CSS",
    "author": "Krzysztof Kryczka",

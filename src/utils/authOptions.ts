@@ -56,14 +56,6 @@ export const authOptions: NextAuthOptions = {
             token.maxAge = user.savePassword ? 30 * 24 * 60 * 60 : 1 * 60 * 60
          }
 
-         // Usuń pole encodedToken przed zakodowaniem tokena
-         // delete token.encodedToken
-         // Zakoduj token jako JWT
-         // const secretKey = process.env.JWT_SECRET!
-         // const encodedToken = jwt.sign(token, secretKey, { algorithm: 'HS256' })
-         // console.log('JWT Callback - Encoded Token:', encodedToken)
-         // token.encodedToken = encodedToken
-
          // console.log('Debug JWT Callback - Token:', token)
          return token
       },
@@ -74,7 +66,6 @@ export const authOptions: NextAuthOptions = {
             name: token.name ?? 'Unknown',
             image: token.picture ?? undefined,
          }
-         // session.accessToken = token.encodedToken  as string | undefined
          session.maxAge = Number(token.maxAge) || 3600
          session.expires = new Date(Date.now() + session.maxAge * 1000).toISOString()
 

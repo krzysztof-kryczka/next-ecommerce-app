@@ -15,13 +15,13 @@ type RegisterResponse = {
 }
 
 const RegisterPage = (): JSX.Element => {
-   const { postData, error } = useFetch<RegisterResponse>(null)
+   const { postData, error, setError } = useFetch<RegisterResponse>(null)
    const router = useRouter()
 
    const onSubmit = async (data: RegisterFormData) => {
       try {
          const response = await postData('/api/register', data)
-
+         setError(null)
          if (error) {
             toast.error(error)
          } else if (response?.success) {
