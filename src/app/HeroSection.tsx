@@ -17,6 +17,8 @@ import useFetch from '@/hooks/useFetch'
 import { Category } from '@/types/Category'
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon'
 import Image from 'next/image'
+import LoadingIndicator from '@/components/ui/LoadingIndicator'
+import ErrorMessage from '@/components/ui/ErrorMessage'
 
 export default function CategoriesCarousel() {
    const [carouselApi, setCarouselApi] = useState<CarouselApi>()
@@ -43,17 +45,12 @@ export default function CategoriesCarousel() {
       router.push(`/products?selected[]=${categoryId}`)
    }
 
-   if (loading) {
-      return <p>Loading categories...</p>
-   }
-
-   if (error) {
-      return <p>{error}</p>
-   }
+   if (loading) return <LoadingIndicator />
+   if (error) return <ErrorMessage sectionName='categories.' errorDetails={error} />
 
    return (
       <div className='px-10'>
-         <div >
+         <div>
             <Card className='gap-0 border-[var(--color-gray-800)] p-0'>
                <CardContent className='relative overflow-hidden p-0'>
                   <Carousel setApi={setCarouselApi} className='relative'>

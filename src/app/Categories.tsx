@@ -11,6 +11,8 @@ import HeadphoneIcon from '@/components/icons/HeadphoneIcon'
 import Text from '@/components/ui/text'
 import useFetch from '@/hooks/useFetch'
 import { Category } from '@/types/Category'
+import LoadingIndicator from '@/components/ui/LoadingIndicator'
+import ErrorMessage from '@/components/ui/ErrorMessage'
 
 const categoryIcons: Record<string, JSX.Element> = {
    Monitor: <MonitorIcon />,
@@ -22,8 +24,10 @@ const categoryIcons: Record<string, JSX.Element> = {
 
 const Categories = (): JSX.Element => {
    const { data: categories, loading, error } = useFetch<Category>('/api/categories', {}, false, true)
-   if (loading) return <p>Loading categories...</p>
-   if (error) return <p>{error}</p>
+
+   if (loading) return <LoadingIndicator />
+   if (error) return <ErrorMessage sectionName='categories.' errorDetails={error} />
+
    return (
       <div className='px-6 sm:px-8 md:px-10'>
          <div>

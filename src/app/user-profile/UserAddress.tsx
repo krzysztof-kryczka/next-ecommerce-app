@@ -7,6 +7,8 @@ import useFetch from '@/hooks/useFetch'
 import { toast } from 'react-toastify'
 import AddressForm from '@/components/AddressForm'
 import AddressList from '@/components/AddressList'
+import LoadingIndicator from '@/components/ui/LoadingIndicator'
+import ErrorMessage from '@/components/ui/ErrorMessage'
 
 export default function UserAddresses() {
    const [addresses, setAddresses] = useState<Address[]>([])
@@ -102,8 +104,8 @@ export default function UserAddresses() {
    return (
       <div className='w-full max-w-full'>
          <h2 className='text-xl font-bold'>My Address</h2>
-         {loading && <p>Loading addresses...</p>}
-         {error && <p className='text-red-500'>Error: {error}</p>}
+         {loading && <LoadingIndicator />}
+         {error && <ErrorMessage sectionName='profile.' errorDetails={error} />}
          {isEditing && editingAddress ? (
             <AddressForm
                onSubmit={updatedAddress =>

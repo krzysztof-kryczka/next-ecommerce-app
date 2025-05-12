@@ -3,10 +3,12 @@ import Text from '@/components/ui/text'
 import AddressDialog from './AddressDialog'
 import { MainAddressDisplayProps } from '@/types/MainAddressDisplayProps'
 import { JSX } from 'react'
+import LoadingIndicator from './ui/LoadingIndicator'
+import ErrorMessage from './ui/ErrorMessage'
 
 const MainAddressDisplay = ({ loading, error, addresses, onSelectAddress }: MainAddressDisplayProps): JSX.Element => {
-   if (loading) return <p>Loading addresses...</p>
-   if (error) return <p className='text-red-500'>{error}</p>
+   if (loading) return <LoadingIndicator />
+   if (error) return <ErrorMessage sectionName='Address.' errorDetails={error} />
    if (addresses.length === 0) return <p>No addresses found.</p>
 
    const mainAddress = addresses.find(addr => addr.isMain)

@@ -21,7 +21,7 @@ const ProductCard = ({ product }: ProductCardProps): JSX.Element => {
    }, [product?.id, addToCart])
 
    return (
-      <div className='relative z-10 h-[386px] w-[300px] cursor-pointer overflow-hidden rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)]'>
+      <div className='xs:h-[320px] xs:w-[250px] relative z-10 cursor-pointer overflow-hidden rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] sm:h-[340px] sm:w-[270px] md:h-[360px] md:w-[290px] lg:h-[386px] lg:w-[300px]'>
          <div
             onClick={handleAddToCart}
             className='absolute top-8 left-8 z-10 flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-base-gray)] hover:bg-[var(--color-blazeOrange-600)]'
@@ -36,7 +36,7 @@ const ProductCard = ({ product }: ProductCardProps): JSX.Element => {
                   height={204}
                   width={268}
                   priority
-                  className='h-[204px] w-[268px] rounded-md border border-[var(--color-neutral-900)] object-cover'
+                  className='xs:h-[160px] xs:w-[210px] rounded-md border border-[var(--color-neutral-900)] object-cover sm:h-[180px] sm:w-[230px] md:h-[200px] md:w-[250px] lg:h-[204px] lg:w-[268px]'
                />
             </div>
             <div className='flex flex-col gap-y-4 px-4 pt-[18px] pb-5'>

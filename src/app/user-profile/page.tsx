@@ -12,6 +12,8 @@ import UserAddress from './UserAddress'
 import UserTransaction from './UserTransaction'
 import TabHeader from './UserTabHeader'
 import { User } from '@/types/User'
+import LoadingIndicator from '@/components/ui/LoadingIndicator'
+import ErrorMessage from '@/components/ui/ErrorMessage'
 
 const UserProfilePage = (): JSX.Element => {
    const { data: session, status } = useSession()
@@ -19,8 +21,8 @@ const UserProfilePage = (): JSX.Element => {
    const { data: userData, loading, error } = useFetch<User>('/api/user-profile')
 
    const user = Array.isArray(userData) ? userData[0] : userData
-   if (status === 'loading' || loading) return <p>Loading...</p>
-   if (error) return <p className='text-red-500'>Error: {error}</p>
+   if (status === 'loading' || loading) return <LoadingIndicator />
+   if (error) return <ErrorMessage sectionName='data.' errorDetails={error} />
 
    return (
       <div className='flex gap-x-10 px-10'>

@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import useFetch from '@/hooks/useFetch'
 import TransactionHistory from '@/components/TransactionHistory'
 import { Order } from '@/types/Order'
+import LoadingIndicator from '@/components/ui/LoadingIndicator'
 
 const UserTransactions = (): JSX.Element => {
    const { data: session } = useSession()
@@ -24,7 +25,7 @@ const UserTransactions = (): JSX.Element => {
 
    return (
       <div className='mx-auto flex w-full flex-col gap-y-6'>
-         {loading && <p>Loading orders...</p>}
+         {loading && <LoadingIndicator />}
          {orders.length > 0 ? <TransactionHistory orders={orders} /> : <p>No transactions found.</p>}
       </div>
    )

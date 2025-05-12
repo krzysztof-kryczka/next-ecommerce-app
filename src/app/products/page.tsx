@@ -16,6 +16,8 @@ import { useCategories } from '@/context/CategoriesContext'
 import useFetch from '@/hooks/useFetch'
 import { useCurrency } from '@/context/CurrencyContext'
 import { PriceRange as PriceRangeType } from '@/types/PriceRange'
+import ErrorMessage from '@/components/ui/ErrorMessage'
+import LoadingIndicator from '@/components/ui/LoadingIndicator'
 
 export default function ProductsPage() {
    const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
@@ -149,7 +151,7 @@ export default function ProductsPage() {
    )
 
    return (
-      <div className='px-10'>
+      <div className='px-6 sm:px-8 md:px-10'>
          <ResizablePanelGroup
             direction='horizontal'
             className='h-full w-full border-t border-t-[var(--color-gray-800)]'
@@ -172,7 +174,7 @@ export default function ProductsPage() {
                   />
                )}
 
-               <div className='mt-[52px]'>
+               <div className='mt-10'>
                   <DropdownSection title='Price' isOpen={isPriceOpen} onToggle={() => setIsPriceOpen(!isPriceOpen)} />
                   {isPriceOpen && <PriceRange priceRange={priceRange} setPriceRange={setPriceRange} />}
                </div>
@@ -184,16 +186,16 @@ export default function ProductsPage() {
             {/* Prawy panel */}
             <ResizablePanel defaultSize={70} className='h-full overflow-y-auto'>
                <div className='flex w-full flex-col'>
-                  <div className='flex w-full items-center gap-[60px] p-10'>
+                  <div className='flex w-full flex-wrap items-center gap-6 p-6 sm:gap-12 sm:p-10'>
                      <div className='flex gap-x-4'>
-                        <Label variant='custom' className='text-xl leading-[30px] font-semibold tracking-[-0.01em]'>
+                        <Label variant='custom' className='text-xl font-semibold'>
                            Sort By
                         </Label>
                         <SortBySelect sortBy={sortBy} setSortBy={handleSortChange} />
                      </div>
 
                      <div className='flex gap-x-4'>
-                        <Label variant='custom' className='text-xl leading-[30px] font-semibold tracking-[-0.01em]'>
+                        <Label variant='custom' className='text-xl font-semibold'>
                            Show
                         </Label>
                         <ShowPerPageSelect
@@ -203,17 +205,19 @@ export default function ProductsPage() {
                         />
                      </div>
                   </div>
+
                   {error ? (
-                     <p className='text-center text-lg text-red-500'>{error}</p>
+                     <ErrorMessage sectionName='products.' errorDetails={error} />
                   ) : loading || categoriesLoading ? (
-                     <p className='text-center text-lg text-gray-500'>Loading products...</p>
+                     <LoadingIndicator />
                   ) : (
-                     <div className='grid grid-cols-3 gap-x-12 gap-y-8 px-10'>
+                     <div className='xs:grid-cols-1 grid gap-x-6 gap-y-8 px-6 sm:grid-cols-1 sm:gap-x-8 sm:px-8 md:grid-cols-2 md:gap-x-10 md:px-10 lg:grid-cols-3 xl:grid-cols-3'>
                         {paginatedProducts.map(product => (
                            <ProductCard key={product.id} product={product} />
                         ))}
                      </div>
                   )}
+
                   <Pagination
                      currentPage={currentPage}
                      totalPages={totalPages}

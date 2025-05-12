@@ -2,11 +2,12 @@
 
 import ProductCard from '@/components/ProductCard'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
+import ErrorMessage from '@/components/ui/ErrorMessage'
+import LoadingIndicator from '@/components/ui/LoadingIndicator'
 import Text from '@/components/ui/text'
 import useFetch from '@/hooks/useFetch'
 import { Product } from '@/types/Product'
 import { JSX } from 'react'
-import { toast } from 'react-toastify'
 
 const Recommendations = (): JSX.Element => {
    const {
@@ -17,17 +18,8 @@ const Recommendations = (): JSX.Element => {
 
    const recommendations = response && 'data' in response ? response.data : []
 
-   if (loading) {
-      return (
-         <Text as='h4' variant='h4mobileMedium' className='text-center text-[var(--color-neutral-900)]'>
-            Loading recommendations...
-         </Text>
-      )
-   }
-
-   if (error) {
-      toast.error('Failed to fetch recommendations. Please try again later.')
-   }
+   if (loading) return <LoadingIndicator />
+   if (error) return <ErrorMessage sectionName='recommendations.' errorDetails={error} />
 
    return (
       <div className='px-10'>

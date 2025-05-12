@@ -17,6 +17,7 @@ import { useCategories } from '@/context/CategoriesContext'
 import { useCurrency } from '@/context/CurrencyContext'
 import { Product } from '@/types/Product'
 import Image from 'next/image'
+import ErrorMessage from '@/components/ui/ErrorMessage'
 
 const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
    const [quantity, setQuantity] = useState<number>(1)
@@ -78,11 +79,7 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
    }
 
    if (!product || error) {
-      return (
-         <div className='flex h-screen items-center justify-center text-[var(--color-danger-50)]'>
-            ⚠️ Product not exists! ({error})
-         </div>
-      )
+      return <ErrorMessage sectionName='product.' errorDetails={error} />
    }
 
    return (

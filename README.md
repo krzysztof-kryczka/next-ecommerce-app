@@ -1,36 +1,132 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NexusHub – E-commerce Platform
 
-## Getting Started
+## 📌 Opis projektu
 
-First, run the development server:
+NexusHub to nowoczesna platforma e-commerce umożliwiająca użytkownikom przeglądanie, filtrowanie i zakup produktów.
+
+## 🚀 Instalacja
+
+Aby uruchomić projekt lokalnie, wykonaj następujące kroki:
+
+1. **Klonowanie repozytorium:**
+   ```
+   git clone https://github.com/krzysztof-kryczka/next-ecommerce-app
+   cd next-ecommerce-app
+   ```
+2. **Wybór Gałęzi (branch):**
+
+   ```
+   $ git branch -a
+   $ git switch dev
+   lub jeśli wolisz archaiczne rozwiązanie to:
+   $ git checkout dev
+   ```
+
+3. **Instalacja zależności:**
+   ```
+   $ npm install
+   $ npx prisma generate
+   $ npx prisma migrate deploy
+   $ tsx prisma/seed.ts lub npm run seed
+   ```
+4. **Konfiguracja środowiska:**
+   Stwórz w głównym katalogu projektu plik .env i dodaj:
+
+   ```
+   DATABASE_URL=
+   NEXTAUTH_URL=
+   NEXTAUTH_SECRET=
+   JWT_SECRET=
+   STRIPE_SECRET_KEY=
+   STRIPE_PUBLISHABLE_KEY=
+   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+   ```
+
+5. **Opcja 1: Uruchamianie Aplikacji w trybie developerskim:**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+      Jeżeli baza PostgreSQL jest przez docker
+         $ npm run start:db
+         $ npm run dev
+      w przeciwnym przypadku:
+         $ npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. **Opcja 2: Uruchamianie Aplikacji w trybie produkcyjnym:**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+    Jeżeli baza PostgreSQL jest przez docker to wystarczy
+         $ npm run start:app
+    w przeciwnym przypadku:
+         $ npm run build
+         $ npm run start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+📂 Struktura projektu
 
-## Learn More
+    .
+    │── app/
+    │   ├── api/               # API backendowe
+    │   ├── cart/              # Strona koszyka
+    │   ├── checkout/          # Strona płatności
+    │   ├── login/             # Strona logowania
+    │   ├── register/          # Strona rejestracji
+    │   ├── products/          # Lista produktów
+    │   ├── user-profile/      # Profil użytkownika
+    │── components/              @ mniejsze elementy składowe komponentów jsx +
+    │   ├── icons/             # Ikony używane w aplikacji
+    │   ├── ui/                # Komponenty UI z shaDCN + własne
+    │── context/               # Konteksty aplikacji (waluty, kategorie)
+    │── hooks/                 # Customowe hooki do pobierania danych z api
+    │── lib/                   # Pomocnicze funkcje
+    │── schema/                # Walidacja danych
+    │── types/                 # Typy dla TypeScript
+    │── utils/                 # Narzędzia i pomocnicze funkcje
+    │── middleware.ts          # Middleware aplikacji
+    │── README.md              # Dokumentacja projektu
 
-To learn more about Next.js, take a look at the following resources:
+📌 Struktura API
+API jest podzielone na osobne moduły, które obsługują różne części aplikacji:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+🔑 Autoryzacja (/api/auth/)
+POST /api/login/ – Logowanie użytkownika.
+POST /api/register/ – Rejestracja nowego użytkownika.
+GET /api/check-user/ – Pomocnicza - sprawdza, czy użytkownik istnieje w bazie jeszcze przed podaniem hasła.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+🏷 Kategorie (/api/categories/)
+GET /api/categories/ – Pobiera wszystkie dostępne kategorie produktów.
 
-## Deploy on Vercel
+🛍 Produkty (/api/products/)
+GET /api/products/ – Pobiera listę wszystkich produktów.
+GET /api/product/{id} – Pobiera szczegóły pojedynczego produktu na podstawie id.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+🔄 Rekomendacje (/api/recommendations/)
+GET /api/recommendations/ – Pobiera lodowo 6 rekomendowanych produktów dla użytkownika.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+🛒 Koszyk (/api/cart/)
+GET /api/cart/ – Pobiera zawartość koszyka użytkownika.
+POST /api/cart/ – Dodaje produkt do koszyka.
+DELETE /api/cart/ – Usuwa produkt z koszyka.
+POST /api/validate-checkout/ – Walidacja przed złożeniem zamówienia czy dane posiadane w localStorage nie zostały zmodyfikowane przez użytkownika (weryfikuje z tym co użytkownik posiada w koszyku)
+POST /api/clear-cart/ – Usuwa z koszyka tylko te produkty po dokonaniu zakupu, które użytkownik faktycznie zakupił i które trafiły do checkout. Pozostałe produkty pozostają w koszyku.
+
+💳 Płatności (/api/create-checkout-session/)
+POST /api/create-checkout-session/ – Tworzy sesję płatności Stripe.
+GET /api/session-details/ – Pobiera szczegóły sesji płatności Stripe.
+
+🚚 Zamówienia (/api/orders/)
+GET /api/orders/ – Pobiera historię zamówień użytkownika.
+GET /api/orders/exists/ – Sprawdza, czy użytkownik ma aktywne zamówienie.
+
+🔑 Profil użytkownika (/api/user-profile/)
+GET /api/user-profile/ – Pobiera dane profilu użytkownika.
+PATCH /api/user-profile/ – Aktualizuje dane użytkownika.
+
+📦 Zarządzanie stanem magazynowym (/api/update-stock/)
+POST /api/update-stock/ – Aktualizuje stan magazynowy produktów po zakupie.
+
+📍 Zarządzanie adresami (/api/addresses/)
+GET /api/addresses/ – Pobiera zapisane adresy użytkownika.
+POST /api/addresses/ – Dodaje nowy adres.
+PATCH /api/addresses/ – Aktualizuje adres użytkownika.
+DELETE /api/addresses/ – Usuwa zapisany adres użytkownika.

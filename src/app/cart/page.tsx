@@ -10,13 +10,15 @@ import TotalList from '@/components/TotalList'
 import { useRouter } from 'next/navigation'
 import useFetch from '@/hooks/useFetch'
 import Text from '@/components/ui/text'
+import ErrorMessage from '@/components/ui/ErrorMessage'
+import LoadingIndicator from '@/components/ui/LoadingIndicator'
 
 const CartPage = (): JSX.Element => {
    const [cartItems, setCartItems] = useState<Product[]>([])
    const [selectedItems, setSelectedItems] = useState<number[]>([])
    const [isSelectAllChecked, setIsSelectAllChecked] = useState(false)
    const [isNoteVisible, setIsNoteVisible] = useState<number | null>(null)
-   const { data, error, deleteData, patchData } = useFetch<Product[]>('/api/cart')
+   const { data, error, loading, deleteData, patchData } = useFetch<Product[]>('/api/cart')
    const router = useRouter()
 
    useEffect(() => {
@@ -86,10 +88,13 @@ const CartPage = (): JSX.Element => {
       router.push('/checkout')
    }
 
-   if (error) return <div className='text-center text-red-500'>Error loading cart: {error}</div>
+   if (loading) return <LoadingIndicator />
+   if (error) {
+      return <ErrorMessage sectionName='cart.' errorDetails={error} />
+   }
 
    return (
-      <div className='mx-auto flex max-w-[1440px] flex-col gap-y-8 px-4 pb-10 sm:px-6 md:px-10'>
+      <div className='mx-auto flex max-w-[1440px] flex-col gap-y-8 px-4 pb-10 sm:px-6 md:px-8 lg:px-10'>
          <Breadcrumb
             paths={[
                { name: 'Home', href: '/' },
@@ -117,7 +122,7 @@ const CartPage = (): JSX.Element => {
                </label>
             </div>
          )}
-         <div className='grid grid-cols-1 gap-x-12 lg:grid-cols-[3fr_1fr]'>
+         <div className='grid gap-x-6 sm:grid-rows-2 sm:gap-x-8 md:grid-rows-2 md:gap-x-10 lg:grid-cols-[3fr_1fr] lg:gap-x-12'>
             {/* Product List */}
             <ProductList
                items={cartItems.map(item => ({
@@ -141,8 +146,7 @@ const CartPage = (): JSX.Element => {
             />
 
             {/* Total */}
-            <div className='w-[423px]'>
-               {/* Total Product */}
+            <div className='w-full sm:w-[350px] md:w-[400px] lg:w-[423px]'>
                <Card className='rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-6'>
                   <CardHeader className='gap-0 px-0'>
                      <Text as='h2' variant='textLmedium' className='text-[var(--color-neutral-900)]'>

@@ -11,7 +11,7 @@ export async function GET() {
       }
 
       const randomIds = Array.from(
-         { length: Math.min(7, totalProducts) },
+         { length: Math.min(6, totalProducts) },
          () => Math.floor(Math.random() * totalProducts) + 1,
       )
 

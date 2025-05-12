@@ -1,5 +1,5 @@
 'use client'
-import React, { JSX, useEffect, useState } from 'react'
+import React, { JSX } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
@@ -100,7 +100,7 @@ const Header = (): JSX.Element => {
                   </div>
                ) : (
                   <Link href='/login'>
-                     <Button variant='fill' className="h-[54px]" asChild>
+                     <Button variant='fill' className='h-[54px]' asChild>
                         <button>Sign In</button>
                      </Button>
                   </Link>
