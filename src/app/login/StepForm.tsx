@@ -14,7 +14,7 @@ export const StepForm = <T extends FieldValues>({
    return (
       <Form {...form}>
          <form onSubmit={form.handleSubmit(handleSubmit)} className='flex flex-col gap-y-6'>
-            {fields.map(({ name, label, placeholder, type = 'text' }, index) => (
+            {fields.map(({ name, label, placeholder, isPassword, type = 'text' }, index) => (
                <FormField
                   key={index}
                   control={form.control}
@@ -28,6 +28,7 @@ export const StepForm = <T extends FieldValues>({
                               variant='custom'
                               state={form.formState.errors[name] ? 'error' : 'neutral'}
                               placeholder={placeholder}
+                              isPassword={isPassword}
                               {...field}
                               error={form.formState.errors[name]?.message?.toString()}
                            />

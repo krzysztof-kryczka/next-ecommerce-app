@@ -96,8 +96,8 @@ export default function ProductsPage() {
 
       if (JSON.stringify(filteredProducts) !== JSON.stringify(filtered)) {
          setFilteredProducts(filtered)
-         setTotalPages(Math.ceil(filtered.length / showPerPage))
       }
+      setTotalPages(Math.ceil(filtered.length / showPerPage))
    }, [
       brandIdParam,
       selectedCategories,

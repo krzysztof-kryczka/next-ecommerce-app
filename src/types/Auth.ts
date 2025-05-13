@@ -1,4 +1,3 @@
-import { Session } from 'next-auth'
 import { UseFormReturn, FieldValues, Path } from 'react-hook-form'
 
 export type StepEmailProps = {
@@ -26,35 +25,8 @@ export type StepFormProps<T extends FieldValues> = {
       name: Path<T>
       label: string
       placeholder: string
+      isPassword?: boolean
       type?: string
    }[]
    buttonLabel: string
-}
-
-export type CustomUser = {
-   id: string
-   email: string
-   savePassword?: boolean
-   name?: string
-   picture?: string
-}
-
-export type CustomToken = {
-   id?: string
-   email?: string | null
-   savePassword?: boolean
-   maxAge?: number
-   name?: string | null
-   picture?: string
-   encodedToken?: string
-}
-
-
-export type CustomSession = Session & {
-   user: {
-      id?: string
-      email?: string
-   }
-   accessToken?: string
-   maxAge?: number
 }

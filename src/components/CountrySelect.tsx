@@ -16,7 +16,7 @@ const CountrySelect = <T extends FieldValues>({
       <select
          {...field}
          id={name}
-         className={`w-full rounded-md border px-5 py-3.5 text-base text-[var(--color-base-white)] placeholder-[var(--color-neutral-300)] focus:border-[var(--color-warning-500)] ${errors?.[name] ? 'border-[var(--color-danger-500)]' : 'border-[var(--color-neutral-500)]'} ${className}`}
+         className={`w-full rounded-md border bg-[var(--color-base-gray)] px-5 py-3.5 text-base text-[var(--color-base-white)] placeholder-[var(--color-neutral-300)] focus:border-[var(--color-warning-500)] ${errors?.[name] ? 'border-[var(--color-danger-500)]' : 'border-[var(--color-neutral-500)]'} ${className}`}
       >
          <option value=''>Select country</option>
          {countryNames.map(country => (
@@ -29,4 +29,3 @@ const CountrySelect = <T extends FieldValues>({
 }
 
 export default CountrySelect
-

@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator'
 import { RegisterFormData } from '@/schema/registerSchema'
 import useFetch from '@/hooks/useFetch'
 import { JSX } from 'react'
+import Text from '@/components/ui/text'
 
 type RegisterResponse = {
    success: boolean
@@ -55,7 +56,17 @@ const RegisterPage = (): JSX.Element => {
                <RegisterForm onSubmit={onSubmit} />
             </CardContent>
             <CardFooter className='px-0 pt-4'>
-               Already have an account? <a href='/login'>Log in</a>
+               <Text as='p' variant='textMregular'>
+                  Already have an account?{' '}
+                  <Text
+                     as='a'
+                     variant='textMmedium'
+                     href='/login'
+                     className='text-[var(--color-neutral-900)] hover:underline'
+                  >
+                     Login
+                  </Text>
+               </Text>
             </CardFooter>
          </Card>
       </div>

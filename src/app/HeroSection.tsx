@@ -84,7 +84,7 @@ export default function CategoriesCarousel() {
                                             variant='stroke'
                                             size='XL'
                                             onClick={() => handleExploreCategory(category.id)}
-                                            className='mx-auto w-full gap-x-3.5 pr-[15px] sm:mx-0 sm:w-[211px]'
+                                            className='mx-auto w-full gap-x-3.5 pr-[15px] hover:bg-[var(--color-primary-600)] hover:text-white sm:mx-0 sm:w-[211px]'
                                          >
                                             <Text variant='textMmedium'>Explore Category</Text>
                                             <ArrowRightIcon className='!h-6 !w-6 stroke-[var(--color-primary-400)]' />

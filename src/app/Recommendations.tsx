@@ -1,12 +1,12 @@
 'use client'
 
 import ProductCard from '@/components/ProductCard'
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 import ErrorMessage from '@/components/ui/ErrorMessage'
 import LoadingIndicator from '@/components/ui/LoadingIndicator'
 import Text from '@/components/ui/text'
 import useFetch from '@/hooks/useFetch'
 import { Product } from '@/types/Product'
+import ScrollableList from '@/components/ScrollableList'
 import { JSX } from 'react'
 
 const Recommendations = (): JSX.Element => {
@@ -22,34 +22,22 @@ const Recommendations = (): JSX.Element => {
    if (error) return <ErrorMessage sectionName='recommendations.' errorDetails={error} />
 
    return (
-      <div className='px-10'>
-         <div className='flex flex-col gap-y-8'>
-            <Text as='h4' variant='h4mobileMedium' className='text-[var(--color-neutral-900)]'>
-               Recomendation
+      <ScrollableList title={'Recommendation'} containerClassName='justify-start' gapClassName='gap-7'>
+         {Array.isArray(recommendations) ? (
+            recommendations.map(product => (
+               <div
+                  key={product.id}
+                  className='h-[386px] w-[300px] flex-shrink-0 gap-7 '
+               >
+                  <ProductCard key={product.id} product={product} />
+               </div>
+            ))
+         ) : (
+            <Text as='p' variant='textMregular' className='text-center text-gray-500'>
+               No products available.
             </Text>
-
-            <Carousel className='w-full'>
-               <CarouselContent className='flex gap-x-10'>
-                  {Array.isArray(recommendations) ? (
-                     recommendations.map(product => (
-                        <CarouselItem
-                           key={product.id}
-                           className='xs:basis-[50%] flex-shrink-0 sm:basis-[42%] md:basis-[34%] lg:basis-[26%] xl:basis-[20%]'
-                        >
-                           <ProductCard product={product} />
-                        </CarouselItem>
-                     ))
-                  ) : (
-                     <Text as='p' variant='textMregular' className='text-center text-gray-500'>
-                        No products available.
-                     </Text>
-                  )}
-               </CarouselContent>
-               <CarouselPrevious className='absolute top-1/2 -left-15 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-gray-300 shadow hover:bg-gray-400 focus:outline-none' />
-               <CarouselNext className='absolute top-1/2 -right-15 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-gray-300 shadow hover:bg-gray-400 focus:outline-none' />
-            </Carousel>
-         </div>
-      </div>
+         )}
+      </ScrollableList>
    )
 }
 

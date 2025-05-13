@@ -21,7 +21,7 @@ const ProductCard = ({ product }: ProductCardProps): JSX.Element => {
    }, [product?.id, addToCart])
 
    return (
-      <div className='xs:h-[320px] xs:w-[250px] relative z-10 cursor-pointer overflow-hidden rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] sm:h-[340px] sm:w-[270px] md:h-[360px] md:w-[290px] lg:h-[386px] lg:w-[300px]'>
+      <div className='xs:h-[320px] xs:w-[250px] relative z-10 cursor-pointer overflow-hidden rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] transition-transform duration-300 hover:z-20 hover:scale-105 hover:brightness-75 sm:h-[340px] sm:w-[270px] md:h-[360px] md:w-[290px] lg:h-[386px] lg:w-[300px]'>
          <div
             onClick={handleAddToCart}
             className='absolute top-8 left-8 z-10 flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-base-gray)] hover:bg-[var(--color-blazeOrange-600)]'

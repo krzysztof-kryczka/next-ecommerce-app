@@ -45,7 +45,7 @@ const Categories = (): JSX.Element => {
                               query: { 'selected[]': [category.id] },
                            }}
                         >
-                           <Card className='w-full cursor-pointer gap-0 border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] px-6 py-6 text-[var(--color-base-white)] transition-transform duration-300 ease-in-out hover:scale-115 hover:shadow-lg sm:max-w-[422px] sm:px-8 sm:py-7 md:px-10 md:py-8 lg:px-[70px] lg:py-7'>
+                           <Card className='w-full cursor-pointer gap-0 border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] px-6 py-6 text-[var(--color-base-white)] transition-transform duration-300 ease-in-out hover:scale-115 hover:shadow-lg hover:brightness-150 sm:max-w-[422px] sm:px-8 sm:py-7 md:px-10 md:py-8 lg:px-[70px] lg:py-7'>
                               <CardHeader className='flex flex-col items-center gap-y-4 p-0 sm:gap-y-5 md:gap-y-6'>
                                  {categoryIcons[category.name] || <span className='text-gray-500'>No Icon</span>}
                                  <CardTitle>
