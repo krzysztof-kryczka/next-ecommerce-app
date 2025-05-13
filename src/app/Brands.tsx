@@ -30,7 +30,7 @@ const BrandList = (): JSX.Element => {
       checkOverflow()
       window.addEventListener('resize', checkOverflow)
       return () => window.removeEventListener('resize', checkOverflow)
-   }, [brands]
+   }, [brands])
 
    const handleScroll = () => {
       if (containerRef.current) {
