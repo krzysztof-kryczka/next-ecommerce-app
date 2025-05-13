@@ -1,68 +1,103 @@
 'use client'
 
+import { useState, useEffect, useRef, JSX } from 'react'
 import { useRouter } from 'next/navigation'
 import Text from '@/components/ui/text'
 import useFetch from '@/hooks/useFetch'
 import { Brand } from '@/types/Brand'
 import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import Image from 'next/image'
-import { JSX } from 'react'
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 import LoadingIndicator from '@/components/ui/LoadingIndicator'
 import ErrorMessage from '@/components/ui/ErrorMessage'
+import ArrowLeftIcon from '@/components/icons/ArrowLeftIcon'
+import ArrowRightIcon from '@/components/icons/ArrowRightIcon'
 
 const BrandList = (): JSX.Element => {
    const { data: brands, loading, error } = useFetch<Brand>('/api/brands', {}, false, true)
    const router = useRouter()
+   const [isExpanded, setIsExpanded] = useState(false)
+   const [isOverflowing, setIsOverflowing] = useState(false)
+   const containerRef = useRef<HTMLDivElement>(null)
+
+   useEffect(() => {
+      const checkOverflow = () => {
+         if (containerRef.current) {
+            const isOverflow = containerRef.current.scrollWidth > containerRef.current.clientWidth
+            setIsOverflowing(isOverflow)
+         }
+      }
+
+      checkOverflow()
+      window.addEventListener('resize', checkOverflow)
+      return () => window.removeEventListener('resize', checkOverflow)
+   }, [brands]
+
+   const handleScroll = () => {
+      if (containerRef.current) {
+         containerRef.current.scrollTo({
+            left: isExpanded ? 0 : containerRef.current.scrollWidth,
+            behavior: 'smooth',
+         })
+         setIsExpanded(!isExpanded)
+      }
+   }
 
    if (loading) return <LoadingIndicator />
    if (error) return <ErrorMessage sectionName='brands.' errorDetails={error} />
 
    return (
       <div className='sm:px-8 md:px-6 lg:px-10'>
-         <div className='flex flex-col gap-y-8 sm:gap-y-6 md:gap-y-5'>
+         <div className='flex flex-row items-center justify-between gap-y-8 sm:gap-y-6 md:gap-y-5'>
             <Text as='h4' variant='h4mobileMedium' className='text-[var(--color-neutral-900)]'>
-               Brands
+               Brand
             </Text>
-
-            <Carousel className='w-full'>
-               <CarouselContent className='flex gap-x-8'>
-                  {Array.isArray(brands) ? (
-                     brands.map(brand => (
-                        <CarouselItem
-                           key={brand.id}
-                           className='xs:basis-[40%] flex-shrink-0 py-5 sm:max-w-[160px] sm:basis-[32%] md:max-w-[180px] md:basis-[24%] lg:max-w-[220px] lg:basis-[18%] xl:basis-[16%]'
-                        >
-                           <Card
-                              className='flex cursor-pointer flex-col items-center justify-center gap-7 rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] px-0 py-[43px] shadow-md transition-transform duration-300 hover:scale-110 sm:h-[180px] sm:w-[160px] sm:gap-6 sm:py-[38px] md:h-[170px] md:w-[180px] md:gap-5 md:py-[35px] lg:h-[190px] lg:w-[220px]'
-                              onClick={() => router.push(`/products?brandId=${brand.id}`)}
-                           >
-                              <CardHeader className='flex w-full flex-col items-center justify-center'>
-                                 <Image
-                                    width={198}
-                                    height={46}
-                                    src={brand.logo}
-                                    alt={brand.name}
-                                    className='h-[46px] w-auto object-contain sm:h-[40px] sm:w-[140px] md:h-[36px] md:w-[160px]'
-                                 />
-                              </CardHeader>
-                              <CardContent className='px-0 text-center'>
-                                 <Text as='h6' variant='h6mobileMedium' className='text-[var(--color-neutral-900)]'>
-                                    {brand.name}
-                                 </Text>
-                              </CardContent>
-                           </Card>
-                        </CarouselItem>
-                     ))
+            {isOverflowing && (
+               <button
+                  onClick={handleScroll}
+                  className='flex items-center gap-x-2 text-sm font-semibold text-[var(--color-primary-400)] hover:underline'
+               >
+                  {isExpanded ? (
+                     <>
+                        See Less <ArrowLeftIcon className='h-6 w-6 stroke-[var(--color-primary-400)]' />
+                     </>
                   ) : (
-                     <Text as='p' variant='textMregular' className='text-center text-gray-500'>
-                        No brands available.
-                     </Text>
+                     <>
+                        See All <ArrowRightIcon className='h-6 w-6 stroke-[var(--color-primary-400)]' />
+                     </>
                   )}
-               </CarouselContent>
-               <CarouselPrevious className='absolute top-1/2 -left-15 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-gray-300 shadow hover:bg-gray-400 focus:outline-none' />
-               <CarouselNext className='absolute top-1/2 -right-15 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-gray-300 shadow hover:bg-gray-400 focus:outline-none' />
-            </Carousel>
+               </button>
+            )}
+         </div>
+
+         <div ref={containerRef} className='flex gap-8 overflow-hidden scroll-smooth py-4'>
+            {Array.isArray(brands) ? (
+               brands.map(brand => (
+                  <Card
+                     key={brand.id}
+                     className='flex h-[190px] w-[220px] cursor-pointer flex-col items-center justify-between rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] px-[69px] py-[43px] shadow-md transition-transform duration-300 hover:scale-110'
+                     onClick={() => router.push(`/products?brandId=${brand.id}`)}
+                  >
+                     <CardHeader className='flex h-[46px] w-full items-center justify-center'>
+                        <Image
+                           width={220}
+                           height={190}
+                           src={brand.logo}
+                           alt={brand.name}
+                           className='h-full w-full object-contain'
+                        />
+                     </CardHeader>
+                     <CardContent className='mt-4 flex w-full items-center justify-center'>
+                        <Text as='h6' variant='h6mobileMedium' className='text-[var(--color-neutral-900)]'>
+                           {brand.name}
+                        </Text>
+                     </CardContent>
+                  </Card>
+               ))
+            ) : (
+               <Text as='p' variant='textMregular' className='text-center text-gray-500'>
+                  No brands available.
+               </Text>
+            )}
          </div>
       </div>
    )

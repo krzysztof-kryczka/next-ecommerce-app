@@ -1,6 +1,7 @@
 import { JSX } from 'react'
-import PlusSmallIcon from './icons/PlusSmallIcon'
 import { CategoryListProps } from '@/types/CategoryListProps'
+import MinusIcon from './icons/MinusIcon'
+import PlusIcon from './icons/PlusIcon'
 
 const CategoryList = ({
    selectedCategories,
@@ -74,19 +75,15 @@ const CategoryList = ({
          </ul>
 
          {/* Load More */}
-         {visibleCategories < categories.length && (
-            <div className='py-5'>
-               <p
-                  onClick={() => setVisibleCategories(categories.length)}
-                  className='flex cursor-pointer items-center text-xl font-semibold text-[var(--color-neutral-900)]'
-               >
-                  Load More
-                  <span className='pl-3.5'>
-                     <PlusSmallIcon />
-                  </span>
-               </p>
-            </div>
-         )}
+         <div className='py-5'>
+            <p
+               onClick={() => setVisibleCategories(prev => (prev === categories.length ? 4 : categories.length))}
+               className='flex cursor-pointer items-center text-xl font-semibold text-[var(--color-neutral-900)]'
+            >
+               {visibleCategories === categories.length ? 'Load Less' : 'Load More'}
+               <span className='pl-3.5'>{visibleCategories === categories.length ? <MinusIcon /> : <PlusIcon />}</span>
+            </p>
+         </div>
       </div>
    )
 }
