@@ -10,13 +10,13 @@ export async function GET() {
          return NextResponse.json({ success: true, data: [] }, { status: 200 })
       }
 
-      const randomIds = Array.from(
-         { length: Math.min(6, totalProducts) },
-         () => Math.floor(Math.random() * totalProducts) + 1,
-      )
+      const randomIds = new Set<number>()
+      while (randomIds.size < Math.min(6, totalProducts)) {
+         randomIds.add(Math.floor(Math.random() * totalProducts) + 1)
+      }
 
       const recommendations = await prisma.product.findMany({
-         where: { id: { in: randomIds } },
+         where: { id: { in: Array.from(randomIds) } },
          select: {
             id: true,
             name: true,
