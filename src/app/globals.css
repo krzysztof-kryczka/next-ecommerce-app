@@ -1,26 +1,234 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+@theme {
+   --font-geist-sans: 'Inter', sans-serif;
+   --font-geist-mono: 'Fira Code', monospace;
+   --color-background: var(--background);
+   --color-foreground: var(--foreground);
+
+   --color-gray-50: #222327; /* */
+   --color-gray-100: #edeef1;
+   --color-gray-200: #d8dbdf;
+   --color-gray-300: #b6bac3;
+   --color-gray-400: #616674; /* */
+   --color-gray-500: #6b7280;
+   --color-gray-600: #4a4e5a;
+   --color-gray-700: #40444c;
+   --color-gray-800: #383b42; /* */
+   --color-gray-900: #25272c;
+
+   --color-neutral-50: #f6f6f6;
+   --color-neutral-100: #e7e7e7; /* */
+   --color-neutral-200: #d1d1d1;
+   --color-neutral-300: #b0b0b0; /* */
+   --color-neutral-400: #888888;
+   --color-neutral-500: #737373;
+   --color-neutral-600: #5d5d5d;
+   --color-neutral-700: #4f4f4f;
+   --color-neutral-800: #454545;
+   --color-neutral-900: #fcfcfc; /* */
+
+   --color-primary-50: #fef7ee;
+   --color-primary-100: #fdedd7; /* */
+   --color-primary-200: #fad6ae;
+   --color-primary-300: #f7b87a;
+   --color-primary-400: #f29145; /* */
+   --color-primary-500: #ee701d;
+   --color-primary-600: #e05816;
+   --color-primary-700: #b94315; /* */
+   --color-primary-800: #943518;
+   --color-primary-900: #40150a;
+
+   --color-success-50: #295b40; /* #f0fdf5; */
+   --color-success-100: #dcfce8;
+   --color-success-200: #bbf7d1;
+   --color-success-300: #86efad;
+   --color-success-400: #4ade80;
+   --color-success-500: #22c55e;
+   --color-success-600: #16a34a;
+   --color-success-700: #15803c;
+   --color-success-800: #14532b;
+   --color-success-900: #052e14;
+
+   --color-warning-50: #fef9e8;
+   --color-warning-100: #fef0c3;
+   --color-warning-200: #fee28a;
+   --color-warning-300: #fdd147;
+   --color-warning-400: #fac215;
+   --color-warning-500: #eab308;
+   --color-warning-600: #ca9a04;
+   --color-warning-700: #a17c07;
+   --color-warning-800: #85680e;
+   --color-warning-900: #423306;
+
+   --color-danger-50: #842626; /* #fef2f2; */
+   --color-danger-100: #fee2e2;
+   --color-danger-200: #fecaca;
+   --color-danger-300: #fca5a5;
+   --color-danger-400: #f87171; /* */
+   --color-danger-500: #ef4444;
+   --color-danger-600: #dc2626;
+   --color-danger-700: #b91c1c;
+   --color-danger-800: #7f1d1d;
+   --color-danger-900: #450a0a;
+
+   --color-base-white: #ffffff;
+   --color-base-white2: #fdfdfd;
+   --color-base-alabaster: #fbfbfb;
+   --color-base-shark: #232227;
+   --color-base-woodsmoke: #141316;
+   --color-base-black: #000000;
+   --color-base-gray: #262626;
+
+   --color-violet-50: #f2ebfe;
+   --color-violet-100: #d8c0fb;
+   --color-violet-200: #c5a1f9;
+   --color-violet-300: #ab76f6;
+   --color-violet-400: #9a5cf4;
+   --color-violet-500: #8133f1;
+   --color-violet-600: #752edb;
+   --color-violet-700: #5c24ab;
+   --color-violet-800: #471c85;
+   --color-violet-900: #361565;
+
+   --color-brown-50: #f0ede7;
+   --color-brown-100: #d1c6b4;
+   --color-brown-200: #baaa8f;
+   --color-brown-300: #9b845c;
+   --color-brown-400: #886c3d;
+   --color-brown-500: #6a470c;
+   --color-brown-600: #60410b;
+   --color-brown-700: #4b3209;
+   --color-brown-800: #3a2707;
+   --color-brown-900: #2d1e05;
+
+   --color-blueGreen-50: #eef9fa;
+   --color-blueGreen-100: #ccecee;
+   --color-blueGreen-200: #b3e3e6;
+   --color-blueGreen-300: #90d7da;
+   --color-blueGreen-400: #7acfd3;
+   --color-blueGreen-500: #59c3c8;
+   --color-blueGreen-600: #51b1b6;
+   --color-blueGreen-700: #3f8a8e;
+   --color-blueGreen-800: #316b6e;
+   --color-blueGreen-900: #255254;
+
+   --color-blue-50: #e8f2ff;
+   --color-blue-100: #b6d6ff;
+   --color-blue-200: #93c2ff;
+   --color-blue-300: #62a7ff;
+   --color-blue-400: #4495ff;
+   --color-blue-500: #157bff;
+   --color-blue-600: #1370e8;
+   --color-blue-700: #0f57b5;
+   --color-blue-800: #0c448c;
+   --color-blue-900: #09346b;
+
+   --color-greenEvergladee-50: #e9edeb;
+   --color-greenEvergladee-100: #bac7bf;
+   --color-greenEvergladee-200: #99aba1;
+   --color-greenEvergladee-300: #6a8576;
+   --color-greenEvergladee-400: #4d6d5b;
+   --color-greenEvergladee-500: #214932;
+   --color-greenEvergladee-600: #1e422e;
+   --color-greenEvergladee-700: #173424;
+   --color-greenEvergladee-800: #12281c;
+   --color-greenEvergladee-900: #0e1f15;
+
+   --color-blazeOrange-50: #fff0e7;
+   --color-blazeOrange-100: #fed1b3;
+   --color-blazeOrange-200: #febb8f;
+   --color-blazeOrange-300: #fd9c5c;
+   --color-blazeOrange-400: #fd893c;
+   --color-blazeOrange-500: #fc6b0b;
+   --color-blazeOrange-600: #e5610a; /* */
+   --color-blazeOrange-700: #b34c08;
+   --color-blazeOrange-800: #8b3b06;
+   --color-blazeOrange-900: #6a2d05;  /* */
+}
+
+@layer utilities {
+}
+
+.toast-success {
+   background-color: #4caf50 !important;
+   color: #fff !important;
+}
+
+.toast-error {
+   background-color: #f44336 !important;
+   color: #fff !important;
+}
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+   --background: #ffffff;
+   --foreground: #1a1a1a;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+   --color-background: var(--background);
+   --color-foreground: var(--foreground);
+   --font-sans: var(--font-geist-sans);
+   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+   :root {
+      --background: #1a1a1a;
+      --foreground: #fcfcfc;
+   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+   background: var(--background);
+   color: var(--foreground);
+}
+
+:focus-visible {
+   outline: none;
+}
+
+/* Style podstawowe dla kontenera */
+.modal-order-service-checkbox {
+   position: relative;
+   display: inline-block;
+   top: 7px;
+}
+
+/* Styl domyślny dla checkmarka */
+.checkmark {
+   position: absolute;
+   width: 26px;
+   height: 26px;
+   background-color: var(--color-gray-50); /* Kolor tła nieznaczony */
+   border: 2px solid var(--color-gray-400); /* Obramowanie nieznaczone */
+   border-radius: 6px; /* Zaokrąglenie */
+   cursor: pointer;
+   transition:
+      background-color 0.2s,
+      border-color 0.2s; /* Płynna animacja */
+}
+
+/* Stan checked */
+.modal-order-service-checkbox input:checked ~ .checkmark {
+   background-color: var(--color-primary-400); /* Kolor tła zaznaczony */
+   border-color: var(--color-primary-400); /* Obramowanie zaznaczone */
+}
+
+/* Styl fajeczki */
+.checkmark:after {
+   content: '';
+   position: absolute;
+   display: none; /* Ukryj w stanie nieznaczonym */
+}
+
+/* Styl dla fajeczki w stanie checked */
+.modal-order-service-checkbox input:checked ~ .checkmark:after {
+   display: block; /* Pokaż fajeczkę */
+   content: '✓'; /* Możesz zmienić na inną ikonę */
+   color: black; /* Kolor fajeczki */
+   font-size: 24px; /* Rozmiar fajeczki */
+   font-weight: 900; /* Waga tekstu */
+   left: 3px; /* Pozycjonowanie */
+   top: -8px; /* Pozycjonowanie */
 }
