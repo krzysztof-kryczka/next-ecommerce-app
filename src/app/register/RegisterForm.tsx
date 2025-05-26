@@ -11,6 +11,7 @@ import { JSX } from 'react'
 const RegisterForm = ({ onSubmit }: RegisterFormProps): JSX.Element => {
    const form = useForm<RegisterFormData>({
       resolver: zodResolver(registerSchema),
+      mode: 'onChange',
       defaultValues: { email: '', phone: '', password: '', repeatPassword: '', country: '', terms: false },
    })
 
@@ -76,6 +77,10 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps): JSX.Element => {
                            isPassword
                            {...field}
                            error={errors.password?.message}
+                           onChange={e => {
+                              field.onChange(e)
+                              form.trigger('repeatPassword')
+                           }}
                         />
                      </FormControl>
                      <FormDescription className='pt-2'>
@@ -101,6 +106,10 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps): JSX.Element => {
                            isPassword
                            {...field}
                            error={errors.repeatPassword?.message}
+                           onChange={e => {
+                              field.onChange(e)
+                              form.trigger('password')
+                           }}
                         />
                      </FormControl>
                   </FormItem>
