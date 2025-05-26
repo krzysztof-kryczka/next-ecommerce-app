@@ -2,11 +2,11 @@ import { JSX } from 'react'
 import { StepForm } from './StepForm'
 import { StepEmailProps } from '@/types/Auth'
 
-export const StepEmail = ({ form, handleCheckUser }: StepEmailProps): JSX.Element => {
+export const StepEmail = ({ form, handleNextStep }: StepEmailProps): JSX.Element => {
    return (
       <StepForm
          form={form}
-         handleSubmit={handleCheckUser}
+         handleSubmit={handleNextStep}
          fields={[
             {
                name: 'emailOrPhone',

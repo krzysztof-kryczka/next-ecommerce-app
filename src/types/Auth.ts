@@ -2,8 +2,9 @@ import { UseFormReturn, FieldValues, Path } from 'react-hook-form'
 
 export type StepEmailProps = {
    form: UseFormReturn<{ emailOrPhone: string }>
-   handleCheckUser: (data: { emailOrPhone: string }) => void
+   handleNextStep: (data: { emailOrPhone: string }) => void
 }
+
 
 export type StepPasswordProps = {
    form: UseFormReturn<{ password: string }>
