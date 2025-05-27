@@ -18,6 +18,8 @@ import { useCurrency } from '@/context/CurrencyContext'
 import { PriceRange as PriceRangeType } from '@/types/PriceRange'
 import ErrorMessage from '@/components/ui/ErrorMessage'
 import LoadingIndicator from '@/components/ui/LoadingIndicator'
+import { Brand } from '@/types/Brand'
+import BrandList from '@/components/BrandList'
 
 export default function ProductsPage() {
    const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
@@ -27,14 +29,21 @@ export default function ProductsPage() {
    const [currentPage, setCurrentPage] = useState<number>(1)
    const [totalPages, setTotalPages] = useState<number>(1)
    const [isProductOpen, setIsProductOpen] = useState<boolean>(true)
+   const [isBrandOpen, setIsBrandOpen] = useState<boolean>(true)
    const [isPriceOpen, setIsPriceOpen] = useState<boolean>(true)
    const [visibleCategories, setVisibleCategories] = useState<number>(4)
    const [selectedCategories, setSelectedCategories] = useState<number[]>([])
    const { categories, loading: categoriesLoading } = useCategories()
    const searchParams = useSearchParams()
    // const selectedParam = searchParams?.getAll('selected[]') || []
-   const brandIdParam = searchParams?.get('brandId')
+   //const brandIdParam = searchParams?.get('brandId')
+   const [brandIdParam, setBrandIdParam] = useState<number | null>(
+      searchParams?.get('brandId') ? parseInt(searchParams.get('brandId')!, 10) : null,
+   )
+   const [visibleBrands, setVisibleBrands] = useState<number>(5)
+
    const { currency, convertCurrency } = useCurrency()
+   const { data: brands, loading: brandsLoading, error: brandsError } = useFetch<Brand>('/api/brands', {}, false, true)
    const {
       data: response,
       loading,
@@ -69,7 +78,7 @@ export default function ProductsPage() {
       let filtered = [...products]
 
       if (brandIdParam) {
-         const brandId = parseInt(brandIdParam, 10)
+         const brandId = Number(brandIdParam)
          if (!isNaN(brandId)) {
             filtered = filtered.filter(product => product.brandId === brandId)
          }
@@ -150,6 +159,11 @@ export default function ProductsPage() {
       [setSortBy, setCurrentPage],
    )
 
+   const handleBrandChange = (brandId: number | null) => {
+      setBrandIdParam(brandId)
+      window.history.replaceState(null, '', brandId ? `/products?brandId=${brandId}` : '/products')
+   }
+
    return (
       <div className='px-6 sm:px-8 md:px-10'>
          <ResizablePanelGroup
@@ -172,6 +186,29 @@ export default function ProductsPage() {
                      visibleCategories={visibleCategories}
                      setVisibleCategories={setVisibleCategories}
                   />
+               )}
+
+               <DropdownSection title='Brand' isOpen={isBrandOpen} onToggle={() => setIsBrandOpen(!isBrandOpen)} />
+
+               {isBrandOpen && (
+                  <>
+                     {brandsLoading ? (
+                        <LoadingIndicator />
+                     ) : brandsError ? (
+                        <ErrorMessage sectionName='brands' errorDetails={brandsError} />
+                     ) : Array.isArray(brands) && brands.length > 0 ? (
+                        <BrandList
+                           selectedBrand={brandIdParam}
+                           setSelectedBrand={handleBrandChange}
+                           brands={brands}
+                           setCurrentPage={setCurrentPage}
+                           visibleBrands={visibleBrands}
+                           setVisibleBrands={setVisibleBrands}
+                        />
+                     ) : (
+                        <p className='text-center text-lg font-semibold text-red-500'>No brands available.</p>
+                     )}
+                  </>
                )}
 
                <div className='mt-10'>
