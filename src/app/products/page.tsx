@@ -20,6 +20,7 @@ import ErrorMessage from '@/components/ui/ErrorMessage'
 import LoadingIndicator from '@/components/ui/LoadingIndicator'
 import { Brand } from '@/types/Brand'
 import BrandList from '@/components/BrandList'
+import Text from '@/components/ui/text'
 
 export default function ProductsPage() {
    const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
@@ -75,6 +76,17 @@ export default function ProductsPage() {
    useEffect(() => {
       if (!products || loading) return
 
+      const minPriceUSD = priceRange.min ? Number(convertCurrency(priceRange.min, currency, 'USD')) || 0 : 0
+      const maxPriceUSD = priceRange.max
+         ? Number(convertCurrency(priceRange.max, currency, 'USD')) || Number.MAX_SAFE_INTEGER
+         : Number.MAX_SAFE_INTEGER
+
+      if (minPriceUSD >= maxPriceUSD || maxPriceUSD <= minPriceUSD) {
+         setFilteredProducts([])
+         setTotalPages(0)
+         return
+      }
+
       let filtered = [...products]
 
       if (brandIdParam) {
@@ -84,11 +96,8 @@ export default function ProductsPage() {
          }
       }
 
-      const minPriceUSD = priceRange.min ? convertCurrency(priceRange.min, currency, 'USD') : 0
-      const maxPriceUSD = priceRange.max ? convertCurrency(priceRange.max, currency, 'USD') : Number.MAX_SAFE_INTEGER
-
       filtered = filtered.filter(
-         product => Number(product.price) >= Number(minPriceUSD) && Number(product.price) <= Number(maxPriceUSD),
+         product => Number(product.price) >= minPriceUSD && Number(product.price) <= maxPriceUSD,
       )
 
       if (selectedCategories.length > 0) {
@@ -103,20 +112,18 @@ export default function ProductsPage() {
          filtered = filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       }
 
-      if (JSON.stringify(filteredProducts) !== JSON.stringify(filtered)) {
-         setFilteredProducts(filtered)
-      }
+      setFilteredProducts(filtered)
       setTotalPages(Math.ceil(filtered.length / showPerPage))
    }, [
       brandIdParam,
       selectedCategories,
-      priceRange,
+      priceRange.min,
+      priceRange.max,
       sortBy,
       products,
       showPerPage,
       currency,
       convertCurrency,
-      filteredProducts,
       loading,
    ])
 
@@ -247,6 +254,20 @@ export default function ProductsPage() {
                      <ErrorMessage sectionName='products.' errorDetails={error} />
                   ) : loading || categoriesLoading ? (
                      <LoadingIndicator />
+                  ) : parseFloat(priceRange.min) >= parseFloat(priceRange.max) ||
+                    parseFloat(priceRange.max) <= parseFloat(priceRange.min) ? (
+                     <div className='flex min-h-[50vh] items-center justify-center'>
+                        <p className='text-center text-lg font-semibold text-red-500'></p>
+                        <Text as='p' variant='textLregular' className='text-[var(--color-danger-700)]'>
+                           ⚠️ Invalid price range. Please adjust your filters!!!
+                        </Text>
+                     </div>
+                  ) : filteredProducts.length === 0 ? (
+                     <div className='flex min-h-[50vh] items-center justify-center'>
+                        <Text as='p' variant='textLregular' className='text-[var(--color-danger-700)]'>
+                           No products found in the selected price range. Try adjusting your filters!
+                        </Text>
+                     </div>
                   ) : (
                      <div className='xs:grid-cols-1 grid gap-x-6 gap-y-8 px-6 sm:grid-cols-1 sm:gap-x-8 sm:px-8 md:grid-cols-2 md:gap-x-10 md:px-10 lg:grid-cols-3 xl:grid-cols-3'>
                         {paginatedProducts.map(product => (
