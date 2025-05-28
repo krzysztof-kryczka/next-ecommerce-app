@@ -114,6 +114,7 @@ export default function ProductsPage() {
 
       setFilteredProducts(filtered)
       setTotalPages(Math.ceil(filtered.length / showPerPage))
+      setCurrentPage(1)
    }, [
       brandIdParam,
       selectedCategories,
@@ -276,12 +277,14 @@ export default function ProductsPage() {
                      </div>
                   )}
 
-                  <Pagination
-                     currentPage={currentPage}
-                     totalPages={totalPages}
-                     setCurrentPage={setCurrentPage}
-                     getPaginationButtons={getPaginationButtons}
-                  />
+                  {totalPages > 1 && (
+                     <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        setCurrentPage={setCurrentPage}
+                        getPaginationButtons={getPaginationButtons}
+                     />
+                  )}
                </div>
             </ResizablePanel>
          </ResizablePanelGroup>

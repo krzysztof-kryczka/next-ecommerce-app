@@ -1,4 +1,4 @@
-import { JSX, useCallback } from 'react'
+import { JSX } from 'react'
 import {
    Pagination as PaginationUI,
    PaginationContent,
@@ -17,13 +17,23 @@ const Pagination = ({
    setCurrentPage,
    getPaginationButtons,
 }: PaginationProps): JSX.Element => {
-   const handlePrevPage = useCallback(() => {
-      setCurrentPage(prev => Math.max(prev - 1, 1))
-   }, [setCurrentPage])
+   const handlePrevPage = () => {
+      scrollToTop()
+      setTimeout(() => {
+         setCurrentPage(prev => Math.max(prev - 1, 1))
+      }, 1000)
+   }
 
-   const handleNextPage = useCallback(() => {
-      setCurrentPage(prev => Math.min(prev + 1, totalPages))
-   }, [setCurrentPage, totalPages])
+   const handleNextPage = () => {
+      scrollToTop()
+      setTimeout(() => {
+         setCurrentPage(prev => Math.min(prev + 1, totalPages))
+      }, 1000)
+   }
+
+   const scrollToTop = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+   }
 
    return (
       <div className='mt-2 flex items-center justify-between p-10'>
@@ -40,7 +50,11 @@ const Pagination = ({
                         <PaginationItem key={`page-${page}-${index}`}>
                            <PaginationLink
                               href='#'
-                              onClick={() => setCurrentPage(Number(page))}
+                              onClick={e => {
+                                 e.preventDefault()
+                                 setCurrentPage(Number(page))
+                                 scrollToTop()
+                              }}
                               className={`rounded-md px-[17px] py-[9px] text-base font-medium text-[var(--color-neutral-300)] ${
                                  currentPage === page
                                     ? 'bg-[var(--color-primary-400)] text-[var(--color-base-gray)]'
@@ -62,15 +76,19 @@ const Pagination = ({
                <PaginationContent>
                   <Button
                      variant='stroke'
+                     aria-label='Go to previous page'
                      className='border-[var(--color-neutral-900)] text-[var(--color-neutral-900)] hover:bg-gray-100'
                      onClick={handlePrevPage}
+                     disabled={currentPage === 1}
                   >
                      <ArrowLeftIcon /> Previous
                   </Button>
                   <Button
                      variant='stroke'
+                     aria-label='Go to next page'
                      className='border-[var(--color-neutral-900)] text-[var(--color-neutral-900)] hover:bg-gray-100'
                      onClick={handleNextPage}
+                     disabled={currentPage === totalPages}
                   >
                      Next <ArrowRightIcon />
                   </Button>
