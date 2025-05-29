@@ -17,11 +17,13 @@ const QuantityPicker = ({
          button: 'h-5 w-5',
          container: 'px-[25px] py-3 w-[132px] h-[44px]',
          text: 'text-[14px]',
+         input: 'w-[18px] h-[24px] text-center text-sm leading-6 text-sm leading-5',
       },
       lg: {
          button: 'h-6 w-6',
          container: 'px-6 py-[15px] w-[142px] h-[54px]',
          text: 'text-lg',
+         input: 'w-[28px] h-[26px] text-center text-base leading-[26px] font-medium tracking-normal ',
       },
    }
 
@@ -31,6 +33,39 @@ const QuantityPicker = ({
 
    const increaseQuantity = useCallback(() => {
       if (quantity < stock) setQuantity(quantity + 1)
+   }, [quantity, stock, setQuantity])
+
+   const handleInputChange = useCallback(
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+         const value = event.target.value
+
+         // Allow temporary empty value so the user can type a new number
+         if (value === '') {
+            setQuantity(Number(value))
+            return
+         }
+
+         const parsedValue = parseInt(value, 10)
+
+         // Validate if the value is a number and within the allowed range
+         if (!isNaN(parsedValue) && parsedValue >= 1) {
+            setQuantity(parsedValue)
+         }
+      },
+      [setQuantity],
+   )
+
+   const handleBlur = useCallback(() => {
+      // If the user leaves the field empty, set it to 1
+      if (!quantity) {
+         setQuantity(1)
+         return
+      }
+
+      // If the entered quantity exceeds stock, adjust to available stock
+      if (quantity > stock) {
+         setQuantity(stock)
+      }
    }, [quantity, stock, setQuantity])
 
    return (
@@ -53,7 +88,14 @@ const QuantityPicker = ({
                >
                   <MinusIcon />
                </div>
-               <span className={`${sizes[size].text} font-medium text-[var(--color-neutral-900)]`}>{quantity}</span>
+               <input
+                  value={quantity}
+                  onChange={handleInputChange}
+                  onBlur={handleBlur}
+                  className={`border-none bg-transparent ${sizes[size].input}`}
+                  min={1}
+                  max={stock}
+               />
                <div
                   onClick={quantity < stock ? increaseQuantity : undefined}
                   className={`flex items-center justify-center ${sizes[size].button} ${
