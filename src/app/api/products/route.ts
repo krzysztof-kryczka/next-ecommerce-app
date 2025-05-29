@@ -13,6 +13,13 @@ export async function GET() {
             imageUrl: true,
             createdAt: true,
             brandId: true,
+            variants: {
+               select: {
+                  id: true,
+                  color: true,
+                  stock: true,
+               },
+            },
          },
       })
 

@@ -21,11 +21,7 @@ const LoginPage = (): JSX.Element => {
    const [isSavePasswordChecked, setIsSavePasswordChecked] = useState(false)
    const { status } = useSession()
    const router = useRouter()
-   const { postData, error, setError, loading } = useFetch<{ success: boolean; message: string }>(
-      '/api/login',
-      {},
-      true,
-   )
+   const { postData, setError, loading } = useFetch<{ success: boolean; message: string }>('/api/login', {}, true)
 
    useEffect(() => {
       if (status === 'authenticated') {

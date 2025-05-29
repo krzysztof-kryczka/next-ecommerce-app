@@ -19,11 +19,12 @@ import { Product } from '@/types/Product'
 import Image from 'next/image'
 import ErrorMessage from '@/components/ui/ErrorMessage'
 import LoadingIndicator from '@/components/ui/LoadingIndicator'
+import { toast } from 'react-toastify'
 
 const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
    const [quantity, setQuantity] = useState<number>(1)
    const [productId, setProductId] = useState<string | null>(null)
-   const [selectedColor, setSelectedColor] = useState<string>('White')
+   const [selectedColor, setSelectedColor] = useState<string>('')
    const [stock, setStock] = useState(0)
    const [isFullTextVisible, setIsFullTextVisible] = useState(false)
    const [mainImage, setMainImage] = useState<string>('')
@@ -62,16 +63,32 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
    }, [params])
 
    useEffect(() => {
-      // console.log('Details product:', product)
+      if (product && product.variants?.length > 0 && selectedColor === '') {
+         setSelectedColor(product.variants[0].color)
+      }
+   }, [product]) // tylko przy pierwszym wczytaniu produktu ustawiamy domyślny kolor
+
+   useEffect(() => {
       if (product) {
-         setStock(product.stock)
+         setStock(product.variants?.find(v => v.color === selectedColor)?.stock || 0)
+         setQuantity(prevQuantity =>
+            Math.min(prevQuantity, product.variants?.find(v => v.color === selectedColor)?.stock || 1),
+         )
          setMainImage(product.imageUrl[0])
       }
-   }, [product])
+   }, [product, selectedColor])
 
    const handleAddToCart = () => {
       if (product) {
-         addToCart(product.id, quantity)
+         console.log('Product Variants:', product.variants)
+         console.log('Selected Color:', selectedColor)
+         const selectedVariant = product.variants?.find(v => v.color === selectedColor)
+         if (!selectedVariant) {
+            toast.error('Invalid product variant selected.')
+            return
+         }
+          console.log('selectedVariant', selectedVariant)
+         // addToCart(product.id, quantity)
       }
    }
 
@@ -194,10 +211,9 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
             <Card className='max-h-[470px] w-full rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-4 text-[var(--color-base-white)] sm:max-w-[422px] sm:p-6'>
                <CardContent className='flex flex-col gap-y-6 px-0 sm:gap-y-8'>
                   <ColorPicker
-                     colors={[
-                        { name: 'White', value: 'bg-[var(--color-neutral-900)]' },
-                        { name: 'Gray', value: 'bg-[var(--color-gray-800)]' },
-                     ]}
+                     colors={product.variants.map(variant => ({
+                        name: variant.color,
+                     }))}
                      selectedColor={selectedColor}
                      setSelectedColor={setSelectedColor}
                   />
@@ -208,7 +224,7 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                      size='XXL'
                      className='flex h-[54px] w-full items-center gap-2 text-xs sm:text-sm'
                      onClick={handleAddToCart}
-                     disabled={loading}
+                     disabled={loading || stock === 0 || quantity === 0}
                   >
                      <Text as='span' variant='textMmedium'>
                         {loading ? 'Adding...' : 'Add to Cart'}

@@ -19,10 +19,16 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
             name: true,
             price: true,
             categoryId: true,
-            stock: true,
             imageUrl: true,
             description: true,
             createdAt: true,
+            variants: {
+               select: {
+                  id: true,
+                  color: true,
+                  stock: true,
+               },
+            },
          },
       })
 
