@@ -17,7 +17,8 @@ const ProductCard = ({ product }: ProductCardProps): JSX.Element => {
    const { currency, convertCurrency, currencySymbols } = useCurrency()
 
    const handleAddToCart = useCallback(() => {
-      addToCart(product.id, 1)
+      const firstVariant = product.variants[0]
+      addToCart(product.id, 1, firstVariant.id)
    }, [product?.id, addToCart])
 
    return (

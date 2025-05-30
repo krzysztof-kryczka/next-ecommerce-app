@@ -20,9 +20,15 @@ export async function POST(req: Request) {
                         id: true,
                         name: true,
                         price: true,
-                        stock: true,
                         imageUrl: true,
                         category: { select: { name: true } },
+                     },
+                  },
+                  variant: {
+                     select: {
+                        id: true,
+                        stock: true,
+                        color: true,
                      },
                   },
                },
@@ -45,16 +51,17 @@ export async function POST(req: Request) {
             throw new Error(`💰 Price mismatch for product ID ${item.id}`)
          }
 
-         if (cartItem.product.stock < item.quantity) {
+         if (!cartItem.variant || cartItem.variant.stock < item.quantity) {
             throw new Error(`⚠️ Insufficient stock for product ID ${item.id}`)
          }
 
          return {
             id: cartItem.product.id,
+            variantId: cartItem.variant.id,
             name: cartItem.product.name,
             price: cartItem.product.price,
             quantity: item.quantity,
-            stock: cartItem.product.stock,
+            stock: cartItem.variant?.stock,
             imageUrl: cartItem.product.imageUrl[0],
             categoryName: cartItem.product.category.name,
          }

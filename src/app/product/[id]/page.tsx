@@ -80,15 +80,15 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
    const handleAddToCart = () => {
       if (product) {
-         console.log('Product Variants:', product.variants)
-         console.log('Selected Color:', selectedColor)
+         // console.log('Product Variants:', product.variants)
+         // console.log('Selected Color:', selectedColor)
          const selectedVariant = product.variants?.find(v => v.color === selectedColor)
          if (!selectedVariant) {
             toast.error('Invalid product variant selected.')
             return
          }
-          console.log('selectedVariant', selectedVariant)
-         // addToCart(product.id, quantity)
+         console.log('selectedVariant', selectedVariant)
+         addToCart(product.id, quantity, selectedVariant.id)
       }
    }
 

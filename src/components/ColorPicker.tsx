@@ -17,8 +17,8 @@ const tailwindColorMap: Record<string, string> = {
 }
 
 const ColorPicker = ({ colors, selectedColor, setSelectedColor }: ColorPickerProps): JSX.Element => {
-   console.log('Selected Color:', selectedColor)
-   console.log('Available Colors:', colors)
+   // console.log('Selected Color:', selectedColor)
+   // console.log('Available Colors:', colors)
 
    return (
       <div>

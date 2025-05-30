@@ -54,12 +54,15 @@ const PaymentSuccessPage = (): JSX.Element => {
                   userId: session?.user?.id,
                   paymentIntentId: sessionDetails.paymentIntentId,
                   status: sessionDetails.status,
-                  items: sessionDetails.products.map(item => ({
-                     productId: item.id,
-                     name: item.name,
-                     quantity: item.quantity,
-                     price: item.price,
-                  })),
+                  items: sessionDetails.products.map(item => {
+                     console.log('Order item:', item)
+                     return {
+                        productId: item.id,
+                        name: item.name,
+                        quantity: item.quantity,
+                        price: item.price,
+                     }
+                  }),
                   purchaseDate: sessionDetails.transactionDate,
                },
                {
@@ -67,11 +70,16 @@ const PaymentSuccessPage = (): JSX.Element => {
                },
             )
 
+            sessionStorage.removeItem('userTransactionsCache')
+
             await patchData('/api/update-stock', {
-               items: sessionDetails.products.map(item => ({
-                  productId: item.id,
-                  quantityPurchased: item.quantity,
-               })),
+               items: sessionDetails.products.map(item => {
+                  console.log('Processing item:', item)
+                  return {
+                     variantId: item.variantId,
+                     quantityPurchased: item.quantity,
+                  }
+               }),
             })
 
             await deleteData('/api/clear-cart', { items: sessionDetails.products })

@@ -47,11 +47,14 @@ const CartPage = (): JSX.Element => {
 
    const updateQuantity = async (id: number, quantity: number) => {
       try {
-         const result = await patchData('/api/cart', { productId: id, quantity })
+         const cartItem = cartItems.find(item => item.id === id)
+         if (!cartItem) return
+
+         const variantId = cartItem.variantId
+         const result = await patchData('/api/cart', { productId: id, quantity, variantId })
 
          if (result) {
             setCartItems(prevCart => prevCart.map(item => (item.id === id ? { ...item, quantity } : item)))
-            toast.success('Quantity updated!')
          } else {
             toast.error('Failed to update quantity.')
          }
@@ -128,7 +131,8 @@ const CartPage = (): JSX.Element => {
                   name: item.name,
                   quantity: item.quantity,
                   price: item.price,
-                  stock: item.stock,
+                  stock: item.stock ?? 0,
+                  variantId: item.variantId,
                   imageUrl: Array.isArray(item.imageUrl) ? item.imageUrl[0] : item.imageUrl,
                   categoryName: item.categoryName || 'Unknown',
                }))}

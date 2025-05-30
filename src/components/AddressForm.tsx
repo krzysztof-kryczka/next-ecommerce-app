@@ -18,7 +18,7 @@ const AddressForm = ({ onSubmit, initialData, onCancel }: AddressFormProps): JSX
          addressLine: '',
          isMain: false,
       },
-      mode: 'onBlur',
+      mode: 'onChange',
    })
 
    const handleSubmit = methods.handleSubmit(data => {
