@@ -16,6 +16,7 @@ const UserTransactions = (): JSX.Element => {
       {},
       false,
       true,
+      'userTransactionsCache',
    )
 
    // const orders = response?.success ? response.data : []

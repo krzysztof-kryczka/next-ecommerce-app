@@ -23,7 +23,11 @@ import ErrorMessage from '@/components/ui/ErrorMessage'
 export default function CategoriesCarousel() {
    const [carouselApi, setCarouselApi] = useState<CarouselApi>()
    const [currentIndex, setCurrentIndex] = useState(0)
-   const { data: categories, loading, error } = useFetch<Category>('/api/categories', {}, false, true)
+   const {
+      data: categories,
+      loading,
+      error,
+   } = useFetch<Category>('/api/categories', {}, false, true, 'categoriesCache')
    const router = useRouter()
 
    useEffect(() => {

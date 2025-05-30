@@ -44,12 +44,12 @@ export default function ProductsPage() {
    const [visibleBrands, setVisibleBrands] = useState<number>(5)
 
    const { currency, convertCurrency } = useCurrency()
-   const { data: brands, loading: brandsLoading, error: brandsError } = useFetch<Brand>('/api/brands', {}, false, true)
+   const { data: brands, loading: brandsLoading, error: brandsError } = useFetch<Brand>('/api/brands', {}, false, true, 'brandsCache')
    const {
       data: response,
       loading,
       error,
-   } = useFetch<{ success: boolean; data: Product[] }>('/api/products', {}, false, false)
+   } = useFetch<{ success: boolean; data: Product[] }>('/api/products', {}, false, false, 'productsCache')
    //const products = response && 'data' in response ? response.data : []
    const products = useMemo(() => (response && 'data' in response ? response.data : []), [response])
 

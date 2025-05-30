@@ -33,7 +33,6 @@ const UserUpdateForm = ({ userData }: UserFormProps): JSX.Element => {
          setIsPhoneEditable(true)
       } else if (field === 'password') {
          setIsPasswordEditable(true)
-         form.setValue('password', '')
       }
    }
 

@@ -34,9 +34,7 @@ const UserProfilePage = (): JSX.Element => {
                <TabsList>
                   <TabsTrigger value={TabsEnum.Profile}>User Profile</TabsTrigger>
                   <TabsTrigger value={TabsEnum.Address}>My Address</TabsTrigger>
-                  <TabsTrigger value={TabsEnum.Payment}>Payment Method</TabsTrigger>
                   <TabsTrigger value={TabsEnum.Transaction}>Transaction</TabsTrigger>
-                  <TabsTrigger value={TabsEnum.Notification}>Notification</TabsTrigger>
                </TabsList>
                <TabsContent value='profile'>
                   <div className='flex flex-col gap-y-10'>
