@@ -99,7 +99,7 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
    }
 
    return (
-      <div className='flex flex-col gap-y-8 px-10 pb-10 sm:px-6 md:px-10'>
+      <div className='flex flex-col gap-y-6 px-6 pb-6 sm:px-6 md:px-8 lg:px-10'>
          {/* Breadcrumb */}
          <Breadcrumb
             paths={[
@@ -109,13 +109,13 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
          />
 
          {/* Siatka zawierająca kolumny */}
-         <div className='grid grid-cols-1 gap-x-6 gap-y-8 md:gap-x-8 lg:grid-cols-[2fr_1fr]'>
+         <div className='grid grid-cols-1 gap-x-4 gap-y-6 md:gap-x-6 md:gap-y-8 xl:grid-cols-[2fr_1fr]'>
             {/* Kolumna 1 i 2 - Połączone */}
-            <div className='grid grid-cols-1 gap-x-6 gap-y-8 md:gap-x-8 lg:grid-cols-2'>
+            <div className='grid grid-cols-1 gap-x-4 gap-y-6 md:gap-x-6 lg:grid-cols-2'>
                {/* Kolumna 1 */}
-               <div className='flex flex-col gap-y-6 sm:gap-y-8'>
+               <div className='flex flex-col gap-y-5 sm:gap-y-6 md:gap-y-7'>
                   {/* Główne zdjęcie */}
-                  <Card className='h-[341px] w-[422px] rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-3'>
+                  <Card className='h-[260px] w-full rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-2 sm:h-[300px] sm:w-[320px] md:h-[330px] md:w-[380px] lg:h-[341px] lg:w-[422px]'>
                      <CardContent className='px-0'>
                         {mainImage ? (
                            <Image
@@ -123,23 +123,23 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                               width={398}
                               src={mainImage}
                               alt={product.name || 'Product'}
-                              className='h-[317px] w-[398px] rounded-md'
+                              className='h-[230px] w-full rounded-md sm:h-[280px] sm:w-[300px] md:h-[310px] md:w-[370px] lg:h-[317px] lg:w-[398px]'
                            />
                         ) : null}
                      </CardContent>
                   </Card>
 
                   {/* Miniatury */}
-                  <div className='flex gap-x-2 overflow-x-auto sm:gap-x-4'>
+                  <div className='flex gap-x-2 overflow-x-auto sm:gap-x-4 md:gap-x-5'>
                      {product.imageUrl?.map((url: string, index: number) =>
                         url ? (
                            <Image
                               key={index}
                               src={url}
                               alt={`Thumbnail ${index}`}
-                              width={90}
-                              height={72}
-                              className={`h-[72px] w-[90px] cursor-pointer rounded-md border-2 sm:h-[99px] sm:w-[130px] ${
+                              width={70}
+                              height={56}
+                              className={`h-[56px] w-[70px] cursor-pointer rounded-md border-2 sm:h-[80px] sm:w-[110px] md:h-[90px] md:w-[120px] lg:h-[99px] lg:w-[130px] ${
                                  mainImage === url
                                     ? 'border-[var(--color-primary-400)]'
                                     : 'border-[var(--color-gray-800)]'
@@ -150,9 +150,10 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                      )}
                   </div>
                </div>
+
                {/* Kolumna 2 */}
-               <div className='flex w-full flex-col gap-y-6 sm:gap-y-8 md:w-[427px]'>
-                  <div className='flex flex-col gap-y-3 sm:gap-y-5'>
+               <div className='flex w-full flex-col gap-y-6 sm:gap-y-8 md:gap-y-7'>
+                  <div className='flex flex-col gap-y-2 sm:gap-y-4 md:gap-y-3'>
                      <Text as='h1' variant='h5medium' className='text-[var(--color-neutral-900)]'>
                         {product.name}
                      </Text>
@@ -160,7 +161,7 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                         disabled
                         variant={'fill'}
                         size={'XS'}
-                        className='h-auto px-2 py-1 text-xs font-medium disabled:bg-[var(--color-blazeOrange-600)] disabled:text-[var(--color-primary-100)] sm:px-2.5 sm:py-1.5 sm:text-sm'
+                        className='h-auto px-2 py-1 text-xs font-medium disabled:bg-[var(--color-blazeOrange-600)] disabled:text-[var(--color-primary-100)] sm:px-2.5 sm:py-1.5 sm:text-sm md:px-3 md:py-2'
                      >
                         {categoriesMap[product.categoryId] || 'Unknown'}
                      </Button>
@@ -173,18 +174,18 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                      {isFullTextVisible ? product.description : product.description?.slice(0, 50)}{' '}
                      <Button
                         variant='text'
-                        className='w-auto px-0 text-base leading-[26px] font-medium tracking-normal'
+                        className='w-auto px-0 text-base leading-[26px] font-medium tracking-normal md:text-lg md:leading-[28px]'
                         onClick={handleToggleText}
                      >
                         {isFullTextVisible ? 'View less' : 'View more'}
                      </Button>
                   </Text>
 
-                  <div className='flex flex-col gap-y-3.5'>
+                  <div className='flex flex-col gap-y-3.5 md:gap-y-4'>
                      <Text as='p' variant='textLmedium' className='text-[var(--color-neutral-300)]'>
                         Shipping Available
                      </Text>
-                     <div className='flex w-full flex-col gap-y-1 rounded-md border p-3 sm:w-[312px] sm:p-4'>
+                     <div className='flex w-full flex-col gap-y-2 rounded-md border p-3 sm:w-[260px] sm:p-4 md:w-[280px] md:p-5'>
                         <div className='flex items-start gap-2'>
                            <ShieldCrossIcon />
                            <div className='flex flex-col gap-y-1'>
@@ -208,8 +209,8 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
             </div>
 
             {/* Kolumna 3 */}
-            <Card className='max-h-[470px] w-full rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-4 text-[var(--color-base-white)] sm:max-w-[422px] sm:p-6'>
-               <CardContent className='flex flex-col gap-y-6 px-0 sm:gap-y-8'>
+            <Card className='max-h-[470px] w-full rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-4 text-[var(--color-base-white)] sm:max-w-[350px] sm:p-6 md:max-w-[380px] md:p-7 lg:max-w-[422px]'>
+               <CardContent className='flex flex-col gap-y-5 px-0 sm:gap-y-6 md:gap-y-7 lg:gap-y-8'>
                   <ColorPicker
                      colors={product.variants.map(variant => ({
                         name: variant.color,
@@ -222,7 +223,7 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                   <Button
                      variant='stroke'
                      size='XXL'
-                     className='flex h-[54px] w-full items-center gap-2 text-xs sm:text-sm'
+                     className='md:text-md flex h-[48px] w-full items-center gap-2 text-xs sm:text-sm md:h-[52px]'
                      onClick={handleAddToCart}
                      disabled={loading || stock === 0 || quantity === 0}
                   >
@@ -236,6 +237,8 @@ const ProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
          </div>
       </div>
    )
+   
+   
 }
 
 export default ProductPage

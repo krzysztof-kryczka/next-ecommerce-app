@@ -102,8 +102,8 @@ export default function UserAddresses() {
    }, [addresses])
 
    return (
-      <div className='w-full max-w-full'>
-         <h2 className='text-xl font-bold'>My Address</h2>
+      <div className='w-full max-w-full px-2 py-2 sm:px-4 sm:py-4 lg:px-0 lg:py-0'>
+         <h2 className='text-lg font-bold lg:text-xl'>My Address</h2>
          {loading && <LoadingIndicator />}
          {error && <ErrorMessage sectionName='profile.' errorDetails={error} />}
          {isEditing && editingAddress ? (

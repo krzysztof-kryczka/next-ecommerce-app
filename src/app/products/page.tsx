@@ -44,7 +44,11 @@ export default function ProductsPage() {
    const [visibleBrands, setVisibleBrands] = useState<number>(5)
 
    const { currency, convertCurrency } = useCurrency()
-   const { data: brands, loading: brandsLoading, error: brandsError } = useFetch<Brand>('/api/brands', {}, false, true, 'brandsCache')
+   const {
+      data: brands,
+      loading: brandsLoading,
+      error: brandsError,
+   } = useFetch<Brand>('/api/brands', {}, false, true, 'brandsCache')
    const {
       data: response,
       loading,
@@ -173,13 +177,10 @@ export default function ProductsPage() {
    }
 
    return (
-      <div className='px-6 sm:px-8 md:px-10'>
-         <ResizablePanelGroup
-            direction='horizontal'
-            className='h-full w-full border-t border-t-[var(--color-gray-800)]'
-         >
-            {/* Lewy panel */}
-            <ResizablePanel defaultSize={25} className='h-full p-4'>
+      <div className='px-2 sm:px-4 md:px-6 lg:px-6'>
+         {/* MOBILE/TABLET: układ kolumnowy, bez panelu bocznego i rozdzielacza */}
+         <div className='flex flex-col lg:hidden'>
+            <div className='mb-4 flex flex-col gap-y-4'>
                <DropdownSection
                   title='Category'
                   isOpen={isProductOpen}
@@ -197,7 +198,6 @@ export default function ProductsPage() {
                )}
 
                <DropdownSection title='Brand' isOpen={isBrandOpen} onToggle={() => setIsBrandOpen(!isBrandOpen)} />
-
                {isBrandOpen && (
                   <>
                      {brandsLoading ? (
@@ -219,75 +219,187 @@ export default function ProductsPage() {
                   </>
                )}
 
-               <div className='mt-10'>
+               <div className='mt-6'>
                   <DropdownSection title='Price' isOpen={isPriceOpen} onToggle={() => setIsPriceOpen(!isPriceOpen)} />
                   {isPriceOpen && <PriceRange priceRange={priceRange} setPriceRange={setPriceRange} />}
                </div>
-            </ResizablePanel>
+            </div>
 
-            {/* Rozdzielacz */}
-            <ResizableHandle className='bg-[var(--color-gray-800)]' />
-
-            {/* Prawy panel */}
-            <ResizablePanel defaultSize={70} className='h-full overflow-y-auto'>
-               <div className='flex w-full flex-col'>
-                  <div className='flex w-full flex-wrap items-center gap-6 p-6 sm:gap-12 sm:p-10'>
-                     <div className='flex gap-x-4'>
-                        <Label variant='custom' className='text-xl font-semibold'>
-                           Sort By
-                        </Label>
-                        <SortBySelect sortBy={sortBy} setSortBy={handleSortChange} />
-                     </div>
-
-                     <div className='flex gap-x-4'>
-                        <Label variant='custom' className='text-xl font-semibold'>
-                           Show
-                        </Label>
-                        <ShowPerPageSelect
-                           showPerPage={showPerPage}
-                           setShowPerPage={setShowPerPage}
-                           setCurrentPage={setCurrentPage}
-                        />
-                     </div>
+            <div className='flex w-full flex-col'>
+               <div className='flex w-full flex-wrap items-center gap-4 p-2 sm:gap-6 sm:p-4 md:gap-8 md:p-6'>
+                  <div className='flex gap-x-2 sm:gap-x-4'>
+                     <Label variant='custom' className='text-base font-semibold sm:text-lg md:text-xl'>
+                        Sort By
+                     </Label>
+                     <SortBySelect sortBy={sortBy} setSortBy={handleSortChange} />
                   </div>
-
-                  {error ? (
-                     <ErrorMessage sectionName='products.' errorDetails={error} />
-                  ) : loading || categoriesLoading ? (
-                     <LoadingIndicator />
-                  ) : parseFloat(priceRange.min) >= parseFloat(priceRange.max) ||
-                    parseFloat(priceRange.max) <= parseFloat(priceRange.min) ? (
-                     <div className='flex min-h-[50vh] items-center justify-center'>
-                        <p className='text-center text-lg font-semibold text-red-500'></p>
-                        <Text as='p' variant='textLregular' className='text-[var(--color-danger-700)]'>
-                           ⚠️ Invalid price range. Please adjust your filters!!!
-                        </Text>
-                     </div>
-                  ) : filteredProducts.length === 0 ? (
-                     <div className='flex min-h-[50vh] items-center justify-center'>
-                        <Text as='p' variant='textLregular' className='text-[var(--color-danger-700)]'>
-                           No products found in the selected price range. Try adjusting your filters!
-                        </Text>
-                     </div>
-                  ) : (
-                     <div className='xs:grid-cols-1 grid gap-x-6 gap-y-8 px-6 sm:grid-cols-1 sm:gap-x-8 sm:px-8 md:grid-cols-2 md:gap-x-10 md:px-10 lg:grid-cols-3 xl:grid-cols-3'>
-                        {paginatedProducts.map(product => (
-                           <ProductCard key={product.id} product={product} />
-                        ))}
-                     </div>
-                  )}
-
-                  {totalPages > 1 && (
-                     <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
+                  <div className='flex gap-x-2 sm:gap-x-4'>
+                     <Label variant='custom' className='text-base font-semibold sm:text-lg md:text-xl'>
+                        Show
+                     </Label>
+                     <ShowPerPageSelect
+                        showPerPage={showPerPage}
+                        setShowPerPage={setShowPerPage}
                         setCurrentPage={setCurrentPage}
-                        getPaginationButtons={getPaginationButtons}
+                     />
+                  </div>
+               </div>
+
+               {error ? (
+                  <ErrorMessage sectionName='products.' errorDetails={error} />
+               ) : loading || categoriesLoading ? (
+                  <LoadingIndicator />
+               ) : parseFloat(priceRange.min) >= parseFloat(priceRange.max) ||
+                 parseFloat(priceRange.max) <= parseFloat(priceRange.min) ? (
+                  <div className='flex min-h-[50vh] items-center justify-center'>
+                     <Text as='p' variant='textLregular' className='text-[var(--color-danger-700)]'>
+                        ⚠️ Invalid price range. Please adjust your filters!!!
+                     </Text>
+                  </div>
+               ) : filteredProducts.length === 0 ? (
+                  <div className='flex min-h-[50vh] items-center justify-center'>
+                     <Text as='p' variant='textLregular' className='text-[var(--color-danger-700)]'>
+                        No products found in the selected price range. Try adjusting your filters!
+                     </Text>
+                  </div>
+               ) : (
+                  <div className='grid grid-cols-1 gap-x-2 gap-y-4 px-1 sm:grid-cols-2 sm:gap-x-4 sm:gap-y-6 sm:px-2 md:grid-cols-2 md:gap-x-6 md:gap-y-8 md:px-4 lg:grid-cols-3 lg:gap-x-6 lg:gap-y-8 lg:px-6 xl:grid-cols-3'>
+                     {paginatedProducts.map(product => (
+                        <ProductCard key={product.id} product={product} />
+                     ))}
+                  </div>
+               )}
+
+               {totalPages > 1 && (
+                  <Pagination
+                     currentPage={currentPage}
+                     totalPages={totalPages}
+                     setCurrentPage={setCurrentPage}
+                     getPaginationButtons={getPaginationButtons}
+                  />
+               )}
+            </div>
+         </div>
+
+         {/* DESKTOP: układ poziomy z panelami i rozdzielaczem */}
+         <div className='hidden lg:block'>
+            <ResizablePanelGroup
+               direction='horizontal'
+               className='h-full w-full border-t border-t-[var(--color-gray-800)]'
+            >
+               {/* Lewy panel */}
+               <ResizablePanel defaultSize={25} className='h-full p-4'>
+                  <DropdownSection
+                     title='Category'
+                     isOpen={isProductOpen}
+                     onToggle={() => setIsProductOpen(!isProductOpen)}
+                  />
+                  {isProductOpen && (
+                     <CategoryList
+                        selectedCategories={selectedCategories}
+                        setSelectedCategories={handleCategoryChange}
+                        categories={categories}
+                        setCurrentPage={setCurrentPage}
+                        visibleCategories={visibleCategories}
+                        setVisibleCategories={setVisibleCategories}
                      />
                   )}
-               </div>
-            </ResizablePanel>
-         </ResizablePanelGroup>
+
+                  <DropdownSection title='Brand' isOpen={isBrandOpen} onToggle={() => setIsBrandOpen(!isBrandOpen)} />
+                  {isBrandOpen && (
+                     <>
+                        {brandsLoading ? (
+                           <LoadingIndicator />
+                        ) : brandsError ? (
+                           <ErrorMessage sectionName='brands' errorDetails={brandsError} />
+                        ) : Array.isArray(brands) && brands.length > 0 ? (
+                           <BrandList
+                              selectedBrand={brandIdParam}
+                              setSelectedBrand={handleBrandChange}
+                              brands={brands}
+                              setCurrentPage={setCurrentPage}
+                              visibleBrands={visibleBrands}
+                              setVisibleBrands={setVisibleBrands}
+                           />
+                        ) : (
+                           <p className='text-center text-lg font-semibold text-red-500'>No brands available.</p>
+                        )}
+                     </>
+                  )}
+
+                  <div className='mt-10'>
+                     <DropdownSection
+                        title='Price'
+                        isOpen={isPriceOpen}
+                        onToggle={() => setIsPriceOpen(!isPriceOpen)}
+                     />
+                     {isPriceOpen && <PriceRange priceRange={priceRange} setPriceRange={setPriceRange} />}
+                  </div>
+               </ResizablePanel>
+
+               {/* Rozdzielacz */}
+               <ResizableHandle className='bg-[var(--color-gray-800)]' />
+
+               {/* Prawy panel */}
+               <ResizablePanel defaultSize={70} className='h-full overflow-y-auto'>
+                  <div className='flex w-full flex-col'>
+                     <div className='flex w-full flex-wrap items-center gap-6 p-6 sm:gap-12 sm:p-10'>
+                        <div className='flex gap-x-4'>
+                           <Label variant='custom' className='text-xl font-semibold'>
+                              Sort By
+                           </Label>
+                           <SortBySelect sortBy={sortBy} setSortBy={handleSortChange} />
+                        </div>
+
+                        <div className='flex gap-x-4'>
+                           <Label variant='custom' className='text-xl font-semibold'>
+                              Show
+                           </Label>
+                           <ShowPerPageSelect
+                              showPerPage={showPerPage}
+                              setShowPerPage={setShowPerPage}
+                              setCurrentPage={setCurrentPage}
+                           />
+                        </div>
+                     </div>
+
+                     {error ? (
+                        <ErrorMessage sectionName='products.' errorDetails={error} />
+                     ) : loading || categoriesLoading ? (
+                        <LoadingIndicator />
+                     ) : parseFloat(priceRange.min) >= parseFloat(priceRange.max) ||
+                       parseFloat(priceRange.max) <= parseFloat(priceRange.min) ? (
+                        <div className='flex min-h-[50vh] items-center justify-center'>
+                           <Text as='p' variant='textLregular' className='text-[var(--color-danger-700)]'>
+                              ⚠️ Invalid price range. Please adjust your filters!!!
+                           </Text>
+                        </div>
+                     ) : filteredProducts.length === 0 ? (
+                        <div className='flex min-h-[50vh] items-center justify-center'>
+                           <Text as='p' variant='textLregular' className='text-[var(--color-danger-700)]'>
+                              No products found in the selected price range. Try adjusting your filters!
+                           </Text>
+                        </div>
+                     ) : (
+                        <div className='xs:grid-cols-1 grid gap-x-6 gap-y-8 px-6 sm:grid-cols-1 sm:gap-x-8 sm:px-8 md:grid-cols-2 md:gap-x-10 md:px-10 lg:grid-cols-3 xl:grid-cols-3'>
+                           {paginatedProducts.map(product => (
+                              <ProductCard key={product.id} product={product} />
+                           ))}
+                        </div>
+                     )}
+
+                     {totalPages > 1 && (
+                        <Pagination
+                           currentPage={currentPage}
+                           totalPages={totalPages}
+                           setCurrentPage={setCurrentPage}
+                           getPaginationButtons={getPaginationButtons}
+                        />
+                     )}
+                  </div>
+               </ResizablePanel>
+            </ResizablePanelGroup>
+         </div>
       </div>
    )
 }

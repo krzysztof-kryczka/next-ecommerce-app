@@ -10,9 +10,10 @@ import { signIn, signOut, useSession } from 'next-auth/react'
 
 interface UserFormProps {
    userData: UpdateUserFormData
+   onProfileUpdate?: () => void // dodaj callback
 }
 
-const UserUpdateForm = ({ userData }: UserFormProps): JSX.Element => {
+const UserUpdateForm = ({ userData, onProfileUpdate }: UserFormProps): JSX.Element => {
    const [isEditing, setIsEditing] = useState(false)
    const [isPhoneEditable, setIsPhoneEditable] = useState(false)
    const [isPasswordEditable, setIsPasswordEditable] = useState(false)
@@ -62,6 +63,7 @@ const UserUpdateForm = ({ userData }: UserFormProps): JSX.Element => {
 
       if (response.ok) {
          toast.success('Profile updated successfully!')
+         if (onProfileUpdate) onProfileUpdate()
 
          // Jeśli zmieniono e-mail, wymuś ponowne logowanie, aby odświeżyć sesję
          if (formData.email !== session?.user?.email) {
@@ -94,20 +96,20 @@ const UserUpdateForm = ({ userData }: UserFormProps): JSX.Element => {
          )}
 
          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='flex w-[624px] flex-col gap-y-8'>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='flex w-full max-w-[624px] flex-col gap-y-8'>
                <CustomFormField
                   name='name'
                   label='Name'
                   type='text'
                   placeholder='Your Name'
-                  classNameItem='justify-between'
+                  classNameItem='flex-col sm:flex-row justify-between'
                />
                <CustomFormField
                   name='email'
                   label='Email'
                   type='email'
                   placeholder='Your Email'
-                  classNameItem='justify-between'
+                  classNameItem='flex-col sm:flex-row justify-between'
                   disabled={!isEmailEditable}
                   actionText='Change Email'
                   onActionClick={() => handleEditStart('email')}
@@ -117,7 +119,7 @@ const UserUpdateForm = ({ userData }: UserFormProps): JSX.Element => {
                   label='Phone Number'
                   type='tel'
                   placeholder='Your Phone'
-                  classNameItem='justify-between'
+                  classNameItem='flex-col sm:flex-row justify-between'
                   disabled={!isPhoneEditable}
                   actionText='Change Phone Number'
                   onActionClick={() => handleEditStart('phone')}
@@ -128,7 +130,7 @@ const UserUpdateForm = ({ userData }: UserFormProps): JSX.Element => {
                   type='password'
                   isPassword
                   placeholder='Enter New Password'
-                  classNameItem='justify-between'
+                  classNameItem='flex-col sm:flex-row justify-between'
                   disabled={!isPasswordEditable}
                   actionText='Change Password'
                   onActionClick={() => handleEditStart('password')}
