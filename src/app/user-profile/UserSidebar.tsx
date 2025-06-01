@@ -7,12 +7,15 @@ import { useSession, signOut } from 'next-auth/react'
 import { UserSidebarProps } from '@/types/UserSidebarProps'
 import { TabsEnum } from '@/enum/TabsEnum'
 import { JSX } from 'react'
+import useFetch from '@/hooks/useFetch'
 
 const UserSidebar = ({ activeTab, setActiveTab }: UserSidebarProps): JSX.Element => {
    const { data: session } = useSession()
+   const { data: userData } = useFetch('/api/user-profile')
+   const user = Array.isArray(userData) ? userData[0] : userData
 
    return (
-      <Card className='flex w-1/4 flex-col gap-y-6 rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-6'>
+      <Card className='flex flex-col gap-y-6 rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-6'>
          <CardHeader className='flex items-center gap-x-4'>
             <Image
                src={session?.user?.image || 'https://i.ibb.co/VpPFKGR4/55335c708ac05d8f469894d08e2671fa.jpg'}
@@ -23,7 +26,7 @@ const UserSidebar = ({ activeTab, setActiveTab }: UserSidebarProps): JSX.Element
             />
             <div>
                <Text as='p' variant='textMregular' className='text-[var(--color-neutral-100)]'>
-                  {session?.user?.name || 'Unknown'}
+                  {user?.name || 'Unknown'}
                </Text>
                <Text as='p' variant='textMregular' className='text-[var(--color-neutral-100)]'>
                   {session?.user?.email}

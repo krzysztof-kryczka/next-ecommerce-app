@@ -3,7 +3,7 @@ import useAuthFetch from '@/hooks/useAuthFetch'
 import { toast } from 'react-toastify'
 
 type UseAddToCart = {
-   addToCart: (productId: number, quantity: number) => Promise<void>
+   addToCart: (productId: number, quantity: number, variantId: number) => Promise<void>
    loading: boolean
 }
 
@@ -11,13 +11,10 @@ export const useAddToCart = (): UseAddToCart => {
    const { fetchWithAuth } = useAuthFetch()
    const [loading, setLoading] = useState(false)
 
-   const addToCart = async (productId: number, quantity: number): Promise<void> => {
+   const addToCart = async (productId: number, quantity: number, variantId: number): Promise<void> => {
       try {
          setLoading(true)
-         const cartItem = {
-            productId,
-            quantity,
-         }
+         const cartItem = { productId, quantity, variantId }
 
          const response: Response | null = await fetchWithAuth('/api/cart', {
             method: 'POST',
@@ -33,6 +30,8 @@ export const useAddToCart = (): UseAddToCart => {
 
          if (response.ok) {
             toast.success(responseData.message || 'Product added to cart!')
+         } else if (response.status === 400) {
+            toast.error(responseData.message || 'This product is already in the cart!')
          } else {
             toast.error(responseData.message || 'Failed to add product to cart.')
          }

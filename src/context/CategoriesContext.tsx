@@ -13,7 +13,11 @@ const CategoriesContext = createContext<CategoriesContextType>({
 })
 
 export const CategoriesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-   const { data: categories, loading, error } = useFetch<Category>('/api/categories', {}, false, true)
+   const {
+      data: categories,
+      loading,
+      error,
+   } = useFetch<Category>('/api/categories', {}, false, true, 'categoriesCache')
 
    const safeCategories = Array.isArray(categories) ? categories : []
 

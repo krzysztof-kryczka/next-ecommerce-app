@@ -5,8 +5,13 @@ type ApiResponse = {
    success: boolean
    message: string
 }
-const useFetch = <T>(url: string | null, options?: RequestInit, disableFetch = false, defaultToArray = false) => {
-   // const [data, setData] = useState<T | T[]>(defaultToArray ? ([] as T[]) : null)
+const useFetch = <T>(
+   url: string | null,
+   options?: RequestInit,
+   disableFetch = false,
+   defaultToArray = false,
+   cacheKey?: string, // Klucz cache dla każdego zapytania
+) => {
    const [data, setData] = useState<T | T[]>(defaultToArray ? ([] as T[]) : (null as T))
    const [loading, setLoading] = useState(false)
    const [error, setError] = useState<string | null>(null)
@@ -17,6 +22,17 @@ const useFetch = <T>(url: string | null, options?: RequestInit, disableFetch = f
       try {
          setLoading(true)
          setError(null)
+
+         if (cacheKey) {
+            const cachedData = sessionStorage.getItem(cacheKey)
+            if (cachedData) {
+               console.info(`⚡ Using cached data for: ${cacheKey}`)
+               setData(JSON.parse(cachedData))
+               setLoading(false)
+               return
+            }
+         }
+
          console.info(`🔄 Fetching data from: ${url}`)
 
          const response = await fetch(url, options)
@@ -24,6 +40,8 @@ const useFetch = <T>(url: string | null, options?: RequestInit, disableFetch = f
 
          const result: T | T[] = await response.json()
          setData(result)
+
+         if (cacheKey) sessionStorage.setItem(cacheKey, JSON.stringify(result))
 
          return result
       } catch (error) {

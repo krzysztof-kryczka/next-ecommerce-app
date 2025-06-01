@@ -16,6 +16,7 @@ const UserTransactions = (): JSX.Element => {
       {},
       false,
       true,
+      'userTransactionsCache',
    )
 
    // const orders = response?.success ? response.data : []
@@ -24,7 +25,7 @@ const UserTransactions = (): JSX.Element => {
    if (!userId) return <p className='text-red-500'>You must log in to view your transaction history.</p>
 
    return (
-      <div className='mx-auto flex w-full flex-col gap-y-6'>
+      <div className='mx-auto flex w-full flex-col gap-y-4 px-2 py-2 sm:gap-y-6 sm:px-4 sm:py-4 lg:gap-y-6 lg:px-0 lg:py-0'>
          {loading && <LoadingIndicator />}
          {orders.length > 0 ? <TransactionHistory orders={orders} /> : <p>No transactions found.</p>}
       </div>

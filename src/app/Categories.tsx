@@ -23,7 +23,11 @@ const categoryIcons: Record<string, JSX.Element> = {
 }
 
 const Categories = (): JSX.Element => {
-   const { data: categories, loading, error } = useFetch<Category>('/api/categories', {}, false, true)
+   const {
+      data: categories,
+      loading,
+      error,
+   } = useFetch<Category>('/api/categories', {}, false, true, 'categoriesCache')
 
    if (loading) return <LoadingIndicator />
    if (error) return <ErrorMessage sectionName='categories.' errorDetails={error} />

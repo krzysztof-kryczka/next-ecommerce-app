@@ -108,7 +108,7 @@ const ProductList = ({
                                        stock={stock}
                                        showTitle={false}
                                        size='md'
-                                       hideStock={true}
+                                       hideStock={false}
                                     />
                                  )}
                               </div>

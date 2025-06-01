@@ -14,7 +14,7 @@ import { UserAvatarProps } from '@/types/UserAvatarProps'
 
 const UserAvatar = ({ session }: UserAvatarProps): JSX.Element => {
    return (
-      <div className='flex w-[252px] flex-col items-center gap-y-3'>
+      <div className='flex w-full max-w-[220px] flex-col items-center gap-y-3 lg:w-[252px] lg:max-w-none'>
          <Image
             src={session?.user?.image || 'https://i.ibb.co/VpPFKGR4/55335c708ac05d8f469894d08e2671fa.jpg'}
             alt='User Avatar'

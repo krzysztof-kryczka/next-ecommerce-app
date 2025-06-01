@@ -1,3 +1,5 @@
+import { ProductVariant } from './ProductVariant'
+
 export type Product = {
    id: number
    name: string
@@ -7,7 +9,9 @@ export type Product = {
    imageUrl: string[]
    createdAt: string
    quantity: number
-   stock: number
+   stock?: number
+   variantId?: number
+   variants: ProductVariant[]
    description?: string
    deliveryDateRange: {
       startDate?: string

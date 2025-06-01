@@ -10,8 +10,8 @@ const SortBySelect = ({ sortBy, setSortBy }: SortBySelectProps): JSX.Element => 
          </SelectTrigger>
          <SelectContent>
             <SelectItem value='latest'>Latest</SelectItem>
-            <SelectItem value='price_asc'>Ascending</SelectItem>
-            <SelectItem value='price_desc'>Descending</SelectItem>
+            <SelectItem value='price_asc'>Price: Low to High (Ascending)</SelectItem>
+            <SelectItem value='price_desc'>Price: High to Low (Descending)</SelectItem>
          </SelectContent>
       </Select>
    )

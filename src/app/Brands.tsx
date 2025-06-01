@@ -11,7 +11,7 @@ import ErrorMessage from '@/components/ui/ErrorMessage'
 import ScrollableList from '@/components/ScrollableList'
 
 const BrandList = () => {
-   const { data: brands, loading, error } = useFetch<Brand>('/api/brands', {}, false, true)
+   const { data: brands, loading, error } = useFetch<Brand>('/api/brands', {}, false, true, 'brandsCache')
    const router = useRouter()
 
    if (loading) return <LoadingIndicator />

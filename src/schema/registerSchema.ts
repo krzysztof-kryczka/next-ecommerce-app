@@ -4,7 +4,7 @@ export const registerSchema = z
    .object({
       // name: z.string().min(3, { message: 'Name must be at least 3 characters long' }),
       email: z.string().email({ message: 'Invalid email address', }),
-      phone: z.string().regex(/^[0-9]+$/, { message: 'Mobile number must only contain digits', }),
+      phone: z.string().regex(/^\d{3,}$/, { message: 'Mobile number must contain at least 3 digits', }),
       country: z.string().min(2, { message: 'Country is required', }),
       password: z
          .string()

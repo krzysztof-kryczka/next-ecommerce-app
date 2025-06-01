@@ -47,11 +47,14 @@ const CartPage = (): JSX.Element => {
 
    const updateQuantity = async (id: number, quantity: number) => {
       try {
-         const result = await patchData('/api/cart', { productId: id, quantity })
+         const cartItem = cartItems.find(item => item.id === id)
+         if (!cartItem) return
+
+         const variantId = cartItem.variantId
+         const result = await patchData('/api/cart', { productId: id, quantity, variantId })
 
          if (result) {
             setCartItems(prevCart => prevCart.map(item => (item.id === id ? { ...item, quantity } : item)))
-            toast.success('Quantity updated!')
          } else {
             toast.error('Failed to update quantity.')
          }
@@ -92,7 +95,7 @@ const CartPage = (): JSX.Element => {
    }
 
    return (
-      <div className='mx-auto flex max-w-[1440px] flex-col gap-y-8 px-4 pb-10 sm:px-6 md:px-8 lg:px-10'>
+      <div className='mx-auto flex max-w-[1440px] flex-col gap-y-8 px-2 pb-10 sm:px-4 md:px-6 lg:px-10'>
          <Breadcrumb
             paths={[
                { name: 'Home', href: '/' },
@@ -120,7 +123,7 @@ const CartPage = (): JSX.Element => {
                </label>
             </div>
          )}
-         <div className='grid gap-x-6 sm:grid-rows-2 sm:gap-x-8 md:grid-rows-2 md:gap-x-10 lg:grid-cols-[3fr_1fr] lg:gap-x-12'>
+         <div className='grid gap-x-0 gap-y-8 sm:gap-x-6 sm:gap-y-10 md:grid-cols-1 md:gap-x-8 md:gap-y-12 lg:grid-cols-[3fr_1fr] lg:gap-x-12'>
             {/* Product List */}
             <ProductList
                items={cartItems.map(item => ({
@@ -128,7 +131,8 @@ const CartPage = (): JSX.Element => {
                   name: item.name,
                   quantity: item.quantity,
                   price: item.price,
-                  stock: item.stock,
+                  stock: item.stock ?? 0,
+                  variantId: item.variantId,
                   imageUrl: Array.isArray(item.imageUrl) ? item.imageUrl[0] : item.imageUrl,
                   categoryName: item.categoryName || 'Unknown',
                }))}
@@ -144,8 +148,8 @@ const CartPage = (): JSX.Element => {
             />
 
             {/* Total */}
-            <div className='w-full sm:w-[350px] md:w-[400px] lg:w-[423px]'>
-               <Card className='rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-6'>
+            <div className='mt-8 w-full sm:w-[350px] md:w-[400px] lg:mt-0 lg:w-[423px]'>
+               <Card className='rounded-md border border-[var(--color-gray-800)] bg-[var(--color-base-gray)] p-4 sm:p-6'>
                   <CardHeader className='gap-0 px-0'>
                      <Text as='h2' variant='textLmedium' className='text-[var(--color-neutral-900)]'>
                         Total Product

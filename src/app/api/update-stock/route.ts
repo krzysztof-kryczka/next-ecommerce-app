@@ -7,9 +7,15 @@ export async function PATCH(req: Request) {
       const { items } = await req.json()
 
       for (const item of items) {
-         await prisma.product.update({
-            where: { id: item.productId },
-            data: { stock: { decrement: item.quantityPurchased } },
+         if (!item.variantId) {
+            continue
+         }
+
+         await prisma.productVariant.update({
+            where: { id: item.variantId },
+            data: {
+               stock: { decrement: item.quantityPurchased },
+            },
          })
       }
 

@@ -1,3 +1,5 @@
+import { ProductVariant } from './ProductVariant'
+
 export type ProductCardProps = {
    product: {
       id: number
@@ -5,5 +7,6 @@ export type ProductCardProps = {
       price: number
       imageUrl: string[]
       categoryId: number
+      variants: ProductVariant[]
    }
 }

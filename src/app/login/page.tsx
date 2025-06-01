@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, JSX } from 'react'
+import React, { JSX, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loginStepOneSchema, loginStepTwoSchema } from '@/schema/loginSchema'
@@ -21,11 +21,7 @@ const LoginPage = (): JSX.Element => {
    const [isSavePasswordChecked, setIsSavePasswordChecked] = useState(false)
    const { status } = useSession()
    const router = useRouter()
-   const { postData, error, setError, loading } = useFetch<{ success: boolean; message: string }>(
-      '/api/check-user',
-      {},
-      true,
-   )
+   const { postData, setError, loading } = useFetch<{ success: boolean; message: string }>('/api/login', {}, true)
 
    useEffect(() => {
       if (status === 'authenticated') {
@@ -35,63 +31,48 @@ const LoginPage = (): JSX.Element => {
 
    const formStepOne = useForm({
       resolver: zodResolver(loginStepOneSchema),
+      mode: 'onChange',
       defaultValues: { emailOrPhone: '' },
    })
 
    const formStepTwo = useForm({
       resolver: zodResolver(loginStepTwoSchema),
+      mode: 'onChange',
       defaultValues: { password: '' },
    })
 
-   const handleCheckUser = async (data: { emailOrPhone: string }) => {
-      try {
-         const responseData = await postData('/api/check-user', { emailOrPhone: data.emailOrPhone })
-         setError(null)
-         if (error) {
-            toast.error('Unexpected error: No response from server.')
-            return
-         }
-         if (responseData?.success) {
-            setEmailOrPhone(data.emailOrPhone)
-            setStep('password')
-         } else {
-            formStepOne.setError('emailOrPhone', { type: 'manual', message: responseData?.message || 'User not found' })
-         }
-      } catch (err) {
-         console.error('Error in handleCheckUser:', err)
-         toast.error('Something went wrong. Please try again later.')
-      }
+   const handleNextStep = (data: { emailOrPhone: string }) => {
+      setEmailOrPhone(data.emailOrPhone)
+      setStep('password')
    }
 
    const handleVerifyPassword = async (data: { password: string }) => {
       try {
          const responseData = await postData('/api/login', { emailOrPhone, password: data.password })
          setError(null)
-         if (error) {
-            toast.error('Unexpected error: No response from server.')
-            return
-         }
-         if (responseData?.success) {
-            const signInResponse = await signIn('credentials', {
-               redirect: false,
-               emailOrPhone,
-               password: data.password,
-               savePassword: isSavePasswordChecked,
-            })
 
-            if (signInResponse?.error) {
-               toast.error('Login failed. Please try again.')
-               return
-            }
-
-            toast.success('Successfully logged in!')
-            router.push('/user-profile')
-         } else {
+         if (!responseData?.success) {
             formStepTwo.setError('password', {
                type: 'manual',
-               message: responseData?.message || 'Invalid credentials',
+               message: 'Wrong email/phone or password',
             })
+            return
          }
+
+         const signInResponse = await signIn('credentials', {
+            redirect: false,
+            emailOrPhone,
+            password: data.password,
+            savePassword: isSavePasswordChecked,
+         })
+
+         if (signInResponse?.error) {
+            toast.error('Login failed. Please try again.')
+            return
+         }
+
+         toast.success('Successfully logged in!')
+         router.push('/user-profile')
       } catch (err) {
          console.error('Error in handleVerifyPassword:', err)
          toast.error('Something went wrong. Please try again later.')
@@ -103,7 +84,7 @@ const LoginPage = (): JSX.Element => {
    }
 
    const steps = {
-      email: <StepEmail form={formStepOne} handleCheckUser={handleCheckUser} />,
+      email: <StepEmail form={formStepOne} handleNextStep={handleNextStep} />,
       password: (
          <StepPassword
             form={formStepTwo}
@@ -112,10 +93,6 @@ const LoginPage = (): JSX.Element => {
             handleSavePasswordChange={handleSavePasswordChange}
          />
       ),
-   }
-
-   if (status === 'authenticated') {
-      return <p>Redirecting...</p>
    }
 
    return (
